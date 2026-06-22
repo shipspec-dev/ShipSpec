@@ -1,0 +1,12 @@
+{
+  "name": "gsd-node-basic-example",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "node --check index.mjs",
+    "test": "node --test",
+    "typecheck": "node --check index.mjs",
+    "test:e2e": "node --test"
+  }
+}

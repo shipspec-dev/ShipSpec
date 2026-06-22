@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "command": "npm test",
+      "required": true
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "required": true
+    },
+    {
+      "name": "e2e",
+      "command": "npm run test:e2e",
+      "required": false,
+      "fullOnly": true
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap');
+
+:root {
+  --bg: #11131f;
+  --panel: #1b2033;
+  --panel-2: #232944;
+  --grid: rgba(255,255,255,.06);
+  --text: #f8f4d8;
+  --muted: #aeb7d8;
+  --green: #67f58c;
+  --yellow: #ffd166;
+  --blue: #64d2ff;
+  --line: #3c456c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Pixelify Sans', ui-monospace, monospace;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--bg);
+  background-size: 18px 18px;
+  color: var(--text);
+}
+.shell { padding: 28px; max-width: 1180px; margin: 0 auto; }
+header { display: flex; justify-content: space-between; align-items: start; gap: 18px; margin-bottom: 20px; }
+h1 { margin: 0; font-size: 54px; color: var(--green); text-shadow: 4px 4px 0 #000; }
+h2 { margin: 0 0 14px; color: var(--blue); }
+p { margin: 8px 0 0; color: var(--muted); }
+button {
+  font: inherit;
+  color: var(--text);
+  background: #11172a;
+  border: 3px solid var(--line);
+  box-shadow: 5px 5px 0 #05060b;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+button:hover { color: var(--green); transform: translate(1px, 1px); box-shadow: 4px 4px 0 #05060b; }
+.grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+.lower { margin-top: 18px; }
+.panel {
+  background: var(--panel);
+  border: 3px solid var(--line);
+  box-shadow: 8px 8px 0 #05060b;
+  padding: 18px;
+}
+.pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stage { background: var(--panel-2); border: 2px solid var(--line); padding: 14px; min-height: 78px; }
+.stage b { display: block; margin-bottom: 8px; }
+.pass { color: var(--green); }
+.wait { color: var(--yellow); }
+.actions { display: grid; gap: 10px; }
+pre {
+  margin: 0;
+  min-height: 210px;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  background: #11172a;
+  border: 2px solid var(--line);
+  padding: 12px;
+  color: var(--text);
+}
+@media (max-width: 900px) {
+  header, .grid { grid-template-columns: 1fr; display: grid; }
+  h1 { font-size: 38px; }
+}

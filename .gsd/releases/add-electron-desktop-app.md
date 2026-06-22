@@ -1,0 +1,1030 @@
+# Release: Add Electron Desktop App
+
+## Summary
+
+Release handoff for `add-electron-desktop-app`.
+
+## Spec
+
+openspec/changes/add-electron-desktop-app
+
+## Validation
+
+- Spec validation: pass
+- Ready validation: pass
+
+## Verification
+
+.agent/evidence/add-electron-desktop-app.md
+
+## Review Report
+
+.gsd/reports/add-electron-desktop-app.md
+
+## Changed Files
+
+- .cursor/rules/gsd.mdc
+- .github/workflows/gsd.yml
+- AGENTS.md
+- CHANGELOG.md
+- CLAUDE.md
+- GEMINI.md
+- LICENSE
+- README.md
+- apps/desktop/main.js
+- apps/desktop/node_modules/.bin/electron
+- apps/desktop/node_modules/.bin/extract-zip
+- apps/desktop/node_modules/.bin/semver
+- apps/desktop/node_modules/.package-lock.json
+- apps/desktop/node_modules/@electron/get/LICENSE
+- apps/desktop/node_modules/@electron/get/README.md
+- apps/desktop/node_modules/@electron/get/dist/cjs/Cache.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/Cache.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/Cache.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/Downloader.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/Downloader.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/Downloader.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/GotDownloader.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/GotDownloader.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/GotDownloader.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/artifact-utils.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/artifact-utils.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/artifact-utils.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/downloader-resolver.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/downloader-resolver.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/downloader-resolver.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/index.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/index.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/index.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/proxy.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/proxy.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/proxy.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/types.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/types.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/types.js.map
+- apps/desktop/node_modules/@electron/get/dist/cjs/utils.d.ts
+- apps/desktop/node_modules/@electron/get/dist/cjs/utils.js
+- apps/desktop/node_modules/@electron/get/dist/cjs/utils.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/Cache.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/Cache.js
+- apps/desktop/node_modules/@electron/get/dist/esm/Cache.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/Downloader.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/Downloader.js
+- apps/desktop/node_modules/@electron/get/dist/esm/Downloader.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/GotDownloader.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/GotDownloader.js
+- apps/desktop/node_modules/@electron/get/dist/esm/GotDownloader.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/artifact-utils.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/artifact-utils.js
+- apps/desktop/node_modules/@electron/get/dist/esm/artifact-utils.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/downloader-resolver.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/downloader-resolver.js
+- apps/desktop/node_modules/@electron/get/dist/esm/downloader-resolver.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/index.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/index.js
+- apps/desktop/node_modules/@electron/get/dist/esm/index.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/proxy.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/proxy.js
+- apps/desktop/node_modules/@electron/get/dist/esm/proxy.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/types.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/types.js
+- apps/desktop/node_modules/@electron/get/dist/esm/types.js.map
+- apps/desktop/node_modules/@electron/get/dist/esm/utils.d.ts
+- apps/desktop/node_modules/@electron/get/dist/esm/utils.js
+- apps/desktop/node_modules/@electron/get/dist/esm/utils.js.map
+- apps/desktop/node_modules/@electron/get/package.json
+- apps/desktop/node_modules/@sindresorhus/is/dist/index.d.ts
+- apps/desktop/node_modules/@sindresorhus/is/dist/index.js
+- apps/desktop/node_modules/@sindresorhus/is/dist/types.d.ts
+- apps/desktop/node_modules/@sindresorhus/is/dist/types.js
+- apps/desktop/node_modules/@sindresorhus/is/license
+- apps/desktop/node_modules/@sindresorhus/is/package.json
+- apps/desktop/node_modules/@sindresorhus/is/readme.md
+- apps/desktop/node_modules/@szmarczak/http-timer/LICENSE
+- apps/desktop/node_modules/@szmarczak/http-timer/README.md
+- apps/desktop/node_modules/@szmarczak/http-timer/dist/source/index.d.ts
+- apps/desktop/node_modules/@szmarczak/http-timer/dist/source/index.js
+- apps/desktop/node_modules/@szmarczak/http-timer/package.json
+- apps/desktop/node_modules/@types/cacheable-request/LICENSE
+- apps/desktop/node_modules/@types/cacheable-request/README.md
+- apps/desktop/node_modules/@types/cacheable-request/index.d.ts
+- apps/desktop/node_modules/@types/cacheable-request/package.json
+- apps/desktop/node_modules/@types/http-cache-semantics/LICENSE
+- apps/desktop/node_modules/@types/http-cache-semantics/README.md
+- apps/desktop/node_modules/@types/http-cache-semantics/index.d.ts
+- apps/desktop/node_modules/@types/http-cache-semantics/package.json
+- apps/desktop/node_modules/@types/keyv/LICENSE
+- apps/desktop/node_modules/@types/keyv/README.md
+- apps/desktop/node_modules/@types/keyv/index.d.ts
+- apps/desktop/node_modules/@types/keyv/package.json
+- apps/desktop/node_modules/@types/node/LICENSE
+- apps/desktop/node_modules/@types/node/README.md
+- apps/desktop/node_modules/@types/node/assert.d.ts
+- apps/desktop/node_modules/@types/node/assert/strict.d.ts
+- apps/desktop/node_modules/@types/node/async_hooks.d.ts
+- apps/desktop/node_modules/@types/node/buffer.buffer.d.ts
+- apps/desktop/node_modules/@types/node/buffer.d.ts
+- apps/desktop/node_modules/@types/node/child_process.d.ts
+- apps/desktop/node_modules/@types/node/cluster.d.ts
+- apps/desktop/node_modules/@types/node/compatibility/disposable.d.ts
+- apps/desktop/node_modules/@types/node/compatibility/index.d.ts
+- apps/desktop/node_modules/@types/node/compatibility/indexable.d.ts
+- apps/desktop/node_modules/@types/node/compatibility/iterators.d.ts
+- apps/desktop/node_modules/@types/node/console.d.ts
+- apps/desktop/node_modules/@types/node/constants.d.ts
+- apps/desktop/node_modules/@types/node/crypto.d.ts
+- apps/desktop/node_modules/@types/node/dgram.d.ts
+- apps/desktop/node_modules/@types/node/diagnostics_channel.d.ts
+- apps/desktop/node_modules/@types/node/dns.d.ts
+- apps/desktop/node_modules/@types/node/dns/promises.d.ts
+- apps/desktop/node_modules/@types/node/domain.d.ts
+- apps/desktop/node_modules/@types/node/events.d.ts
+- apps/desktop/node_modules/@types/node/fs.d.ts
+- apps/desktop/node_modules/@types/node/fs/promises.d.ts
+- apps/desktop/node_modules/@types/node/globals.d.ts
+- apps/desktop/node_modules/@types/node/globals.typedarray.d.ts
+- apps/desktop/node_modules/@types/node/http.d.ts
+- apps/desktop/node_modules/@types/node/http2.d.ts
+- apps/desktop/node_modules/@types/node/https.d.ts
+- apps/desktop/node_modules/@types/node/index.d.ts
+- apps/desktop/node_modules/@types/node/inspector.generated.d.ts
+- apps/desktop/node_modules/@types/node/module.d.ts
+- apps/desktop/node_modules/@types/node/net.d.ts
+- apps/desktop/node_modules/@types/node/os.d.ts
+- apps/desktop/node_modules/@types/node/package.json
+- apps/desktop/node_modules/@types/node/path.d.ts
+- apps/desktop/node_modules/@types/node/perf_hooks.d.ts
+- apps/desktop/node_modules/@types/node/process.d.ts
+- apps/desktop/node_modules/@types/node/punycode.d.ts
+- apps/desktop/node_modules/@types/node/querystring.d.ts
+- apps/desktop/node_modules/@types/node/readline.d.ts
+- apps/desktop/node_modules/@types/node/readline/promises.d.ts
+- apps/desktop/node_modules/@types/node/repl.d.ts
+- apps/desktop/node_modules/@types/node/sea.d.ts
+- apps/desktop/node_modules/@types/node/stream.d.ts
+- apps/desktop/node_modules/@types/node/stream/consumers.d.ts
+- apps/desktop/node_modules/@types/node/stream/promises.d.ts
+- apps/desktop/node_modules/@types/node/stream/web.d.ts
+- apps/desktop/node_modules/@types/node/string_decoder.d.ts
+- apps/desktop/node_modules/@types/node/test.d.ts
+- apps/desktop/node_modules/@types/node/timers.d.ts
+- apps/desktop/node_modules/@types/node/timers/promises.d.ts
+- apps/desktop/node_modules/@types/node/tls.d.ts
+- apps/desktop/node_modules/@types/node/trace_events.d.ts
+- apps/desktop/node_modules/@types/node/ts5.6/buffer.buffer.d.ts
+- apps/desktop/node_modules/@types/node/ts5.6/globals.typedarray.d.ts
+- apps/desktop/node_modules/@types/node/ts5.6/index.d.ts
+- apps/desktop/node_modules/@types/node/tty.d.ts
+- apps/desktop/node_modules/@types/node/url.d.ts
+- apps/desktop/node_modules/@types/node/util.d.ts
+- apps/desktop/node_modules/@types/node/v8.d.ts
+- apps/desktop/node_modules/@types/node/vm.d.ts
+- apps/desktop/node_modules/@types/node/wasi.d.ts
+- apps/desktop/node_modules/@types/node/web-globals/abortcontroller.d.ts
+- apps/desktop/node_modules/@types/node/web-globals/domexception.d.ts
+- apps/desktop/node_modules/@types/node/web-globals/events.d.ts
+- apps/desktop/node_modules/@types/node/web-globals/fetch.d.ts
+- apps/desktop/node_modules/@types/node/worker_threads.d.ts
+- apps/desktop/node_modules/@types/node/zlib.d.ts
+- apps/desktop/node_modules/@types/responselike/LICENSE
+- apps/desktop/node_modules/@types/responselike/README.md
+- apps/desktop/node_modules/@types/responselike/index.d.ts
+- apps/desktop/node_modules/@types/responselike/package.json
+- apps/desktop/node_modules/@types/yauzl/LICENSE
+- apps/desktop/node_modules/@types/yauzl/README.md
+- apps/desktop/node_modules/@types/yauzl/index.d.ts
+- apps/desktop/node_modules/@types/yauzl/package.json
+- apps/desktop/node_modules/boolean/.eslintrc.json
+- apps/desktop/node_modules/boolean/.npmpackagejsonlintrc.json
+- apps/desktop/node_modules/boolean/.releaserc.json
+- apps/desktop/node_modules/boolean/CHANGELOG.md
+- apps/desktop/node_modules/boolean/LICENSE.txt
+- apps/desktop/node_modules/boolean/README.md
+- apps/desktop/node_modules/boolean/build/lib/boolean.d.ts
+- apps/desktop/node_modules/boolean/build/lib/boolean.js
+- apps/desktop/node_modules/boolean/build/lib/index.d.ts
+- apps/desktop/node_modules/boolean/build/lib/index.js
+- apps/desktop/node_modules/boolean/build/lib/isBooleanable.d.ts
+- apps/desktop/node_modules/boolean/build/lib/isBooleanable.js
+- apps/desktop/node_modules/boolean/lib/boolean.ts
+- apps/desktop/node_modules/boolean/lib/index.ts
+- apps/desktop/node_modules/boolean/lib/isBooleanable.ts
+- apps/desktop/node_modules/boolean/licenseCheck.json
+- apps/desktop/node_modules/boolean/package.json
+- apps/desktop/node_modules/boolean/tsconfig.json
+- apps/desktop/node_modules/buffer-crc32/LICENSE
+- apps/desktop/node_modules/buffer-crc32/README.md
+- apps/desktop/node_modules/buffer-crc32/index.js
+- apps/desktop/node_modules/buffer-crc32/package.json
+- apps/desktop/node_modules/cacheable-lookup/LICENSE
+- apps/desktop/node_modules/cacheable-lookup/README.md
+- apps/desktop/node_modules/cacheable-lookup/index.d.ts
+- apps/desktop/node_modules/cacheable-lookup/package.json
+- apps/desktop/node_modules/cacheable-lookup/source/index.js
+- apps/desktop/node_modules/cacheable-request/LICENSE
+- apps/desktop/node_modules/cacheable-request/README.md
+- apps/desktop/node_modules/cacheable-request/package.json
+- apps/desktop/node_modules/cacheable-request/src/index.js
+- apps/desktop/node_modules/clone-response/LICENSE
+- apps/desktop/node_modules/clone-response/README.md
+- apps/desktop/node_modules/clone-response/package.json
+- apps/desktop/node_modules/clone-response/src/index.js
+- apps/desktop/node_modules/debug/LICENSE
+- apps/desktop/node_modules/debug/README.md
+- apps/desktop/node_modules/debug/package.json
+- apps/desktop/node_modules/debug/src/browser.js
+- apps/desktop/node_modules/debug/src/common.js
+- apps/desktop/node_modules/debug/src/index.js
+- apps/desktop/node_modules/debug/src/node.js
+- apps/desktop/node_modules/decompress-response/index.d.ts
+- apps/desktop/node_modules/decompress-response/index.js
+- apps/desktop/node_modules/decompress-response/license
+- apps/desktop/node_modules/decompress-response/node_modules/mimic-response/index.d.ts
+- apps/desktop/node_modules/decompress-response/node_modules/mimic-response/index.js
+- apps/desktop/node_modules/decompress-response/node_modules/mimic-response/license
+- apps/desktop/node_modules/decompress-response/node_modules/mimic-response/package.json
+- apps/desktop/node_modules/decompress-response/node_modules/mimic-response/readme.md
+- apps/desktop/node_modules/decompress-response/package.json
+- apps/desktop/node_modules/decompress-response/readme.md
+- apps/desktop/node_modules/defer-to-connect/LICENSE
+- apps/desktop/node_modules/defer-to-connect/README.md
+- apps/desktop/node_modules/defer-to-connect/dist/source/index.d.ts
+- apps/desktop/node_modules/defer-to-connect/dist/source/index.js
+- apps/desktop/node_modules/defer-to-connect/package.json
+- apps/desktop/node_modules/define-data-property/.eslintrc
+- apps/desktop/node_modules/define-data-property/.github/FUNDING.yml
+- apps/desktop/node_modules/define-data-property/.nycrc
+- apps/desktop/node_modules/define-data-property/CHANGELOG.md
+- apps/desktop/node_modules/define-data-property/LICENSE
+- apps/desktop/node_modules/define-data-property/README.md
+- apps/desktop/node_modules/define-data-property/index.d.ts
+- apps/desktop/node_modules/define-data-property/index.js
+- apps/desktop/node_modules/define-data-property/package.json
+- apps/desktop/node_modules/define-data-property/test/index.js
+- apps/desktop/node_modules/define-data-property/tsconfig.json
+- apps/desktop/node_modules/define-properties/.editorconfig
+- apps/desktop/node_modules/define-properties/.eslintrc
+- apps/desktop/node_modules/define-properties/.github/FUNDING.yml
+- apps/desktop/node_modules/define-properties/.nycrc
+- apps/desktop/node_modules/define-properties/CHANGELOG.md
+- apps/desktop/node_modules/define-properties/LICENSE
+- apps/desktop/node_modules/define-properties/README.md
+- apps/desktop/node_modules/define-properties/index.js
+- apps/desktop/node_modules/define-properties/package.json
+- apps/desktop/node_modules/detect-node/LICENSE
+- apps/desktop/node_modules/detect-node/Readme.md
+- apps/desktop/node_modules/detect-node/browser.js
+- apps/desktop/node_modules/detect-node/index.esm.js
+- apps/desktop/node_modules/detect-node/index.js
+- apps/desktop/node_modules/detect-node/package.json
+- apps/desktop/node_modules/electron/LICENSE
+- apps/desktop/node_modules/electron/README.md
+- apps/desktop/node_modules/electron/checksums.json
+- apps/desktop/node_modules/electron/cli.js
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Electron Framework
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Helpers
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Libraries
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Resources
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/chrome_crashpad_handler
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libEGL.dylib
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libGLESv2.dylib
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libffmpeg.dylib
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvk_swiftshader.dylib
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/vk_swiftshader_icd.json
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/MainMenu.nib
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_100_percent.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_200_percent.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/icudtl.dat
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/resources.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/v8_context_snapshot.arm64.bin
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW.lproj/locale.pak
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/Current
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/MacOS/Electron Helper (GPU)
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/PkgInfo
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/MacOS/Electron Helper (Plugin)
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/PkgInfo
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/Electron Helper (Renderer)
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/PkgInfo
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/PkgInfo
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Mantle.framework/Mantle
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Mantle.framework/Resources
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/Mantle
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Mantle.framework/Versions/Current
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/ReactiveObjC.framework/ReactiveObjC
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/ReactiveObjC.framework/Resources
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/ReactiveObjC
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/Resources/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/Current
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Resources
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Squirrel
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Frameworks/Squirrel.framework/Versions/Current
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Info.plist
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/PkgInfo
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Resources/default_app.asar
+- apps/desktop/node_modules/electron/dist/Electron.app/Contents/Resources/electron.icns
+- apps/desktop/node_modules/electron/dist/LICENSE
+- apps/desktop/node_modules/electron/dist/LICENSES.chromium.html
+- apps/desktop/node_modules/electron/dist/version
+- apps/desktop/node_modules/electron/electron.d.ts
+- apps/desktop/node_modules/electron/index.js
+- apps/desktop/node_modules/electron/install.js
+- apps/desktop/node_modules/electron/package.json
+- apps/desktop/node_modules/electron/path.txt
+- apps/desktop/node_modules/end-of-stream/LICENSE
+- apps/desktop/node_modules/end-of-stream/README.md
+- apps/desktop/node_modules/end-of-stream/index.js
+- apps/desktop/node_modules/end-of-stream/package.json
+- apps/desktop/node_modules/env-paths/index.d.ts
+- apps/desktop/node_modules/env-paths/index.js
+- apps/desktop/node_modules/env-paths/license
+- apps/desktop/node_modules/env-paths/package.json
+- apps/desktop/node_modules/env-paths/readme.md
+- apps/desktop/node_modules/es-define-property/.eslintrc
+- apps/desktop/node_modules/es-define-property/.github/FUNDING.yml
+- apps/desktop/node_modules/es-define-property/.nycrc
+- apps/desktop/node_modules/es-define-property/CHANGELOG.md
+- apps/desktop/node_modules/es-define-property/LICENSE
+- apps/desktop/node_modules/es-define-property/README.md
+- apps/desktop/node_modules/es-define-property/index.d.ts
+- apps/desktop/node_modules/es-define-property/index.js
+- apps/desktop/node_modules/es-define-property/package.json
+- apps/desktop/node_modules/es-define-property/test/index.js
+- apps/desktop/node_modules/es-define-property/tsconfig.json
+- apps/desktop/node_modules/es-errors/.eslintrc
+- apps/desktop/node_modules/es-errors/.github/FUNDING.yml
+- apps/desktop/node_modules/es-errors/CHANGELOG.md
+- apps/desktop/node_modules/es-errors/LICENSE
+- apps/desktop/node_modules/es-errors/README.md
+- apps/desktop/node_modules/es-errors/eval.d.ts
+- apps/desktop/node_modules/es-errors/eval.js
+- apps/desktop/node_modules/es-errors/index.d.ts
+- apps/desktop/node_modules/es-errors/index.js
+- apps/desktop/node_modules/es-errors/package.json
+- apps/desktop/node_modules/es-errors/range.d.ts
+- apps/desktop/node_modules/es-errors/range.js
+- apps/desktop/node_modules/es-errors/ref.d.ts
+- apps/desktop/node_modules/es-errors/ref.js
+- apps/desktop/node_modules/es-errors/syntax.d.ts
+- apps/desktop/node_modules/es-errors/syntax.js
+- apps/desktop/node_modules/es-errors/test/index.js
+- apps/desktop/node_modules/es-errors/tsconfig.json
+- apps/desktop/node_modules/es-errors/type.d.ts
+- apps/desktop/node_modules/es-errors/type.js
+- apps/desktop/node_modules/es-errors/uri.d.ts
+- apps/desktop/node_modules/es-errors/uri.js
+- apps/desktop/node_modules/es6-error/CHANGELOG.md
+- apps/desktop/node_modules/es6-error/LICENSE.md
+- apps/desktop/node_modules/es6-error/README.md
+- apps/desktop/node_modules/es6-error/es6/index.js
+- apps/desktop/node_modules/es6-error/lib/index.js
+- apps/desktop/node_modules/es6-error/package.json
+- apps/desktop/node_modules/es6-error/typings/index.d.ts
+- apps/desktop/node_modules/escape-string-regexp/index.d.ts
+- apps/desktop/node_modules/escape-string-regexp/index.js
+- apps/desktop/node_modules/escape-string-regexp/license
+- apps/desktop/node_modules/escape-string-regexp/package.json
+- apps/desktop/node_modules/escape-string-regexp/readme.md
+- apps/desktop/node_modules/extract-zip/LICENSE
+- apps/desktop/node_modules/extract-zip/cli.js
+- apps/desktop/node_modules/extract-zip/index.d.ts
+- apps/desktop/node_modules/extract-zip/index.js
+- apps/desktop/node_modules/extract-zip/package.json
+- apps/desktop/node_modules/extract-zip/readme.md
+- apps/desktop/node_modules/fd-slicer/.npmignore
+- apps/desktop/node_modules/fd-slicer/.travis.yml
+- apps/desktop/node_modules/fd-slicer/CHANGELOG.md
+- apps/desktop/node_modules/fd-slicer/LICENSE
+- apps/desktop/node_modules/fd-slicer/README.md
+- apps/desktop/node_modules/fd-slicer/index.js
+- apps/desktop/node_modules/fd-slicer/package.json
+- apps/desktop/node_modules/fd-slicer/test/test.js
+- apps/desktop/node_modules/fs-extra/CHANGELOG.md
+- apps/desktop/node_modules/fs-extra/LICENSE
+- apps/desktop/node_modules/fs-extra/README.md
+- apps/desktop/node_modules/fs-extra/lib/copy-sync/copy-sync.js
+- apps/desktop/node_modules/fs-extra/lib/copy-sync/index.js
+- apps/desktop/node_modules/fs-extra/lib/copy/copy.js
+- apps/desktop/node_modules/fs-extra/lib/copy/index.js
+- apps/desktop/node_modules/fs-extra/lib/empty/index.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/file.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/index.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/link.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/symlink-paths.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/symlink-type.js
+- apps/desktop/node_modules/fs-extra/lib/ensure/symlink.js
+- apps/desktop/node_modules/fs-extra/lib/fs/index.js
+- apps/desktop/node_modules/fs-extra/lib/index.js
+- apps/desktop/node_modules/fs-extra/lib/json/index.js
+- apps/desktop/node_modules/fs-extra/lib/json/jsonfile.js
+- apps/desktop/node_modules/fs-extra/lib/json/output-json-sync.js
+- apps/desktop/node_modules/fs-extra/lib/json/output-json.js
+- apps/desktop/node_modules/fs-extra/lib/mkdirs/index.js
+- apps/desktop/node_modules/fs-extra/lib/mkdirs/mkdirs-sync.js
+- apps/desktop/node_modules/fs-extra/lib/mkdirs/mkdirs.js
+- apps/desktop/node_modules/fs-extra/lib/mkdirs/win32.js
+- apps/desktop/node_modules/fs-extra/lib/move-sync/index.js
+- apps/desktop/node_modules/fs-extra/lib/move-sync/move-sync.js
+- apps/desktop/node_modules/fs-extra/lib/move/index.js
+- apps/desktop/node_modules/fs-extra/lib/move/move.js
+- apps/desktop/node_modules/fs-extra/lib/output/index.js
+- apps/desktop/node_modules/fs-extra/lib/path-exists/index.js
+- apps/desktop/node_modules/fs-extra/lib/remove/index.js
+- apps/desktop/node_modules/fs-extra/lib/remove/rimraf.js
+- apps/desktop/node_modules/fs-extra/lib/util/buffer.js
+- apps/desktop/node_modules/fs-extra/lib/util/stat.js
+- apps/desktop/node_modules/fs-extra/lib/util/utimes.js
+- apps/desktop/node_modules/fs-extra/package.json
+- apps/desktop/node_modules/get-stream/buffer-stream.js
+- apps/desktop/node_modules/get-stream/index.d.ts
+- apps/desktop/node_modules/get-stream/index.js
+- apps/desktop/node_modules/get-stream/license
+- apps/desktop/node_modules/get-stream/package.json
+- apps/desktop/node_modules/get-stream/readme.md
+- apps/desktop/node_modules/global-agent/.flowconfig
+- apps/desktop/node_modules/global-agent/LICENSE
+- apps/desktop/node_modules/global-agent/README.md
+- apps/desktop/node_modules/global-agent/bootstrap.js
+- apps/desktop/node_modules/global-agent/dist/Logger.js
+- apps/desktop/node_modules/global-agent/dist/Logger.js.flow
+- apps/desktop/node_modules/global-agent/dist/Logger.js.map
+- apps/desktop/node_modules/global-agent/dist/classes/Agent.js
+- apps/desktop/node_modules/global-agent/dist/classes/Agent.js.flow
+- apps/desktop/node_modules/global-agent/dist/classes/Agent.js.map
+- apps/desktop/node_modules/global-agent/dist/classes/HttpProxyAgent.js
+- apps/desktop/node_modules/global-agent/dist/classes/HttpProxyAgent.js.flow
+- apps/desktop/node_modules/global-agent/dist/classes/HttpProxyAgent.js.map
+- apps/desktop/node_modules/global-agent/dist/classes/HttpsProxyAgent.js
+- apps/desktop/node_modules/global-agent/dist/classes/HttpsProxyAgent.js.flow
+- apps/desktop/node_modules/global-agent/dist/classes/HttpsProxyAgent.js.map
+- apps/desktop/node_modules/global-agent/dist/classes/index.js
+- apps/desktop/node_modules/global-agent/dist/classes/index.js.flow
+- apps/desktop/node_modules/global-agent/dist/classes/index.js.map
+- apps/desktop/node_modules/global-agent/dist/errors.js
+- apps/desktop/node_modules/global-agent/dist/errors.js.flow
+- apps/desktop/node_modules/global-agent/dist/errors.js.map
+- apps/desktop/node_modules/global-agent/dist/factories/createGlobalProxyAgent.js
+- apps/desktop/node_modules/global-agent/dist/factories/createGlobalProxyAgent.js.flow
+- apps/desktop/node_modules/global-agent/dist/factories/createGlobalProxyAgent.js.map
+- apps/desktop/node_modules/global-agent/dist/factories/createProxyController.js
+- apps/desktop/node_modules/global-agent/dist/factories/createProxyController.js.flow
+- apps/desktop/node_modules/global-agent/dist/factories/createProxyController.js.map
+- apps/desktop/node_modules/global-agent/dist/factories/index.js
+- apps/desktop/node_modules/global-agent/dist/factories/index.js.flow
+- apps/desktop/node_modules/global-agent/dist/factories/index.js.map
+- apps/desktop/node_modules/global-agent/dist/index.js
+- apps/desktop/node_modules/global-agent/dist/index.js.flow
+- apps/desktop/node_modules/global-agent/dist/index.js.map
+- apps/desktop/node_modules/global-agent/dist/routines/bootstrap.js
+- apps/desktop/node_modules/global-agent/dist/routines/bootstrap.js.flow
+- apps/desktop/node_modules/global-agent/dist/routines/bootstrap.js.map
+- apps/desktop/node_modules/global-agent/dist/routines/index.js
+- apps/desktop/node_modules/global-agent/dist/routines/index.js.flow
+- apps/desktop/node_modules/global-agent/dist/routines/index.js.map
+- apps/desktop/node_modules/global-agent/dist/types.js
+- apps/desktop/node_modules/global-agent/dist/types.js.flow
+- apps/desktop/node_modules/global-agent/dist/types.js.map
+- apps/desktop/node_modules/global-agent/dist/utilities/bindHttpMethod.js
+- apps/desktop/node_modules/global-agent/dist/utilities/bindHttpMethod.js.flow
+- apps/desktop/node_modules/global-agent/dist/utilities/bindHttpMethod.js.map
+- apps/desktop/node_modules/global-agent/dist/utilities/index.js
+- apps/desktop/node_modules/global-agent/dist/utilities/index.js.flow
+- apps/desktop/node_modules/global-agent/dist/utilities/index.js.map
+- apps/desktop/node_modules/global-agent/dist/utilities/isUrlMatchingNoProxy.js
+- apps/desktop/node_modules/global-agent/dist/utilities/isUrlMatchingNoProxy.js.flow
+- apps/desktop/node_modules/global-agent/dist/utilities/isUrlMatchingNoProxy.js.map
+- apps/desktop/node_modules/global-agent/dist/utilities/parseProxyUrl.js
+- apps/desktop/node_modules/global-agent/dist/utilities/parseProxyUrl.js.flow
+- apps/desktop/node_modules/global-agent/dist/utilities/parseProxyUrl.js.map
+- apps/desktop/node_modules/global-agent/node_modules/.bin/semver
+- apps/desktop/node_modules/global-agent/node_modules/semver/LICENSE
+- apps/desktop/node_modules/global-agent/node_modules/semver/README.md
+- apps/desktop/node_modules/global-agent/node_modules/semver/bin/semver.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/classes/comparator.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/classes/index.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/classes/range.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/classes/semver.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/clean.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/cmp.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/coerce.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/compare-build.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/compare-loose.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/compare.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/diff.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/eq.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/gt.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/gte.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/inc.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/lt.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/lte.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/major.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/minor.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/neq.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/parse.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/patch.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/prerelease.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/rcompare.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/rsort.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/satisfies.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/sort.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/truncate.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/functions/valid.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/index.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/constants.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/debug.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/identifiers.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/lrucache.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/parse-options.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/internal/re.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/package.json
+- apps/desktop/node_modules/global-agent/node_modules/semver/preload.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/range.bnf
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/gtr.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/intersects.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/ltr.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/max-satisfying.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/min-satisfying.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/min-version.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/outside.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/simplify.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/subset.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/to-comparators.js
+- apps/desktop/node_modules/global-agent/node_modules/semver/ranges/valid.js
+- apps/desktop/node_modules/global-agent/package.json
+- apps/desktop/node_modules/global-agent/src/Logger.js
+- apps/desktop/node_modules/global-agent/src/classes/Agent.js
+- apps/desktop/node_modules/global-agent/src/classes/HttpProxyAgent.js
+- apps/desktop/node_modules/global-agent/src/classes/HttpsProxyAgent.js
+- apps/desktop/node_modules/global-agent/src/classes/index.js
+- apps/desktop/node_modules/global-agent/src/errors.js
+- apps/desktop/node_modules/global-agent/src/factories/createGlobalProxyAgent.js
+- apps/desktop/node_modules/global-agent/src/factories/createProxyController.js
+- apps/desktop/node_modules/global-agent/src/factories/index.js
+- apps/desktop/node_modules/global-agent/src/index.js
+- apps/desktop/node_modules/global-agent/src/routines/bootstrap.js
+- apps/desktop/node_modules/global-agent/src/routines/index.js
+- apps/desktop/node_modules/global-agent/src/types.js
+- apps/desktop/node_modules/global-agent/src/utilities/bindHttpMethod.js
+- apps/desktop/node_modules/global-agent/src/utilities/index.js
+- apps/desktop/node_modules/global-agent/src/utilities/isUrlMatchingNoProxy.js
+- apps/desktop/node_modules/global-agent/src/utilities/parseProxyUrl.js
+- apps/desktop/node_modules/globalthis/.eslintrc
+- apps/desktop/node_modules/globalthis/.nycrc
+- apps/desktop/node_modules/globalthis/CHANGELOG.md
+- apps/desktop/node_modules/globalthis/LICENSE
+- apps/desktop/node_modules/globalthis/README.md
+- apps/desktop/node_modules/globalthis/auto.js
+- apps/desktop/node_modules/globalthis/implementation.browser.js
+- apps/desktop/node_modules/globalthis/implementation.js
+- apps/desktop/node_modules/globalthis/index.js
+- apps/desktop/node_modules/globalthis/package.json
+- apps/desktop/node_modules/globalthis/polyfill.js
+- apps/desktop/node_modules/globalthis/shim.js
+- apps/desktop/node_modules/globalthis/test/implementation.js
+- apps/desktop/node_modules/globalthis/test/index.js
+- apps/desktop/node_modules/globalthis/test/native.js
+- apps/desktop/node_modules/globalthis/test/shimmed.js
+- apps/desktop/node_modules/globalthis/test/tests.js
+- apps/desktop/node_modules/gopd/.eslintrc
+- apps/desktop/node_modules/gopd/.github/FUNDING.yml
+- apps/desktop/node_modules/gopd/CHANGELOG.md
+- apps/desktop/node_modules/gopd/LICENSE
+- apps/desktop/node_modules/gopd/README.md
+- apps/desktop/node_modules/gopd/gOPD.d.ts
+- apps/desktop/node_modules/gopd/gOPD.js
+- apps/desktop/node_modules/gopd/index.d.ts
+- apps/desktop/node_modules/gopd/index.js
+- apps/desktop/node_modules/gopd/package.json
+- apps/desktop/node_modules/gopd/test/index.js
+- apps/desktop/node_modules/gopd/tsconfig.json
+- apps/desktop/node_modules/got/dist/source/as-promise/create-rejection.d.ts
+- apps/desktop/node_modules/got/dist/source/as-promise/create-rejection.js
+- apps/desktop/node_modules/got/dist/source/as-promise/index.d.ts
+- apps/desktop/node_modules/got/dist/source/as-promise/index.js
+- apps/desktop/node_modules/got/dist/source/as-promise/normalize-arguments.d.ts
+- apps/desktop/node_modules/got/dist/source/as-promise/normalize-arguments.js
+- apps/desktop/node_modules/got/dist/source/as-promise/parse-body.d.ts
+- apps/desktop/node_modules/got/dist/source/as-promise/parse-body.js
+- apps/desktop/node_modules/got/dist/source/as-promise/types.d.ts
+- apps/desktop/node_modules/got/dist/source/as-promise/types.js
+- apps/desktop/node_modules/got/dist/source/core/calculate-retry-delay.d.ts
+- apps/desktop/node_modules/got/dist/source/core/calculate-retry-delay.js
+- apps/desktop/node_modules/got/dist/source/core/index.d.ts
+- apps/desktop/node_modules/got/dist/source/core/index.js
+- apps/desktop/node_modules/got/dist/source/core/utils/dns-ip-version.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/dns-ip-version.js
+- apps/desktop/node_modules/got/dist/source/core/utils/get-body-size.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/get-body-size.js
+- apps/desktop/node_modules/got/dist/source/core/utils/get-buffer.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/get-buffer.js
+- apps/desktop/node_modules/got/dist/source/core/utils/is-form-data.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/is-form-data.js
+- apps/desktop/node_modules/got/dist/source/core/utils/is-response-ok.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/is-response-ok.js
+- apps/desktop/node_modules/got/dist/source/core/utils/options-to-url.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/options-to-url.js
+- apps/desktop/node_modules/got/dist/source/core/utils/proxy-events.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/proxy-events.js
+- apps/desktop/node_modules/got/dist/source/core/utils/timed-out.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/timed-out.js
+- apps/desktop/node_modules/got/dist/source/core/utils/unhandle.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/unhandle.js
+- apps/desktop/node_modules/got/dist/source/core/utils/url-to-options.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/url-to-options.js
+- apps/desktop/node_modules/got/dist/source/core/utils/weakable-map.d.ts
+- apps/desktop/node_modules/got/dist/source/core/utils/weakable-map.js
+- apps/desktop/node_modules/got/dist/source/create.d.ts
+- apps/desktop/node_modules/got/dist/source/create.js
+- apps/desktop/node_modules/got/dist/source/index.d.ts
+- apps/desktop/node_modules/got/dist/source/index.js
+- apps/desktop/node_modules/got/dist/source/types.d.ts
+- apps/desktop/node_modules/got/dist/source/types.js
+- apps/desktop/node_modules/got/dist/source/utils/deep-freeze.d.ts
+- apps/desktop/node_modules/got/dist/source/utils/deep-freeze.js
+- apps/desktop/node_modules/got/dist/source/utils/deprecation-warning.d.ts
+- apps/desktop/node_modules/got/dist/source/utils/deprecation-warning.js
+- apps/desktop/node_modules/got/license
+- apps/desktop/node_modules/got/package.json
+- apps/desktop/node_modules/got/readme.md
+- apps/desktop/node_modules/graceful-fs/LICENSE
+- apps/desktop/node_modules/graceful-fs/README.md
+- apps/desktop/node_modules/graceful-fs/clone.js
+- apps/desktop/node_modules/graceful-fs/graceful-fs.js
+- apps/desktop/node_modules/graceful-fs/legacy-streams.js
+- apps/desktop/node_modules/graceful-fs/package.json
+- apps/desktop/node_modules/graceful-fs/polyfills.js
+- apps/desktop/node_modules/has-property-descriptors/.eslintrc
+- apps/desktop/node_modules/has-property-descriptors/.github/FUNDING.yml
+- apps/desktop/node_modules/has-property-descriptors/.nycrc
+- apps/desktop/node_modules/has-property-descriptors/CHANGELOG.md
+- apps/desktop/node_modules/has-property-descriptors/LICENSE
+- apps/desktop/node_modules/has-property-descriptors/README.md
+- apps/desktop/node_modules/has-property-descriptors/index.js
+- apps/desktop/node_modules/has-property-descriptors/package.json
+- apps/desktop/node_modules/has-property-descriptors/test/index.js
+- apps/desktop/node_modules/http-cache-semantics/LICENSE
+- apps/desktop/node_modules/http-cache-semantics/README.md
+- apps/desktop/node_modules/http-cache-semantics/index.js
+- apps/desktop/node_modules/http-cache-semantics/package.json
+- apps/desktop/node_modules/http2-wrapper/LICENSE
+- apps/desktop/node_modules/http2-wrapper/README.md
+- apps/desktop/node_modules/http2-wrapper/package.json
+- apps/desktop/node_modules/http2-wrapper/source/agent.js
+- apps/desktop/node_modules/http2-wrapper/source/auto.js
+- apps/desktop/node_modules/http2-wrapper/source/client-request.js
+- apps/desktop/node_modules/http2-wrapper/source/incoming-message.js
+- apps/desktop/node_modules/http2-wrapper/source/index.js
+- apps/desktop/node_modules/http2-wrapper/source/utils/calculate-server-name.js
+- apps/desktop/node_modules/http2-wrapper/source/utils/errors.js
+- apps/desktop/node_modules/http2-wrapper/source/utils/is-request-pseudo-header.js
+- apps/desktop/node_modules/http2-wrapper/source/utils/proxy-events.js
+- apps/desktop/node_modules/http2-wrapper/source/utils/url-to-options.js
+- apps/desktop/node_modules/json-buffer/.travis.yml
+- apps/desktop/node_modules/json-buffer/LICENSE
+- apps/desktop/node_modules/json-buffer/README.md
+- apps/desktop/node_modules/json-buffer/index.js
+- apps/desktop/node_modules/json-buffer/package.json
+- apps/desktop/node_modules/json-buffer/test/index.js
+- apps/desktop/node_modules/json-stringify-safe/.npmignore
+- apps/desktop/node_modules/json-stringify-safe/CHANGELOG.md
+- apps/desktop/node_modules/json-stringify-safe/LICENSE
+- apps/desktop/node_modules/json-stringify-safe/Makefile
+- apps/desktop/node_modules/json-stringify-safe/README.md
+- apps/desktop/node_modules/json-stringify-safe/package.json
+- apps/desktop/node_modules/json-stringify-safe/stringify.js
+- apps/desktop/node_modules/json-stringify-safe/test/mocha.opts
+- apps/desktop/node_modules/json-stringify-safe/test/stringify_test.js
+- apps/desktop/node_modules/jsonfile/CHANGELOG.md
+- apps/desktop/node_modules/jsonfile/LICENSE
+- apps/desktop/node_modules/jsonfile/README.md
+- apps/desktop/node_modules/jsonfile/index.js
+- apps/desktop/node_modules/jsonfile/package.json
+- apps/desktop/node_modules/keyv/README.md
+- apps/desktop/node_modules/keyv/package.json
+- apps/desktop/node_modules/keyv/src/index.d.ts
+- apps/desktop/node_modules/keyv/src/index.js
+- apps/desktop/node_modules/lowercase-keys/index.d.ts
+- apps/desktop/node_modules/lowercase-keys/index.js
+- apps/desktop/node_modules/lowercase-keys/license
+- apps/desktop/node_modules/lowercase-keys/package.json
+- apps/desktop/node_modules/lowercase-keys/readme.md
+- apps/desktop/node_modules/matcher/index.d.ts
+- apps/desktop/node_modules/matcher/index.js
+- apps/desktop/node_modules/matcher/license
+- apps/desktop/node_modules/matcher/package.json
+- apps/desktop/node_modules/matcher/readme.md
+- apps/desktop/node_modules/mimic-response/index.js
+- apps/desktop/node_modules/mimic-response/license
+- apps/desktop/node_modules/mimic-response/package.json
+- apps/desktop/node_modules/mimic-response/readme.md
+- apps/desktop/node_modules/ms/index.js
+- apps/desktop/node_modules/ms/license.md
+- apps/desktop/node_modules/ms/package.json
+- apps/desktop/node_modules/ms/readme.md
+- apps/desktop/node_modules/normalize-url/index.d.ts
+- apps/desktop/node_modules/normalize-url/index.js
+- apps/desktop/node_modules/normalize-url/license
+- apps/desktop/node_modules/normalize-url/package.json
+- apps/desktop/node_modules/normalize-url/readme.md
+- apps/desktop/node_modules/object-keys/.editorconfig
+- apps/desktop/node_modules/object-keys/.eslintrc
+- apps/desktop/node_modules/object-keys/.travis.yml
+- apps/desktop/node_modules/object-keys/CHANGELOG.md
+- apps/desktop/node_modules/object-keys/LICENSE
+- apps/desktop/node_modules/object-keys/README.md
+- apps/desktop/node_modules/object-keys/implementation.js
+- apps/desktop/node_modules/object-keys/index.js
+- apps/desktop/node_modules/object-keys/isArguments.js
+- apps/desktop/node_modules/object-keys/package.json
+- apps/desktop/node_modules/object-keys/test/index.js
+- apps/desktop/node_modules/once/LICENSE
+- apps/desktop/node_modules/once/README.md
+- apps/desktop/node_modules/once/once.js
+- apps/desktop/node_modules/once/package.json
+- apps/desktop/node_modules/p-cancelable/index.d.ts
+- apps/desktop/node_modules/p-cancelable/index.js
+- apps/desktop/node_modules/p-cancelable/license
+- apps/desktop/node_modules/p-cancelable/package.json
+- apps/desktop/node_modules/p-cancelable/readme.md
+- apps/desktop/node_modules/pend/LICENSE
+- apps/desktop/node_modules/pend/README.md
+- apps/desktop/node_modules/pend/index.js
+- apps/desktop/node_modules/pend/package.json
+- apps/desktop/node_modules/pend/test.js
+- apps/desktop/node_modules/progress/CHANGELOG.md
+- apps/desktop/node_modules/progress/LICENSE
+- apps/desktop/node_modules/progress/Makefile
+- apps/desktop/node_modules/progress/Readme.md
+- apps/desktop/node_modules/progress/index.js
+- apps/desktop/node_modules/progress/lib/node-progress.js
+- apps/desktop/node_modules/progress/package.json
+- apps/desktop/node_modules/pump/.github/FUNDING.yml
+- apps/desktop/node_modules/pump/.travis.yml
+- apps/desktop/node_modules/pump/LICENSE
+- apps/desktop/node_modules/pump/README.md
+- apps/desktop/node_modules/pump/SECURITY.md
+- apps/desktop/node_modules/pump/empty.js
+- apps/desktop/node_modules/pump/index.js
+- apps/desktop/node_modules/pump/package.json
+- apps/desktop/node_modules/pump/test-browser.js
+- apps/desktop/node_modules/pump/test-node.js
+- apps/desktop/node_modules/quick-lru/index.d.ts
+- apps/desktop/node_modules/quick-lru/index.js
+- apps/desktop/node_modules/quick-lru/license
+- apps/desktop/node_modules/quick-lru/package.json
+- apps/desktop/node_modules/quick-lru/readme.md
+- apps/desktop/node_modules/resolve-alpn/LICENSE
+- apps/desktop/node_modules/resolve-alpn/README.md
+- apps/desktop/node_modules/resolve-alpn/index.js
+- apps/desktop/node_modules/resolve-alpn/package.json
+- apps/desktop/node_modules/responselike/LICENSE
+- apps/desktop/node_modules/responselike/README.md
+- apps/desktop/node_modules/responselike/package.json
+- apps/desktop/node_modules/responselike/src/index.js
+- apps/desktop/node_modules/roarr/LICENSE
+- apps/desktop/node_modules/roarr/README.md
+- apps/desktop/node_modules/roarr/dist/constants.js
+- apps/desktop/node_modules/roarr/dist/constants.js.flow
+- apps/desktop/node_modules/roarr/dist/constants.js.map
+- apps/desktop/node_modules/roarr/dist/factories/createLogger.js
+- apps/desktop/node_modules/roarr/dist/factories/createLogger.js.flow
+- apps/desktop/node_modules/roarr/dist/factories/createLogger.js.map
+- apps/desktop/node_modules/roarr/dist/factories/createMockLogger.js
+- apps/desktop/node_modules/roarr/dist/factories/createMockLogger.js.flow
+- apps/desktop/node_modules/roarr/dist/factories/createMockLogger.js.map
+- apps/desktop/node_modules/roarr/dist/factories/createNodeWriter.js
+- apps/desktop/node_modules/roarr/dist/factories/createNodeWriter.js.flow
+- apps/desktop/node_modules/roarr/dist/factories/createNodeWriter.js.map
+- apps/desktop/node_modules/roarr/dist/factories/createRoarrInititialGlobalState.js
+- apps/desktop/node_modules/roarr/dist/factories/createRoarrInititialGlobalState.js.flow
+- apps/desktop/node_modules/roarr/dist/factories/createRoarrInititialGlobalState.js.map
+- apps/desktop/node_modules/roarr/dist/factories/index.js
+- apps/desktop/node_modules/roarr/dist/factories/index.js.flow
+- apps/desktop/node_modules/roarr/dist/factories/index.js.map
+- apps/desktop/node_modules/roarr/dist/log.js
+- apps/desktop/node_modules/roarr/dist/log.js.flow
+- apps/desktop/node_modules/roarr/dist/log.js.map
+- apps/desktop/node_modules/roarr/dist/types.js
+- apps/desktop/node_modules/roarr/dist/types.js.flow
+- apps/desktop/node_modules/roarr/dist/types.js.map
+- apps/desktop/node_modules/roarr/package.json
+- apps/desktop/node_modules/semver-compare/.travis.yml
+- apps/desktop/node_modules/semver-compare/LICENSE
+- apps/desktop/node_modules/semver-compare/example/cmp.js
+- apps/desktop/node_modules/semver-compare/example/lex.js
+- apps/desktop/node_modules/semver-compare/index.js
+- apps/desktop/node_modules/semver-compare/package.json
+- apps/desktop/node_modules/semver-compare/readme.markdown
+- apps/desktop/node_modules/semver-compare/test/cmp.js
+- apps/desktop/node_modules/semver/LICENSE
+- apps/desktop/node_modules/semver/README.md
+- apps/desktop/node_modules/semver/bin/semver.js
+- apps/desktop/node_modules/semver/package.json
+- apps/desktop/node_modules/semver/range.bnf
+- apps/desktop/node_modules/semver/semver.js
+- apps/desktop/node_modules/serialize-error/index.d.ts
+- apps/desktop/node_modules/serialize-error/index.js
+- apps/desktop/node_modules/serialize-error/license
+- apps/desktop/node_modules/serialize-error/package.json
+- apps/desktop/node_modules/serialize-error/readme.md
+- apps/desktop/node_modules/sprintf-js/CONTRIBUTORS.md
+- apps/desktop/node_modules/sprintf-js/LICENSE
+- apps/desktop/node_modules/sprintf-js/README.md
+- apps/desktop/node_modules/sprintf-js/dist/.gitattributes
+- apps/desktop/node_modules/sprintf-js/dist/angular-sprintf.min.js
+- apps/desktop/node_modules/sprintf-js/dist/angular-sprintf.min.js.map
+- apps/desktop/node_modules/sprintf-js/dist/sprintf.min.js
+- apps/desktop/node_modules/sprintf-js/dist/sprintf.min.js.map
+- apps/desktop/node_modules/sprintf-js/package.json
+- apps/desktop/node_modules/sprintf-js/src/angular-sprintf.js
+- apps/desktop/node_modules/sprintf-js/src/sprintf.js
+- apps/desktop/node_modules/sumchecker/.github/FUNDING.yml
+- apps/desktop/node_modules/sumchecker/.github/workflows/ci.yml
+- apps/desktop/node_modules/sumchecker/LICENSE
+- apps/desktop/node_modules/sumchecker/NEWS.md
+- apps/desktop/node_modules/sumchecker/README.md
+- apps/desktop/node_modules/sumchecker/index.d.ts
+- apps/desktop/node_modules/sumchecker/index.js
+- apps/desktop/node_modules/sumchecker/index.test-d.ts
+- apps/desktop/node_modules/sumchecker/package.json
+- apps/desktop/node_modules/sumchecker/yarn.lock
+- apps/desktop/node_modules/type-fest/index.d.ts
+- apps/desktop/node_modules/type-fest/license
+- apps/desktop/node_modules/type-fest/package.json
+- apps/desktop/node_modules/type-fest/readme.md
+- apps/desktop/node_modules/type-fest/source/async-return-type.d.ts
+- apps/desktop/node_modules/type-fest/source/basic.d.ts
+- apps/desktop/node_modules/type-fest/source/conditional-except.d.ts
+- apps/desktop/node_modules/type-fest/source/conditional-keys.d.ts
+- apps/desktop/node_modules/type-fest/source/conditional-pick.d.ts
+- apps/desktop/node_modules/type-fest/source/except.d.ts
+- apps/desktop/node_modules/type-fest/source/literal-union.d.ts
+- apps/desktop/node_modules/type-fest/source/merge-exclusive.d.ts
+- apps/desktop/node_modules/type-fest/source/merge.d.ts
+- apps/desktop/node_modules/type-fest/source/mutable.d.ts
+- apps/desktop/node_modules/type-fest/source/opaque.d.ts
+- apps/desktop/node_modules/type-fest/source/package-json.d.ts
+- apps/desktop/node_modules/type-fest/source/partial-deep.d.ts
+- apps/desktop/node_modules/type-fest/source/promisable.d.ts
+- apps/desktop/node_modules/type-fest/source/promise-value.d.ts
+- apps/desktop/node_modules/type-fest/source/readonly-deep.d.ts
+- apps/desktop/node_modules/type-fest/source/require-at-least-one.d.ts
+- apps/desktop/node_modules/type-fest/source/require-exactly-one.d.ts
+- apps/desktop/node_modules/type-fest/source/set-optional.d.ts
+- apps/desktop/node_modules/type-fest/source/set-required.d.ts
+- apps/desktop/node_modules/type-fest/source/stringified.d.ts
+- apps/desktop/node_modules/type-fest/source/tsconfig-json.d.ts
+- apps/desktop/node_modules/type-fest/source/union-to-intersection.d.ts
+- apps/desktop/node_modules/type-fest/source/value-of.d.ts
+- apps/desktop/node_modules/undici-types/LICENSE
+- apps/desktop/node_modules/undici-types/README.md
+- apps/desktop/node_modules/undici-types/agent.d.ts
+- apps/desktop/node_modules/undici-types/api.d.ts
+- apps/desktop/node_modules/undici-types/balanced-pool.d.ts
+- apps/desktop/node_modules/undici-types/cache.d.ts
+- apps/desktop/node_modules/undici-types/client.d.ts
+- apps/desktop/node_modules/undici-types/connector.d.ts
+- apps/desktop/node_modules/undici-types/content-type.d.ts
+- apps/desktop/node_modules/undici-types/cookies.d.ts
+- apps/desktop/node_modules/undici-types/diagnostics-channel.d.ts
+- apps/desktop/node_modules/undici-types/dispatcher.d.ts
+- apps/desktop/node_modules/undici-types/env-http-proxy-agent.d.ts
+- apps/desktop/node_modules/undici-types/errors.d.ts
+- apps/desktop/node_modules/undici-types/eventsource.d.ts
+- apps/desktop/node_modules/undici-types/fetch.d.ts
+- apps/desktop/node_modules/undici-types/file.d.ts
+- apps/desktop/node_modules/undici-types/filereader.d.ts
+- apps/desktop/node_modules/undici-types/formdata.d.ts
+- apps/desktop/node_modules/undici-types/global-dispatcher.d.ts
+- apps/desktop/node_modules/undici-types/global-origin.d.ts
+- apps/desktop/node_modules/undici-types/handlers.d.ts
+- apps/desktop/node_modules/undici-types/header.d.ts
+- apps/desktop/node_modules/undici-types/index.d.ts
+- apps/desktop/node_modules/undici-types/interceptors.d.ts
+- apps/desktop/node_modules/undici-types/mock-agent.d.ts
+- apps/desktop/node_modules/undici-types/mock-client.d.ts
+- apps/desktop/node_modules/undici-types/mock-errors.d.ts
+- apps/desktop/node_modules/undici-types/mock-interceptor.d.ts
+- apps/desktop/node_modules/undici-types/mock-pool.d.ts
+- apps/desktop/node_modules/undici-types/package.json
+- apps/desktop/node_modules/undici-types/patch.d.ts
+- apps/desktop/node_modules/undici-types/pool-stats.d.ts
+- apps/desktop/node_modules/undici-types/pool.d.ts
+- apps/desktop/node_modules/undici-types/proxy-agent.d.ts
+- apps/desktop/node_modules/undici-types/readable.d.ts
+- apps/desktop/node_modules/undici-types/retry-agent.d.ts
+- apps/desktop/node_modules/undici-types/retry-handler.d.ts
+- apps/desktop/node_modules/undici-types/util.d.ts
+- apps/desktop/node_modules/undici-types/webidl.d.ts
+- apps/desktop/node_modules/undici-types/websocket.d.ts
+- apps/desktop/node_modules/universalify/LICENSE
+- apps/desktop/node_modules/universalify/README.md
+- apps/desktop/node_modules/universalify/index.js
+- apps/desktop/node_modules/universalify/package.json
+- apps/desktop/node_modules/wrappy/LICENSE
+- apps/desktop/node_modules/wrappy/README.md
+- apps/desktop/node_modules/wrappy/package.json
+- apps/desktop/node_modules/wrappy/wrappy.js
+- apps/desktop/node_modules/yauzl/LICENSE
+- apps/desktop/node_modules/yauzl/README.md
+- apps/desktop/node_modules/yauzl/index.js
+- apps/desktop/node_modules/yauzl/package.json
+- apps/desktop/package-lock.json
+- apps/desktop/package.json
+- apps/desktop/preload.js
+- apps/desktop/renderer/app.js
+- apps/desktop/renderer/index.html
+- apps/desktop/renderer/styles.css
+- bin/gsd.mjs
+- docs/superpowers/plans/2026-06-17-gsd-mvp.md
+- examples/node-basic/.gsd/current.json
+- examples/node-basic/.gsd/workflow.json
+- examples/node-basic/README.md
+- examples/node-basic/index.mjs
+- examples/node-basic/openspec/changes/example-change/proposal.md
+- examples/node-basic/openspec/changes/example-change/tasks.md
+- examples/node-basic/package.json
+- package.json
+- src/gsd.mjs
+- test/gsd.test.mjs
+
+## Agent Handoffs
+
+- 2026-06-19T08:23:40.642Z planner: Spec is ready for builder
+
+## Release Notes
+
+- Prepared Add Electron Desktop App for release review.
+- Review the linked spec, verification evidence, and report before shipping.
+
+## Ship Checklist
+
+- [ ] Spec reviewed
+- [ ] Evidence reviewed
+- [ ] Report reviewed
+- [ ] Risks accepted

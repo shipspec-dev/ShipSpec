@@ -1,0 +1,18 @@
+node_modules/
+.DS_Store
+
+# Local environment
+.env
+.env.*
+
+# Build and coverage output
+dist/
+build/
+coverage/
+
+# Generated locally with `gsd ci`; OAuth tokens without workflow scope cannot push this file.
+.github/workflows/gsd.yml
+
+# Logs
+*.log
+npm-debug.log*

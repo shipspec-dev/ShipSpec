@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShipSpec Desktop</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>ShipSpec Desktop</h1>
+        <p id="projectPath">No project selected</p>
+      </div>
+      <button id="chooseProject">Choose Project</button>
+    </header>
+
+    <section class="grid">
+      <div class="panel hero">
+        <h2>Pipeline</h2>
+        <div id="pipeline" class="pipeline"></div>
+      </div>
+      <div class="panel">
+        <h2>Actions</h2>
+        <div class="actions">
+          <button data-command="status">Status</button>
+          <button data-command="validate">Validate</button>
+          <button data-command="verify --full">Verify Full</button>
+          <button data-command="report">Report</button>
+          <button data-command="release">Release</button>
+          <button data-command="ui">Refresh UI</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lower">
+      <div class="panel">
+        <h2>Agent Inbox</h2>
+        <pre id="inbox">Loading...</pre>
+      </div>
+      <div class="panel">
+        <h2>Command Output</h2>
+        <pre id="output">Ready.</pre>
+      </div>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "name": "shipspec",
+  "version": "0.1.0",
+  "description": "Spec-to-ship workflow for AI-assisted software delivery.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agents",
+    "openspec",
+    "workflow",
+    "cli",
+    "delivery"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ewent404/ShipSpec.git"
+  },
+  "bin": {
+    "gsd": "./bin/gsd.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "examples",
+    "apps/desktop",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "cli": "node bin/gsd.mjs",
+    "install:local": "npm link",
+    "lint": "node --check src/gsd.mjs && node --check bin/gsd.mjs && node --check test/gsd.test.mjs",
+    "test": "node --test",
+    "test:e2e": "node --test",
+    "typecheck": "node --check src/gsd.mjs && node --check bin/gsd.mjs && node --check test/gsd.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
