@@ -379,6 +379,23 @@ test("deliver prepares intake, spec, contract, room, and validation", async () =
   assert.equal(await exists(join(root, ".agent", "room", "jira-123-add-invoice-export", "handoff.md")), true);
 });
 
+test("deliver --adaptive prepares reasoning with the ShipSpec package", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["deliver", "--adaptive", "JIRA-456 Add checkout API"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Adaptive ShipSpec package prepared/);
+  assert.equal(await exists(join(root, ".gsd", "intake", "jira-456-add-checkout-api.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "contracts", "jira-456-add-checkout-api.md")), true);
+  assert.equal(await exists(join(root, ".agent", "room", "jira-456-add-checkout-api", "handoff.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "reasoning", "jira-456-add-checkout-api.md")), true);
+
+  const reasoning = await readFile(join(root, ".gsd", "reasoning", "jira-456-add-checkout-api.md"), "utf8");
+  assert.match(reasoning, /# Reasoning: JIRA-456 Add checkout API/);
+  assert.match(reasoning, /gsd loop/);
+});
+
 test("generateReflection writes lightweight readiness critique without leaking evidence output", async () => {
   const root = await tempRoot();
   await initWorkspace(root);

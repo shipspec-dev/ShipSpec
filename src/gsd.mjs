@@ -857,12 +857,12 @@ export async function getAuditTrail(root) {
   };
 }
 
-export async function prepareDelivery(root, request) {
+export async function prepareDelivery(root, request, options = {}) {
   const title = request.trim();
   if (!title) {
     return {
       ok: false,
-      message: "Usage: gsd deliver <request title or ticket link>",
+      message: "Usage: gsd deliver [--adaptive] <request title or ticket link>",
     };
   }
 
@@ -870,15 +870,19 @@ export async function prepareDelivery(root, request) {
   const change = await startChange(root, title);
   const contract = await generateContract(root);
   const room = await generateAgentRoom(root);
+  const reasoning = options.adaptive ? await generateReasoning(root) : null;
   const validation = await validateChange(root, { ready: false });
+  const ok = intake.ok && change.ok && contract.ok && room.ok && (!reasoning || reasoning.ok) && validation.ok;
+  const preparedMessage = options.adaptive ? "Adaptive ShipSpec package prepared" : "ShipSpec package prepared";
 
   return {
-    ok: intake.ok && change.ok && contract.ok && room.ok && validation.ok,
-    message: validation.ok ? "ShipSpec package prepared" : "ShipSpec package prepared, but validation needs attention",
+    ok,
+    message: validation.ok ? preparedMessage : `${preparedMessage}, but validation needs attention`,
     intake,
     change,
     contract,
     room,
+    reasoning,
     validation,
   };
 }
@@ -1385,7 +1389,9 @@ export async function runCli(argv, options = {}) {
     }
 
     if (command === "deliver") {
-      const result = await prepareDelivery(cwd, rest.join(" "));
+      const adaptive = rest.includes("--adaptive");
+      const request = rest.filter((part) => part !== "--adaptive").join(" ");
+      const result = await prepareDelivery(cwd, request, { adaptive });
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 

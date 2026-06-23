@@ -97,7 +97,7 @@ gsd done
 For AI-assisted work, ShipSpec can prepare a complete implementation package before coding starts:
 
 ```bash
-gsd deliver "JIRA-123 Add invoice export"
+gsd deliver --adaptive "JIRA-123 Add invoice export"
 ```
 
 That creates:
@@ -106,6 +106,7 @@ That creates:
 - OpenSpec-style proposal and tasks under `openspec/changes/`
 - implementation contract under `.gsd/contracts/`
 - role-based agent room under `.agent/room/`
+- adaptive reasoning under `.gsd/reasoning/`
 - validation output from `gsd validate`
 
 You can also run each step directly:
@@ -115,6 +116,7 @@ gsd intake "JIRA-123 Add invoice export"
 gsd start "JIRA-123 Add invoice export"
 gsd contract
 gsd room
+gsd reason
 gsd audit
 ```
 

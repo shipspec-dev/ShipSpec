@@ -33,7 +33,7 @@ gsd validate
 If there is no active change, create the ShipSpec package from the user's request:
 
 ```bash
-gsd deliver "<user request or ticket title>"
+gsd deliver --adaptive "<user request or ticket title>"
 ```
 
 If a change already exists but needs missing artifacts:
@@ -42,6 +42,7 @@ If a change already exists but needs missing artifacts:
 gsd intake "<user request or ticket title>"
 gsd contract
 gsd room
+gsd reason
 gsd validate
 ```
 
@@ -49,6 +50,7 @@ Before claiming implementation is done:
 
 ```bash
 gsd verify --full
+gsd loop
 gsd audit
 gsd validate --ready
 ```
