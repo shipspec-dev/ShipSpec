@@ -6,6 +6,7 @@
 - Added `gsd learn` for governed self-improvement lessons and project patterns.
 - Added `gsd loop` for a safe one-pass verify, reflect, and learn cycle.
 - Added `gsd memory` for read-only memory, pattern, lesson, reflection, and loop inspection.
+- Added `gsd reason` for deterministic local reasoning from spec, workflow, project signals, and memory.
 - Kept reflection local-only, bounded, and free of raw verification log copying.
 
 ## 0.3.1

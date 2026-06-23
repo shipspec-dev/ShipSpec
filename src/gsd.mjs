@@ -1091,6 +1091,45 @@ export async function getMemorySummary(root) {
   };
 }
 
+export async function generateReasoning(root) {
+  const activeChange = await requireActiveChange(root);
+  const specStatus = await getSpecStatus(root);
+  const detection = await detectProject(root);
+  const workflow = await readWorkflow(root);
+  const memory = await getMemorySummary(root);
+  const requiredVerification = buildRequiredVerification(workflow, detection);
+  const likelyAffectedAreas = inferAffectedAreas(activeChange.title, detection);
+  const risks = inferReasoningRisks({ specStatus, detection, workflow, memory });
+  const recommendedWorkflow = [
+    "gsd validate",
+    "gsd verify --full",
+    "gsd reflect",
+    "gsd loop",
+    "gsd memory",
+  ];
+  const questions = buildReasoningQuestions({ risks, detection });
+  const reasoningPath = join(root, ".gsd", "reasoning", `${activeChange.slug}.md`);
+  const result = {
+    ok: true,
+    activeChange,
+    whatMatters: buildWhatMatters(activeChange, specStatus, memory),
+    likelyAffectedAreas,
+    risks,
+    recommendedWorkflow,
+    requiredVerification,
+    questions,
+    reasoningPath,
+  };
+
+  await mkdir(join(root, ".gsd", "reasoning"), { recursive: true });
+  await writeFile(reasoningPath, buildReasoningMarkdown(result, detection));
+
+  return {
+    ...result,
+    message: `Reasoning written to .gsd/reasoning/${activeChange.slug}.md`,
+  };
+}
+
 export async function verifyChange(root, options = {}) {
   const activeChange = await requireActiveChange(root);
   const workflow = await readWorkflow(root);
@@ -1337,6 +1376,12 @@ export async function runCli(argv, options = {}) {
       const result = await getMemorySummary(cwd);
       if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
       return cliResult(0, `${formatMemorySummary(result)}\n`);
+    }
+
+    if (command === "reason") {
+      const result = await generateReasoning(cwd);
+      if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
     if (command === "deliver") {
@@ -2084,6 +2129,126 @@ function trimForDisplay(value, maxLength) {
   return `${text.slice(0, maxLength).trimEnd()}\n...`;
 }
 
+function buildWhatMatters(activeChange, specStatus, memory) {
+  const items = [
+    `Deliver \`${activeChange.title}\` against the active ShipSpec contract.`,
+    specStatus.acceptanceCriteria
+      ? "Keep acceptance criteria aligned with implementation evidence."
+      : "Clarify acceptance criteria before implementation goes far.",
+    specStatus.verificationPlan ? "Use the recorded verification plan as the minimum bar." : "Add a verification plan.",
+  ];
+
+  if (memory.lessons.length > 0) items.push("Apply recent lessons before choosing the workflow path.");
+  if (memory.projectPatterns.trim()) items.push("Respect learned project patterns from `.gsd/patterns/project.md`.");
+  return items;
+}
+
+function inferAffectedAreas(title, detection) {
+  const text = title.toLowerCase();
+  const areas = [];
+
+  if (/(api|endpoint|route|server|backend|service)/.test(text)) areas.push("API/backend surface");
+  if (/(ui|page|screen|component|button|form|frontend)/.test(text)) areas.push("Frontend/UI surface");
+  if (/(db|database|sql|migration|schema|model)/.test(text)) areas.push("Database/schema surface");
+  if (/(auth|login|permission|token|security)/.test(text)) areas.push("Auth/security surface");
+  if (/(checkout|payment|billing|invoice)/.test(text)) areas.push("Revenue or billing-critical flow");
+  if (detection.framework !== "unknown") areas.push(`${detection.framework} project conventions`);
+  if (areas.length === 0) areas.push("Project files identified by implementation and tests");
+  return [...new Set(areas)];
+}
+
+function inferReasoningRisks({ specStatus, detection, workflow, memory }) {
+  const risks = [];
+
+  if (!specStatus.acceptanceCriteria) risks.push("Acceptance criteria are missing.");
+  if (!specStatus.verificationPlan) risks.push("Verification plan is missing.");
+  if (!detection.scripts.test) risks.push("Unit test script is missing from package metadata.");
+  if (!detection.scripts.e2e) risks.push("E2E script is missing; full verification may not cover user flows.");
+  if (workflow.checks.length === 0) risks.push("No workflow checks are configured.");
+  if (memory.loops.some((loop) => loop.nextActions.length > 0)) risks.push("Recent loop next actions should be reviewed.");
+  if (risks.length === 0) risks.push("No deterministic risks detected from local ShipSpec state.");
+  return risks;
+}
+
+function buildRequiredVerification(workflow, detection) {
+  const commands = workflow.checks.map((check) => check.command);
+  if (commands.length === 0) {
+    if (detection.scripts.lint) commands.push(`${detection.packageManager} run lint`);
+    if (detection.scripts.test) commands.push(`${detection.packageManager} test`);
+    if (detection.scripts.typecheck) commands.push(`${detection.packageManager} run typecheck`);
+    if (detection.scripts.e2e) commands.push(`${detection.packageManager} run test:e2e`);
+  }
+  commands.push("gsd verify --full");
+  commands.push("gsd validate --ready");
+  return [...new Set(commands)];
+}
+
+function buildReasoningQuestions({ risks, detection }) {
+  const questions = [];
+
+  if (risks.some((risk) => risk.includes("Acceptance criteria"))) {
+    questions.push("What user-visible behavior proves this change is complete?");
+  }
+  if (risks.some((risk) => risk.includes("E2E"))) {
+    questions.push("Does this change need browser or end-to-end coverage?");
+  }
+  if (detection.framework === "unknown") {
+    questions.push("Which project conventions should guide implementation?");
+  }
+  if (questions.length === 0) questions.push("Are there edge cases or rollout constraints not captured in the spec?");
+  return questions;
+}
+
+function buildReasoningMarkdown(reasoning, detection) {
+  return [
+    `# Reasoning: ${reasoning.activeChange.title}`,
+    "",
+    `Change: ${reasoning.activeChange.slug}`,
+    `Generated: ${new Date().toISOString()}`,
+    "",
+    "## What Matters",
+    "",
+    ...formatBulletList(reasoning.whatMatters, "No reasoning items."),
+    "",
+    "## Project Signals",
+    "",
+    `- Runtime: ${detection.runtime}`,
+    `- Package manager: ${detection.packageManager}`,
+    `- Framework: ${detection.framework}`,
+    `- Test runner: ${detection.testRunner}`,
+    `- E2E: ${detection.e2e}`,
+    "",
+    "## Likely Affected Areas",
+    "",
+    ...formatBulletList(reasoning.likelyAffectedAreas, "No affected areas inferred."),
+    "",
+    "## Risks",
+    "",
+    ...formatBulletList(reasoning.risks, "No deterministic risks detected."),
+    "",
+    "## Recommended Workflow",
+    "",
+    ...formatBulletList(reasoning.recommendedWorkflow, "No workflow recommended."),
+    "",
+    "## Required Verification",
+    "",
+    ...formatBulletList(reasoning.requiredVerification, "No verification commands detected."),
+    "",
+    "## Questions",
+    "",
+    ...formatBulletList(reasoning.questions, "No open questions detected."),
+    "",
+    "## Safety",
+    "",
+    "- Reasoning is local-only and deterministic.",
+    "- No network calls are made.",
+    "- No shell commands are executed.",
+    "- No code edits or workflow mutations are performed.",
+    "- File reads are bounded to small ShipSpec memory artifacts.",
+    "",
+  ].join("\n");
+}
+
 function buildDesktopPackageJson() {
   return {
     name: "gsd-desktop",
@@ -2630,6 +2795,7 @@ function usage() {
     "  learn",
     "  loop",
     "  memory [--json]",
+    "  reason [--json]",
     "  deliver <request>",
     "  desktop",
     "  ui",

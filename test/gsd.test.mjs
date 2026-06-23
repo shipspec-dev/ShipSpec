@@ -17,6 +17,7 @@ import {
   generateAgentInstructions,
   generateCiWorkflow,
   generateRelease,
+  generateReasoning,
   getMemorySummary,
   getSpecStatus,
   getDiffSummary,
@@ -548,6 +549,63 @@ test("runCli memory prints memory summary and supports json output", async () =>
 
   const help = await runCli(["--help"], { cwd: root });
   assert.match(help.stdout, /memory/);
+});
+
+test("generateReasoning writes adaptive local reasoning from spec, memory, and project signals", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Checkout API");
+  await writeFile(
+    join(root, "package.json"),
+    JSON.stringify(
+      {
+        dependencies: { express: "^4.18.0" },
+        scripts: {
+          lint: "node --check src/api.js",
+          test: "node --test",
+          typecheck: "tsc --noEmit",
+          "test:e2e": "playwright test",
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  await learnFromChange(root);
+
+  const result = await generateReasoning(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(await exists(join(root, ".gsd", "reasoning", "add-checkout-api.md")), true);
+  assert.equal(result.requiredVerification.includes("npm run test:e2e"), true);
+  assert.equal(result.recommendedWorkflow.includes("gsd loop"), true);
+
+  const report = await readFile(join(root, ".gsd", "reasoning", "add-checkout-api.md"), "utf8");
+  assert.match(report, /# Reasoning: Add Checkout API/);
+  assert.match(report, /## What Matters/);
+  assert.match(report, /## Likely Affected Areas/);
+  assert.match(report, /## Required Verification/);
+  assert.match(report, /## Safety/);
+  assert.match(report, /local-only/);
+});
+
+test("runCli reason prints reasoning path and supports json output", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Reason Cli");
+
+  const text = await runCli(["reason"], { cwd: root });
+  assert.equal(text.exitCode, 0);
+  assert.match(text.stdout, /Reasoning written/);
+
+  const json = await runCli(["reason", "--json"], { cwd: root });
+  assert.equal(json.exitCode, 0);
+  const parsed = JSON.parse(json.stdout);
+  assert.equal(parsed.activeChange.slug, "reason-cli");
+  assert.equal(parsed.recommendedWorkflow.includes("gsd loop"), true);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.match(help.stdout, /reason/);
 });
 
 test("generateUiDashboard writes a single-page pixel dashboard", async () => {

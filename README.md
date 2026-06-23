@@ -218,6 +218,7 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 | `gsd learn` | Save governed lessons and project patterns from the current change. |
 | `gsd loop` | Run one safe verify, reflect, and learn pass without editing code. |
 | `gsd memory [--json]` | Inspect project memory, patterns, lessons, reflections, and loop actions. |
+| `gsd reason [--json]` | Generate local adaptive reasoning from spec, workflow, project signals, and memory. |
 | `gsd deliver <request>` | Prepare intake, spec, contract, room, and validation in one command. |
 | `gsd ui` | Generate a static pixel dashboard under `.gsd/ui/index.html`. |
 | `gsd desktop` | Generate an Electron desktop app under `apps/desktop/`. |
