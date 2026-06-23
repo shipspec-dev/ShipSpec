@@ -1,0 +1,8 @@
+interface:
+  display_name: "ShipSpec"
+  short_description: "Spec, verify, and hand off agent work"
+  brand_color: "#58F07A"
+  default_prompt: "Use $shipspec to turn this request into a verified implementation handoff."
+
+policy:
+  allow_implicit_invocation: true

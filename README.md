@@ -124,6 +124,28 @@ The intended agent workflow is:
 Request -> ShipSpec package -> Codex implementation -> verification -> report -> release -> done
 ```
 
+## Codex Skill
+
+ShipSpec includes a Codex skill at:
+
+```text
+skills/shipspec/
+```
+
+The skill teaches Codex when to use ShipSpec for feature requests, task links, spec validation, agent coordination, verification evidence, and handoff preparation.
+
+Install or copy that folder into your Codex skills directory, then ask Codex to use ShipSpec:
+
+```text
+Use $shipspec to implement JIRA-123 Add invoice export.
+```
+
+The skill keeps the CLI as the engine:
+
+```text
+ShipSpec CLI -> ShipSpec skill -> agent workflow -> verified handoff
+```
+
 ## Daily Feature Flow
 
 ```bash
