@@ -4,6 +4,7 @@
 
 - Added `gsd reflect` for lightweight local readiness critique.
 - Added `gsd learn` for governed self-improvement lessons and project patterns.
+- Added `gsd loop` for a safe one-pass verify, reflect, and learn cycle.
 - Kept reflection local-only, bounded, and free of raw verification log copying.
 
 ## 0.3.1

@@ -1003,6 +1003,72 @@ export async function learnFromChange(root) {
   };
 }
 
+export async function runLoop(root) {
+  const activeChange = await requireActiveChange(root);
+  const verification = await verifyChange(root, { full: true });
+  const reflection = await generateReflection(root);
+  const learned = verification.ok && reflection.ok;
+  const lesson = learned ? await learnFromChange(root) : null;
+  const loopPath = join(root, ".gsd", "loops", `${activeChange.slug}.md`);
+  const nextActions = verification.ok
+    ? reflection.nextActions
+    : [`Fix failing verification: ${verification.message}`, ...reflection.nextActions];
+
+  await mkdir(join(root, ".gsd", "loops"), { recursive: true });
+  await writeFile(
+    loopPath,
+    [
+      `# Loop: ${activeChange.title}`,
+      "",
+      "Mode: one-pass",
+      `Change: ${activeChange.slug}`,
+      `Generated: ${new Date().toISOString()}`,
+      "",
+      "## Verification",
+      "",
+      `- Result: ${verification.ok ? "pass" : "fail"}`,
+      `- Message: ${verification.message}`,
+      "",
+      "## Reflection",
+      "",
+      `- Result: ${reflection.ok ? "ready" : "needs attention"}`,
+      `- Reflection: .gsd/reflections/${activeChange.slug}.md`,
+      "",
+      "## Learning",
+      "",
+      learned
+        ? `- Lesson: .gsd/lessons/${activeChange.slug}.md`
+        : "- Learn skipped because reflection still has gaps or verification failed.",
+      "",
+      "## Next Actions",
+      "",
+      ...formatBulletList(nextActions, "No next action needed."),
+      "",
+      "## Safety",
+      "",
+      "- No code edits were made.",
+      "- No deployment was attempted.",
+      "- No network calls were made by the loop command.",
+      "- The loop ran one pass only.",
+      "- Human approval is required for workflow changes.",
+      "",
+    ].join("\n"),
+  );
+
+  return {
+    ok: learned,
+    learned,
+    message: learned
+      ? `Loop completed and learned from .gsd/loops/${activeChange.slug}.md`
+      : `Loop stopped with next actions in .gsd/loops/${activeChange.slug}.md`,
+    loopPath,
+    verification,
+    reflection,
+    lesson,
+    nextActions,
+  };
+}
+
 export async function verifyChange(root, options = {}) {
   const activeChange = await requireActiveChange(root);
   const workflow = await readWorkflow(root);
@@ -1237,6 +1303,11 @@ export async function runCli(argv, options = {}) {
 
     if (command === "learn") {
       const result = await learnFromChange(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "loop") {
+      const result = await runLoop(cwd);
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
@@ -2411,6 +2482,7 @@ function usage() {
     "  audit",
     "  reflect",
     "  learn",
+    "  loop",
     "  deliver <request>",
     "  desktop",
     "  ui",

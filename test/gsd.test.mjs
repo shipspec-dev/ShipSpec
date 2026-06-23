@@ -21,6 +21,7 @@ import {
   getDiffSummary,
   getStatus,
   initWorkspace,
+  runLoop,
   listAgentMessages,
   postAgentMessage,
   runSelfTest,
@@ -439,6 +440,71 @@ test("runCli reflect and learn expose self-improving loop commands", async () =>
   const help = await runCli(["--help"], { cwd: root });
   assert.match(help.stdout, /reflect/);
   assert.match(help.stdout, /learn/);
+});
+
+test("runLoop runs one safe verification and reflection pass without learning when gaps remain", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Guard Checkout Flow");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+
+  const result = await runLoop(root);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.learned, false);
+  assert.match(result.message, /Loop stopped with next actions/);
+  assert.equal(await exists(join(root, ".gsd", "loops", "guard-checkout-flow.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "lessons", "guard-checkout-flow.md")), false);
+
+  const report = await readFile(join(root, ".gsd", "loops", "guard-checkout-flow.md"), "utf8");
+  assert.match(report, /Mode: one-pass/);
+  assert.match(report, /No code edits were made/);
+  assert.match(report, /Learn skipped because reflection still has gaps/);
+});
+
+test("runLoop learns when verification and reflection are ready", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Ready Audit Loop");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await runCli(["intake", "Ready Audit Loop"], { cwd: root });
+  await runCli(["contract"], { cwd: root });
+  await runCli(["room"], { cwd: root });
+  await verifyChange(root, { full: true });
+  await generateReport(root);
+  await generateRelease(root);
+  await completeChange(root);
+
+  const result = await runLoop(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.learned, true);
+  assert.match(result.message, /Loop completed and learned/);
+  assert.equal(await exists(join(root, ".gsd", "loops", "ready-audit-loop.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "lessons", "ready-audit-loop.md")), true);
+});
+
+test("runCli loop exposes the one-pass self-improvement loop", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Loop Cli");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+
+  const loop = await runCli(["loop"], { cwd: root });
+  assert.equal(loop.exitCode, 1);
+  assert.match(loop.stdout, /Loop stopped with next actions/);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.match(help.stdout, /loop/);
 });
 
 test("generateUiDashboard writes a single-page pixel dashboard", async () => {
