@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Added ShipSpec intake, contract, room, audit, and deliver commands.
+- Added ShipSpec audit trail to the pixel dashboard.
+- Kept the workflow ShipSpec-branded while preparing agent-friendly implementation packages.
+
 ## 0.1.0
 
 - Added repo-local ShipSpec workflow initialization.

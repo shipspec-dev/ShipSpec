@@ -129,7 +129,7 @@ test("runCli supports help and version for an installable CLI", async () => {
 
   const version = await runCli(["--version"], { cwd: root });
   assert.equal(version.exitCode, 0);
-  assert.match(version.stdout, /0\.2\.0/);
+  assert.match(version.stdout, /0\.3\.0/);
 });
 
 test("generateExamples creates a node-basic example project with ShipSpec artifacts", async () => {
@@ -267,6 +267,86 @@ test("runCli adapters lists integration points", async () => {
   assert.match(result.stdout, /docs\/superpowers/);
 });
 
+test("intake creates a ShipSpec request intake record", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["intake", "JIRA-123 Add invoice export"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /\.gsd\/intake\/jira-123-add-invoice-export\.md/);
+  const intake = await readFile(join(root, ".gsd", "intake", "jira-123-add-invoice-export.md"), "utf8");
+  assert.match(intake, /# JIRA-123 Add invoice export/);
+  assert.match(intake, /## Source/);
+  assert.match(intake, /## Open Questions/);
+});
+
+test("contract creates a delivery contract for the active ShipSpec change", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Invoice Export");
+
+  const result = await runCli(["contract"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /\.gsd\/contracts\/add-invoice-export\.md/);
+  const contract = await readFile(join(root, ".gsd", "contracts", "add-invoice-export.md"), "utf8");
+  assert.match(contract, /# Add Invoice Export Contract/);
+  assert.match(contract, /## Acceptance Criteria/);
+  assert.match(contract, /## Files Likely Affected/);
+  assert.match(contract, /## Definition Of Done/);
+});
+
+test("room creates role files for the active ShipSpec change", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Invoice Export");
+
+  const result = await runCli(["room"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  const room = join(root, ".agent", "room", "add-invoice-export");
+  assert.equal(await exists(join(room, "planner.md")), true);
+  assert.equal(await exists(join(room, "builder.md")), true);
+  assert.equal(await exists(join(room, "tester.md")), true);
+  assert.equal(await exists(join(room, "reviewer.md")), true);
+  assert.equal(await exists(join(room, "release.md")), true);
+  assert.equal(await exists(join(room, "handoff.md")), true);
+  const handoff = await readFile(join(room, "handoff.md"), "utf8");
+  assert.match(handoff, /Add Invoice Export/);
+});
+
+test("audit reports ShipSpec delivery trail readiness", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Invoice Export");
+  await runCli(["intake", "Add Invoice Export"], { cwd: root });
+  await runCli(["contract"], { cwd: root });
+  await runCli(["room"], { cwd: root });
+
+  const result = await runCli(["audit"], { cwd: root });
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.stdout, /PASS Request intake/);
+  assert.match(result.stdout, /PASS Spec/);
+  assert.match(result.stdout, /PASS Contract/);
+  assert.match(result.stdout, /PASS Agent room/);
+  assert.match(result.stdout, /WAIT Evidence/);
+  assert.match(result.stdout, /WAIT Done/);
+});
+
+test("deliver prepares intake, spec, contract, room, and validation", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["deliver", "JIRA-123 Add invoice export"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /ShipSpec package prepared/);
+  assert.equal(await exists(join(root, ".gsd", "intake", "jira-123-add-invoice-export.md")), true);
+  assert.equal(await exists(join(root, "openspec", "changes", "jira-123-add-invoice-export", "proposal.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "contracts", "jira-123-add-invoice-export.md")), true);
+  assert.equal(await exists(join(root, ".agent", "room", "jira-123-add-invoice-export", "handoff.md")), true);
+});
+
 test("generateUiDashboard writes a single-page pixel dashboard", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });
@@ -323,6 +403,23 @@ test("generateUiDashboard shows committed files when working tree is clean", asy
   assert.match(html, /Committed Files/);
   assert.match(html, /src\/feature\.js/);
   assert.doesNotMatch(html, /No Git changes detected/);
+});
+
+test("generateUiDashboard shows ShipSpec audit trail", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Dashboard Audit Trail");
+  await runCli(["intake", "Dashboard Audit Trail"], { cwd: root });
+  await runCli(["contract"], { cwd: root });
+  await runCli(["room"], { cwd: root });
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  assert.match(html, /ShipSpec Audit/);
+  assert.match(html, /Request intake/);
+  assert.match(html, /Contract/);
+  assert.match(html, /Agent room/);
 });
 
 test("generateDesktopApp writes a renderer that serializes command refreshes", async () => {

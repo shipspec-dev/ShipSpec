@@ -92,6 +92,38 @@ gsd release
 gsd done
 ```
 
+## ShipSpec Workflow Package
+
+For AI-assisted work, ShipSpec can prepare a complete implementation package before coding starts:
+
+```bash
+gsd deliver "JIRA-123 Add invoice export"
+```
+
+That creates:
+
+- request intake under `.gsd/intake/`
+- OpenSpec-style proposal and tasks under `openspec/changes/`
+- implementation contract under `.gsd/contracts/`
+- role-based agent room under `.agent/room/`
+- validation output from `gsd validate`
+
+You can also run each step directly:
+
+```bash
+gsd intake "JIRA-123 Add invoice export"
+gsd start "JIRA-123 Add invoice export"
+gsd contract
+gsd room
+gsd audit
+```
+
+The intended agent workflow is:
+
+```text
+Request -> ShipSpec package -> Codex implementation -> verification -> report -> release -> done
+```
+
 ## Daily Feature Flow
 
 ```bash
@@ -144,6 +176,11 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 | `gsd examples` | Generate example projects. |
 | `gsd self-test` | Run ShipSpec health checks. |
 | `gsd adapters` | List the OpenSpec, Superpowers, GitHub, and project-script integration points. |
+| `gsd intake <request>` | Create a local request intake record. |
+| `gsd contract` | Create the active change implementation contract. |
+| `gsd room` | Create role-based agent room files for the active change. |
+| `gsd audit` | Show the ShipSpec trail from intake through done. |
+| `gsd deliver <request>` | Prepare intake, spec, contract, room, and validation in one command. |
 | `gsd ui` | Generate a static pixel dashboard under `.gsd/ui/index.html`. |
 | `gsd desktop` | Generate an Electron desktop app under `apps/desktop/`. |
 

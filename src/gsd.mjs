@@ -4,7 +4,7 @@ import { basename, join } from "node:path";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 
 const DEFAULT_WORKFLOW = {
   checks: [
@@ -498,7 +498,7 @@ export async function generateExamples(root) {
     `${JSON.stringify(
       {
         name: "gsd-node-basic-example",
-        version: "0.2.0",
+        version: "0.3.0",
         type: "module",
         private: true,
         scripts: {
@@ -637,6 +637,7 @@ export async function generateUiDashboard(root) {
   const readyValidation = await validateChange(root, { ready: true });
   const diff = await getDiffSummary(root);
   const messages = await listAgentMessages(root);
+  const audit = await getAuditTrail(root);
   const activeChange = status.activeChange;
   const reportExists = activeChange ? await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`)) : false;
   const releaseExists = activeChange ? await exists(join(root, ".gsd", "releases", `${activeChange.slug}.md`)) : false;
@@ -652,6 +653,7 @@ export async function generateUiDashboard(root) {
       readyValidation,
       diff,
       messages,
+      audit,
       reportExists,
       releaseExists,
     }),
@@ -661,6 +663,193 @@ export async function generateUiDashboard(root) {
     ok: true,
     message: "Pixel dashboard written to .gsd/ui/index.html",
     uiPath,
+  };
+}
+
+export async function createIntake(root, request) {
+  await initWorkspace(root);
+  const title = request.trim();
+  if (!title) {
+    return {
+      ok: false,
+      message: "Usage: gsd intake <request title or ticket link>",
+    };
+  }
+
+  const slug = slugify(title);
+  const intakePath = join(root, ".gsd", "intake", `${slug}.md`);
+  await mkdir(join(root, ".gsd", "intake"), { recursive: true });
+  await writeFile(
+    intakePath,
+    [
+      `# ${title}`,
+      "",
+      "## Source",
+      "",
+      isLikelyUrl(title) ? title : "- Local request",
+      "",
+      "## Problem",
+      "",
+      "- Describe the request, ticket, or user problem.",
+      "",
+      "## Expected Outcome",
+      "",
+      "- Define what should be true when this work is complete.",
+      "",
+      "## Open Questions",
+      "",
+      "- Confirm scope before implementation if the request is ambiguous.",
+      "",
+    ].join("\n"),
+  );
+
+  return {
+    ok: true,
+    message: `Intake written to .gsd/intake/${slug}.md`,
+    slug,
+    intakePath,
+  };
+}
+
+export async function generateContract(root) {
+  const activeChange = await requireActiveChange(root);
+  const contractPath = join(root, ".gsd", "contracts", `${activeChange.slug}.md`);
+  await mkdir(join(root, ".gsd", "contracts"), { recursive: true });
+  await writeFile(
+    contractPath,
+    [
+      `# ${activeChange.title} Contract`,
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- [ ] The active ShipSpec proposal acceptance criteria are satisfied.",
+      "- [ ] The implementation stays inside the validated scope.",
+      "",
+      "## Files Likely Affected",
+      "",
+      "- List expected source, test, documentation, or configuration files before coding.",
+      "",
+      "## Test Plan",
+      "",
+      "- Run `gsd verify --full` before review or release.",
+      "",
+      "## Definition Of Done",
+      "",
+      "- [ ] Spec validates with `gsd validate`.",
+      "- [ ] Verification evidence exists.",
+      "- [ ] Review report exists.",
+      "- [ ] Release handoff exists.",
+      "- [ ] Done report exists.",
+      "",
+      "## Risks",
+      "",
+      "- Record risky assumptions, migrations, edge cases, or rollback notes.",
+      "",
+      "## Approval Gates",
+      "",
+      "- [ ] Human approved scope.",
+      "- [ ] Human approved release readiness.",
+      "",
+    ].join("\n"),
+  );
+
+  return {
+    ok: true,
+    message: `Contract written to .gsd/contracts/${activeChange.slug}.md`,
+    contractPath,
+  };
+}
+
+export async function generateAgentRoom(root) {
+  const activeChange = await requireActiveChange(root);
+  const roomRoot = join(root, ".agent", "room", activeChange.slug);
+  await mkdir(roomRoot, { recursive: true });
+
+  const roles = [
+    ["planner", "Owns scope clarity, acceptance criteria, and open questions."],
+    ["builder", "Owns implementation inside the validated ShipSpec contract."],
+    ["tester", "Owns verification evidence and regression coverage."],
+    ["reviewer", "Owns changed-file review, risks, and handoff quality."],
+    ["release", "Owns release notes, rollout concerns, and final readiness."],
+  ];
+
+  for (const [role, duty] of roles) {
+    await writeFile(
+      join(roomRoot, `${role}.md`),
+      [`# ${activeChange.title} ${titleCase(role)}`, "", `Duty: ${duty}`, "", "## Notes", "", "- Pending.", ""].join("\n"),
+    );
+  }
+
+  await writeFile(
+    join(roomRoot, "handoff.md"),
+    [
+      `# ${activeChange.title} Handoff`,
+      "",
+      "## Current State",
+      "",
+      "- ShipSpec room created.",
+      "",
+      "## Next Agent",
+      "",
+      "- Planner confirms contract, then builder implements.",
+      "",
+    ].join("\n"),
+  );
+
+  return {
+    ok: true,
+    message: `Agent room written to .agent/room/${activeChange.slug}`,
+    roomRoot,
+  };
+}
+
+export async function getAuditTrail(root) {
+  const status = await getStatus(root);
+  const activeChange = status.activeChange;
+  const specStatus = await getSpecStatus(root);
+  const slug = activeChange?.slug;
+
+  const checks = [
+    ["Request intake", slug ? await exists(join(root, ".gsd", "intake", `${slug}.md`)) : false],
+    ["Spec", Boolean(specStatus.activeChange && specStatus.proposal && specStatus.tasks)],
+    ["Contract", slug ? await exists(join(root, ".gsd", "contracts", `${slug}.md`)) : false],
+    ["Agent room", slug ? await exists(join(root, ".agent", "room", slug, "handoff.md")) : false],
+    ["Evidence", slug ? await exists(join(root, ".agent", "evidence", `${slug}.md`)) : false],
+    ["Report", slug ? await exists(join(root, ".gsd", "reports", `${slug}.md`)) : false],
+    ["Release", slug ? await exists(join(root, ".gsd", "releases", `${slug}.md`)) : false],
+    ["Done", slug ? await exists(join(root, ".gsd", "done", `${slug}.md`)) : false],
+  ].map(([name, ok]) => ({ name, ok }));
+
+  return {
+    ok: checks.every((check) => check.ok),
+    activeChange,
+    checks,
+  };
+}
+
+export async function prepareDelivery(root, request) {
+  const title = request.trim();
+  if (!title) {
+    return {
+      ok: false,
+      message: "Usage: gsd deliver <request title or ticket link>",
+    };
+  }
+
+  const intake = await createIntake(root, title);
+  const change = await startChange(root, title);
+  const contract = await generateContract(root);
+  const room = await generateAgentRoom(root);
+  const validation = await validateChange(root, { ready: false });
+
+  return {
+    ok: intake.ok && change.ok && contract.ok && room.ok && validation.ok,
+    message: validation.ok ? "ShipSpec package prepared" : "ShipSpec package prepared, but validation needs attention",
+    intake,
+    change,
+    contract,
+    room,
+    validation,
   };
 }
 
@@ -852,6 +1041,31 @@ export async function runCli(argv, options = {}) {
 
     if (command === "adapters") {
       return cliResult(0, `${formatAdapters(listIntegrationAdapters())}\n`);
+    }
+
+    if (command === "intake") {
+      const result = await createIntake(cwd, rest.join(" "));
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "contract") {
+      const result = await generateContract(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "room") {
+      const result = await generateAgentRoom(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "audit") {
+      const result = await getAuditTrail(cwd);
+      return cliResult(result.ok ? 0 : 1, `${formatAuditTrail(result)}\n`);
+    }
+
+    if (command === "deliver") {
+      const result = await prepareDelivery(cwd, rest.join(" "));
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
     if (command === "desktop") {
@@ -1409,10 +1623,19 @@ function formatAdapters(adapters) {
     .join("\n\n");
 }
 
+function formatAuditTrail(result) {
+  const lines = [
+    `Change: ${result.activeChange?.slug ?? "none"}`,
+    "",
+    ...result.checks.map((check) => `${check.ok ? "PASS" : "WAIT"} ${check.name}`),
+  ];
+  return lines.join("\n");
+}
+
 function buildDesktopPackageJson() {
   return {
     name: "gsd-desktop",
-    version: "0.2.0",
+    version: "0.3.0",
     private: true,
     main: "main.js",
     scripts: {
@@ -1863,6 +2086,22 @@ function buildUiHtml(model) {
       </div>
     </section>
 
+    <section class="split">
+      <div class="panel">
+        <h2>ShipSpec Audit</h2>
+        <div class="files">
+          ${model.audit.checks.map((check) => `<div class="row">${check.ok ? "PASS" : "WAIT"} ${escapeHtml(check.name)}</div>`).join("")}
+        </div>
+      </div>
+      <div class="panel">
+        <h2>ShipSpec Files</h2>
+        <div class="files">
+          <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
+          <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
+        </div>
+      </div>
+    </section>
+
     <p class="footer">Generated by ShipSpec. Static single-page dashboard. Refresh with <span class="cmd">gsd ui</span>.</p>
   </main>
 </body>
@@ -1876,6 +2115,10 @@ function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function isLikelyUrl(value) {
+  return /^https?:\/\//i.test(value);
 }
 
 function cliResult(exitCode, stdout) {
@@ -1909,6 +2152,11 @@ function usage() {
     "  examples",
     "  self-test",
     "  adapters",
+    "  intake <request>",
+    "  contract",
+    "  room",
+    "  audit",
+    "  deliver <request>",
     "  desktop",
     "  ui",
     "  verify [--full]",
