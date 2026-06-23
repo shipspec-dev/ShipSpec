@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Added `gsd reflect` for lightweight local readiness critique.
+- Added `gsd learn` for governed self-improvement lessons and project patterns.
+- Kept reflection local-only, bounded, and free of raw verification log copying.
+
 ## 0.3.1
 
 - Updated package metadata and public links for the `shipspec-dev` GitHub organization.

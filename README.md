@@ -214,6 +214,8 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 | `gsd contract` | Create the active change implementation contract. |
 | `gsd room` | Create role-based agent room files for the active change. |
 | `gsd audit` | Show the ShipSpec trail from intake through done. |
+| `gsd reflect` | Write a local readiness critique with gaps, risks, and next actions. |
+| `gsd learn` | Save governed lessons and project patterns from the current change. |
 | `gsd deliver <request>` | Prepare intake, spec, contract, room, and validation in one command. |
 | `gsd ui` | Generate a static pixel dashboard under `.gsd/ui/index.html`. |
 | `gsd desktop` | Generate an Electron desktop app under `apps/desktop/`. |

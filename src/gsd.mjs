@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const VERSION = "0.3.1";
+const VERSION = "0.4.0";
 const PACKAGE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
 const DEFAULT_WORKFLOW = {
@@ -501,7 +501,7 @@ export async function generateExamples(root) {
     `${JSON.stringify(
       {
         name: "gsd-node-basic-example",
-        version: "0.3.1",
+        version: "0.4.0",
         type: "module",
         private: true,
         scripts: {
@@ -881,6 +881,128 @@ export async function prepareDelivery(root, request) {
   };
 }
 
+export async function generateReflection(root) {
+  const activeChange = await requireActiveChange(root);
+  const specValidation = await validateChange(root, { ready: false });
+  const readyValidation = await validateChange(root, { ready: true });
+  const summary = await getDiffSummary(root);
+  const audit = await getAuditTrail(root);
+  const messages = await listAgentMessages(root);
+  const evidenceSummary = await readEvidenceSummary(root, activeChange.slug);
+  const reportExists = await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`));
+  const releaseExists = await exists(join(root, ".gsd", "releases", `${activeChange.slug}.md`));
+  const doneExists = await exists(join(root, ".gsd", "done", `${activeChange.slug}.md`));
+  const gaps = buildReflectionGaps({ specValidation, readyValidation, audit, reportExists, releaseExists, doneExists });
+  const nextActions = buildReflectionNextActions(gaps);
+  const reflectionPath = join(root, ".gsd", "reflections", `${activeChange.slug}.md`);
+
+  await mkdir(join(root, ".gsd", "reflections"), { recursive: true });
+  await writeFile(
+    reflectionPath,
+    [
+      `# Reflection: ${activeChange.title}`,
+      "",
+      `Change: ${activeChange.slug}`,
+      `Readiness: ${gaps.length === 0 ? "ready" : "needs attention"}`,
+      `Generated: ${new Date().toISOString()}`,
+      "",
+      "## Summary",
+      "",
+      gaps.length === 0
+        ? "- No ShipSpec gaps detected from local evidence."
+        : "- ShipSpec found gaps that should be resolved before shipping.",
+      `- Changed files detected: ${summary.stagedFiles.length + summary.unstagedFiles.length}`,
+      `- Agent messages reviewed: ${messages.length}`,
+      "",
+      "## Gaps",
+      "",
+      ...formatBulletList(gaps, "No gaps detected."),
+      "",
+      "## Verification",
+      "",
+      ...formatBulletList(evidenceSummary, "No verification evidence summary available."),
+      "",
+      "## Security",
+      "",
+      "- Reflection is local-only and does not call network services.",
+      "- No shell commands were executed by reflection.",
+      "- Raw verification logs are not copied into reflection output.",
+      "- Workflow changes are suggestions only; human approval is required.",
+      "",
+      "## Next Actions",
+      "",
+      ...formatBulletList(nextActions, "Proceed to review or release handoff."),
+      "",
+    ].join("\n"),
+  );
+
+  return {
+    ok: gaps.length === 0,
+    message: `Reflection written to .gsd/reflections/${activeChange.slug}.md${
+      gaps.length === 0 ? "" : " and needs attention"
+    }`,
+    reflectionPath,
+    gaps,
+    nextActions,
+  };
+}
+
+export async function learnFromChange(root) {
+  const activeChange = await requireActiveChange(root);
+  const reflection = await generateReflection(root);
+  const lessonPath = join(root, ".gsd", "lessons", `${activeChange.slug}.md`);
+  const patternsPath = join(root, ".gsd", "patterns", "project.md");
+  const memoryPath = join(root, ".agent", "memory.md");
+  const patternSection = [
+    `## Learned from ${activeChange.title}`,
+    "",
+    `- Change: ${activeChange.slug}`,
+    `- Readiness: ${reflection.ok ? "ready" : "needs attention"}`,
+    `- Primary next action: ${reflection.nextActions[0] ?? "Continue normal review."}`,
+    "- Human approval required before changing workflow rules.",
+    "",
+  ].join("\n");
+  const memorySection = [
+    "## ShipSpec Lessons",
+    "",
+    `- ${activeChange.slug}: ${reflection.nextActions[0] ?? "No next action recorded."}`,
+    "",
+  ].join("\n");
+
+  await mkdir(join(root, ".gsd", "lessons"), { recursive: true });
+  await mkdir(join(root, ".gsd", "patterns"), { recursive: true });
+  await mkdir(join(root, ".agent"), { recursive: true });
+  await writeFile(
+    lessonPath,
+    [
+      `# Lesson: ${activeChange.title}`,
+      "",
+      `Change: ${activeChange.slug}`,
+      `Reflection: .gsd/reflections/${activeChange.slug}.md`,
+      "",
+      "## What ShipSpec Learned",
+      "",
+      ...formatBulletList(reflection.nextActions, "No lesson needed."),
+      "",
+      "## Governance",
+      "",
+      "- Human approval required before changing project workflow, CI, or skills.",
+      "- Lessons are advisory and auditable.",
+      "",
+    ].join("\n"),
+  );
+  await appendUniqueSection(patternsPath, "# Project Patterns\n\n", `Learned from ${activeChange.title}`, patternSection);
+  await appendUniqueSection(memoryPath, "# Project Memory\n\n", activeChange.slug, memorySection);
+
+  return {
+    ok: true,
+    message: `Lesson written to .gsd/lessons/${activeChange.slug}.md`,
+    lessonPath,
+    patternsPath,
+    memoryPath,
+  };
+}
+
 export async function verifyChange(root, options = {}) {
   const activeChange = await requireActiveChange(root);
   const workflow = await readWorkflow(root);
@@ -1108,6 +1230,16 @@ export async function runCli(argv, options = {}) {
       return cliResult(result.ok ? 0 : 1, `${formatAuditTrail(result)}\n`);
     }
 
+    if (command === "reflect") {
+      const result = await generateReflection(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "learn") {
+      const result = await learnFromChange(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
     if (command === "deliver") {
       const result = await prepareDelivery(cwd, rest.join(" "));
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
@@ -1327,6 +1459,71 @@ async function readJsonIfExists(path) {
 async function readTextIfExists(path) {
   if (!(await exists(path))) return "";
   return readFile(path, "utf8");
+}
+
+async function readTextSnippetIfExists(path, maxBytes = 24_000) {
+  const content = await readTextIfExists(path);
+  return content.slice(0, maxBytes);
+}
+
+async function readEvidenceSummary(root, slug) {
+  const evidence = await readTextSnippetIfExists(join(root, ".agent", "evidence", `${slug}.md`));
+  if (!evidence) return [];
+
+  const lines = evidence.split("\n");
+  const checks = [];
+  let current = null;
+
+  for (const line of lines) {
+    if (line.startsWith("### ")) {
+      current = { name: line.slice(4).trim(), result: "unknown", required: "unknown" };
+      checks.push(current);
+    } else if (current && line.startsWith("Result: ")) {
+      current.result = line.slice("Result: ".length).trim();
+    } else if (current && line.startsWith("Required: ")) {
+      current.required = line.slice("Required: ".length).trim();
+    }
+  }
+
+  return checks.map((check) => `${check.result === "pass" ? "PASS" : "CHECK"} ${check.name} (required: ${check.required})`);
+}
+
+function buildReflectionGaps({ specValidation, readyValidation, audit, reportExists, releaseExists, doneExists }) {
+  const gaps = [];
+
+  for (const error of specValidation.errors) gaps.push(`Spec gap: ${error}`);
+  for (const error of readyValidation.errors) gaps.push(`Readiness gap: ${error}`);
+  for (const check of audit.checks.filter((entry) => !entry.ok)) gaps.push(`${check.name} artifact is missing.`);
+  if (!reportExists) gaps.push("Report artifact is missing.");
+  if (!releaseExists) gaps.push("Release handoff is missing.");
+  if (!doneExists) gaps.push("Done report is missing.");
+
+  return [...new Set(gaps)];
+}
+
+function buildReflectionNextActions(gaps) {
+  if (gaps.length === 0) return ["Proceed to review or release handoff."];
+
+  const actions = [];
+  if (gaps.some((gap) => gap.includes("Verification evidence"))) actions.push("Run `gsd verify --full` and review failed checks.");
+  if (gaps.some((gap) => gap.includes("Report"))) actions.push("Run `gsd report` after verification evidence is current.");
+  if (gaps.some((gap) => gap.includes("Release"))) actions.push("Run `gsd release` when review evidence is ready.");
+  if (gaps.some((gap) => gap.includes("Done"))) actions.push("Run `gsd done` only after release handoff is complete.");
+  if (gaps.some((gap) => gap.includes("Spec"))) actions.push("Improve proposal, tasks, acceptance criteria, or verification plan.");
+  if (actions.length === 0) actions.push("Resolve the listed ShipSpec gaps before shipping.");
+  return [...new Set(actions)];
+}
+
+function formatBulletList(items, emptyText) {
+  if (!items.length) return [`- ${emptyText}`];
+  return items.map((item) => `- ${item}`);
+}
+
+async function appendUniqueSection(path, initialContent, marker, section) {
+  const existing = await readTextIfExists(path);
+  const content = existing || initialContent;
+  if (content.includes(marker)) return;
+  await writeFile(path, `${content.trimEnd()}\n\n${section}`);
 }
 
 function hasMarkdownHeading(markdown, heading) {
@@ -1690,7 +1887,7 @@ function formatAuditTrail(result) {
 function buildDesktopPackageJson() {
   return {
     name: "gsd-desktop",
-    version: "0.3.1",
+    version: "0.4.0",
     private: true,
     main: "main.js",
     scripts: {
@@ -2212,6 +2409,8 @@ function usage() {
     "  contract",
     "  room",
     "  audit",
+    "  reflect",
+    "  learn",
     "  deliver <request>",
     "  desktop",
     "  ui",

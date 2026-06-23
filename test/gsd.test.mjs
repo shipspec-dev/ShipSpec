@@ -25,8 +25,10 @@ import {
   postAgentMessage,
   runSelfTest,
   generateReport,
+  generateReflection,
   runCli,
   startChange,
+  learnFromChange,
   validateChange,
   verifyChange,
 } from "../src/gsd.mjs";
@@ -130,7 +132,7 @@ test("runCli supports help and version for an installable CLI", async () => {
 
   const version = await runCli(["--version"], { cwd: root });
   assert.equal(version.exitCode, 0);
-  assert.match(version.stdout, /0\.3\.1/);
+  assert.match(version.stdout, /0\.4\.0/);
 });
 
 test("runCli skill path prints source and default install target", async () => {
@@ -372,6 +374,71 @@ test("deliver prepares intake, spec, contract, room, and validation", async () =
   assert.equal(await exists(join(root, "openspec", "changes", "jira-123-add-invoice-export", "proposal.md")), true);
   assert.equal(await exists(join(root, ".gsd", "contracts", "jira-123-add-invoice-export.md")), true);
   assert.equal(await exists(join(root, ".agent", "room", "jira-123-add-invoice-export", "handoff.md")), true);
+});
+
+test("generateReflection writes lightweight readiness critique without leaking evidence output", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Protect Checkout Token");
+  await writeFile(
+    join(root, "package.json"),
+    JSON.stringify({ scripts: { test: "node -e \"console.log('API_TOKEN=super-secret-value')\"" } }, null, 2),
+  );
+  await verifyChange(root, { full: false });
+
+  const result = await generateReflection(root);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.gaps.some((gap) => gap.includes("Report")), true);
+  assert.equal(await exists(join(root, ".gsd", "reflections", "protect-checkout-token.md")), true);
+
+  const reflection = await readFile(join(root, ".gsd", "reflections", "protect-checkout-token.md"), "utf8");
+  assert.match(reflection, /# Reflection: Protect Checkout Token/);
+  assert.match(reflection, /## Security/);
+  assert.match(reflection, /No shell commands were executed by reflection/);
+  assert.match(reflection, /Report artifact is missing/);
+  assert.doesNotMatch(reflection, /super-secret-value/);
+  assert.doesNotMatch(reflection, /API_TOKEN=/);
+});
+
+test("learnFromChange stores governed lessons and project patterns", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Improve Billing Audit");
+
+  const result = await learnFromChange(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(await exists(join(root, ".gsd", "lessons", "improve-billing-audit.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "patterns", "project.md")), true);
+
+  const lesson = await readFile(join(root, ".gsd", "lessons", "improve-billing-audit.md"), "utf8");
+  const patterns = await readFile(join(root, ".gsd", "patterns", "project.md"), "utf8");
+  const memory = await readFile(join(root, ".agent", "memory.md"), "utf8");
+
+  assert.match(lesson, /Human approval required/);
+  assert.match(patterns, /Improve Billing Audit/);
+  assert.match(memory, /ShipSpec Lessons/);
+  assert.match(memory, /improve-billing-audit/);
+});
+
+test("runCli reflect and learn expose self-improving loop commands", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Risk Ledger");
+
+  const reflect = await runCli(["reflect"], { cwd: root });
+  assert.equal(reflect.exitCode, 1);
+  assert.match(reflect.stdout, /Reflection written/);
+  assert.match(reflect.stdout, /needs attention/);
+
+  const learn = await runCli(["learn"], { cwd: root });
+  assert.equal(learn.exitCode, 0);
+  assert.match(learn.stdout, /Lesson written/);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.match(help.stdout, /reflect/);
+  assert.match(help.stdout, /learn/);
 });
 
 test("generateUiDashboard writes a single-page pixel dashboard", async () => {
