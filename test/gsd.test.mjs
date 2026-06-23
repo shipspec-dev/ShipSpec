@@ -582,6 +582,26 @@ test("generateUiDashboard shows ShipSpec audit trail", async () => {
   assert.match(html, /Agent room/);
 });
 
+test("generateUiDashboard shows self-improving loop state", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Dashboard Loop Trail");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await runCli(["loop"], { cwd: root });
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  assert.match(html, /Self-Improving Loop/);
+  assert.match(html, /Loop: present/);
+  assert.match(html, /Reflection: present/);
+  assert.match(html, /Learn: skipped/);
+  assert.match(html, /Run `gsd report`/);
+});
+
 test("generateDesktopApp writes a renderer that serializes command refreshes", async () => {
   const root = await tempRoot();
 

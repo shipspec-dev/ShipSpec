@@ -669,6 +669,7 @@ export async function generateUiDashboard(root) {
   const activeChange = status.activeChange;
   const reportExists = activeChange ? await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`)) : false;
   const releaseExists = activeChange ? await exists(join(root, ".gsd", "releases", `${activeChange.slug}.md`)) : false;
+  const loop = activeChange ? await getLoopUiState(root, activeChange.slug) : null;
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
   await mkdir(join(root, ".gsd", "ui"), { recursive: true });
@@ -684,6 +685,7 @@ export async function generateUiDashboard(root) {
       audit,
       reportExists,
       releaseExists,
+      loop,
     }),
   );
 
@@ -1535,6 +1537,35 @@ async function readTextIfExists(path) {
 async function readTextSnippetIfExists(path, maxBytes = 24_000) {
   const content = await readTextIfExists(path);
   return content.slice(0, maxBytes);
+}
+
+async function getLoopUiState(root, slug) {
+  const loopPath = join(root, ".gsd", "loops", `${slug}.md`);
+  const reflectionPath = join(root, ".gsd", "reflections", `${slug}.md`);
+  const lessonPath = join(root, ".gsd", "lessons", `${slug}.md`);
+  const loopContent = await readTextSnippetIfExists(loopPath, 12_000);
+
+  return {
+    loop: Boolean(loopContent),
+    reflection: await exists(reflectionPath),
+    learned: await exists(lessonPath),
+    nextActions: extractMarkdownBulletsAfterHeading(loopContent, "Next Actions").slice(0, 4),
+  };
+}
+
+function extractMarkdownBulletsAfterHeading(markdown, heading) {
+  if (!markdown) return [];
+  const lines = markdown.split("\n");
+  const headingIndex = lines.findIndex((line) => line.trim().toLowerCase() === `## ${heading}`.toLowerCase());
+  if (headingIndex === -1) return [];
+  const bullets = [];
+
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (line.startsWith("## ")) break;
+    if (line.startsWith("- ")) bullets.push(line.slice(2).trim());
+  }
+
+  return bullets;
 }
 
 async function readEvidenceSummary(root, slug) {
@@ -2421,6 +2452,23 @@ function buildUiHtml(model) {
         <div class="files">
           <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
           <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="split">
+      <div class="panel">
+        <h2>Self-Improving Loop</h2>
+        <div class="files">
+          <div class="row">Loop: ${model.loop?.loop ? "present" : "missing"}</div>
+          <div class="row">Reflection: ${model.loop?.reflection ? "present" : "missing"}</div>
+          <div class="row">Learn: ${model.loop?.learned ? "learned" : "skipped"}</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Next Actions</h2>
+        <div class="files">
+          ${(model.loop?.nextActions?.length ? model.loop.nextActions : ["Run gsd loop to generate next actions."]).map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
         </div>
       </div>
     </section>
