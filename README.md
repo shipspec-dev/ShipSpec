@@ -136,8 +136,18 @@ The skill teaches Codex when to use ShipSpec for feature requests, task links, s
 
 Install or copy that folder into your Codex skills directory, then ask Codex to use ShipSpec:
 
+```bash
+gsd skill install
+```
+
 ```text
 Use $shipspec to implement JIRA-123 Add invoice export.
+```
+
+To inspect where the bundled skill lives and where it installs:
+
+```bash
+gsd skill path
 ```
 
 The skill keeps the CLI as the engine:
@@ -198,6 +208,8 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 | `gsd examples` | Generate example projects. |
 | `gsd self-test` | Run ShipSpec health checks. |
 | `gsd adapters` | List the OpenSpec, Superpowers, GitHub, and project-script integration points. |
+| `gsd skill path` | Show the bundled ShipSpec skill source and default Codex install target. |
+| `gsd skill install` | Install the bundled ShipSpec skill into the local Codex skills directory. |
 | `gsd intake <request>` | Create a local request intake record. |
 | `gsd contract` | Create the active change implementation contract. |
 | `gsd room` | Create role-based agent room files for the active change. |

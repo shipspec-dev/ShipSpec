@@ -126,10 +126,34 @@ test("runCli supports help and version for an installable CLI", async () => {
   assert.equal(help.exitCode, 0);
   assert.match(help.stdout, /Usage: gsd <command>/);
   assert.match(help.stdout, /doctor/);
+  assert.match(help.stdout, /skill <path\|install>/);
 
   const version = await runCli(["--version"], { cwd: root });
   assert.equal(version.exitCode, 0);
   assert.match(version.stdout, /0\.3\.0/);
+});
+
+test("runCli skill path prints source and default install target", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["skill", "path"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Skill source: .*skills\/shipspec/);
+  assert.match(result.stdout, /Default install target: .*\.codex\/skills\/shipspec/);
+});
+
+test("runCli skill install copies the bundled ShipSpec skill", async () => {
+  const root = await tempRoot();
+  const skillsRoot = join(root, "codex-skills");
+
+  const result = await runCli(["skill", "install"], { cwd: root, skillsRoot });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /ShipSpec skill installed/);
+  assert.match(result.stdout, /Restart Codex/);
+  assert.equal(await exists(join(skillsRoot, "shipspec", "SKILL.md")), true);
+  assert.equal(await exists(join(skillsRoot, "shipspec", "agents", "openai.yaml")), true);
 });
 
 test("generateExamples creates a node-basic example project with ShipSpec artifacts", async () => {

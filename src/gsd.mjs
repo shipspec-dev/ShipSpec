@@ -1,10 +1,13 @@
 import { execFile } from "node:child_process";
-import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { dirname, basename, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const VERSION = "0.3.0";
+const PACKAGE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
 const DEFAULT_WORKFLOW = {
   checks: [
@@ -610,6 +613,31 @@ export async function runSelfTest(root, options = {}) {
   };
 }
 
+export function getShipSpecSkillPath() {
+  return join(PACKAGE_ROOT, "skills", "shipspec");
+}
+
+export function getDefaultCodexSkillsRoot() {
+  return join(homedir(), ".codex", "skills");
+}
+
+export async function installShipSpecSkill(options = {}) {
+  const sourcePath = options.sourcePath ?? getShipSpecSkillPath();
+  const skillsRoot = options.skillsRoot ?? getDefaultCodexSkillsRoot();
+  const targetPath = join(skillsRoot, "shipspec");
+
+  await assertDirectoryExists(sourcePath, "ShipSpec skill source was not found");
+  await mkdir(skillsRoot, { recursive: true });
+  await cp(sourcePath, targetPath, { recursive: true, force: true });
+
+  return {
+    ok: true,
+    sourcePath,
+    targetPath,
+    message: `ShipSpec skill installed to ${targetPath}`,
+  };
+}
+
 export async function generateDesktopApp(root) {
   const appRoot = join(root, "apps", "desktop");
   const rendererRoot = join(appRoot, "renderer");
@@ -1043,6 +1071,23 @@ export async function runCli(argv, options = {}) {
       return cliResult(0, `${formatAdapters(listIntegrationAdapters())}\n`);
     }
 
+    if (command === "skill") {
+      const [subcommand] = rest;
+      if (subcommand === "path") {
+        return cliResult(
+          0,
+          [`Skill source: ${getShipSpecSkillPath()}`, `Default install target: ${join(getDefaultCodexSkillsRoot(), "shipspec")}`].join(
+            "\n",
+          ) + "\n",
+        );
+      }
+      if (subcommand === "install") {
+        const result = await installShipSpecSkill({ skillsRoot: options.skillsRoot });
+        return cliResult(0, `${result.message}\nRestart Codex to load the skill.\n`);
+      }
+      return cliResult(1, "Usage: gsd skill <path|install>\n");
+    }
+
     if (command === "intake") {
       const result = await createIntake(cwd, rest.join(" "));
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
@@ -1108,6 +1153,16 @@ async function isGitRepository(root) {
     return stdout.trim() === "true";
   } catch {
     return false;
+  }
+}
+
+async function assertDirectoryExists(path, message) {
+  try {
+    const info = await stat(path);
+    if (!info.isDirectory()) throw new Error(message);
+  } catch (error) {
+    if (error.code === "ENOENT") throw new Error(message);
+    throw error;
   }
 }
 
@@ -2152,6 +2207,7 @@ function usage() {
     "  examples",
     "  self-test",
     "  adapters",
+    "  skill <path|install>",
     "  intake <request>",
     "  contract",
     "  room",

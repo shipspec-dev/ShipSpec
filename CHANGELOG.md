@@ -5,6 +5,7 @@
 - Added ShipSpec intake, contract, room, audit, and deliver commands.
 - Added ShipSpec audit trail to the pixel dashboard.
 - Kept the workflow ShipSpec-branded while preparing agent-friendly implementation packages.
+- Added bundled Codex skill packaging and `gsd skill path/install` commands.
 
 ## 0.1.0
 
