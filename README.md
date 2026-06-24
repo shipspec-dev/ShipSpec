@@ -1,72 +1,88 @@
 # ShipSpec
 
-ShipSpec is an agent-neutral delivery protocol for AI-assisted software development. It keeps feature scope, verification evidence, agent handoffs, and release notes inside the repo so humans and AI tools can work from the same facts.
+ShipSpec helps humans and AI agents ship software with less confusion.
 
-The command is intentionally short:
+It keeps the important delivery facts inside your repo:
+
+- what you are building
+- what the AI should read
+- what checks passed
+- what is ready for review
+
+The command is short:
 
 ```bash
 gsd
 ```
 
-## Try It In Two Minutes
+## Fast Start
 
 From any project folder:
 
 ```bash
 gsd run "Add user profile page"
 gsd codex
-open .gsd/ui/index.html
 ```
 
-`gsd run` is the AGI-style operator path: it initializes and configures ShipSpec when needed, starts or reuses mission state, validates, writes the reasoning, prompt, and pack, refreshes the UI, and prints the next action.
+Then open Codex and use the output from `gsd codex`.
 
-`gsd codex` prints a short no-copy handoff for Codex. It tells Codex to read the mission, prompt, pack, proposal, and tasks from repo files instead of asking you to paste long context.
-
-For smaller changes, skip the agent instruction ceremony:
-
-```bash
-gsd quickstart --light "Fix navbar alignment"
-```
-
-After coding:
+After the feature is implemented:
 
 ```bash
 gsd ship
 gsd share
 ```
 
-`gsd ship` runs full verification, ready validation, and report generation. `gsd share` creates a portable context pack for any AI tool.
+That is the main flow.
 
-## What It Helps With
+## Daily Flow
 
-- Start a feature with a clear spec and task checklist.
-- Block weak specs before implementation goes too far.
-- Run fast checks during development and full checks before review.
-- Save verification evidence for humans, reviewers, and AI agents.
-- Generate review, release, and done notes from the same project state.
-- Coordinate planner, builder, tester, reviewer, and release handoffs.
+```bash
+cd /path/to/project
+gsd run "Your feature"
+gsd codex
 
-## Demo Project
+# AI or human implements
 
-Pixel Quest Board is a small demo that shows ShipSpec coordinating a real feature:
-
-```text
-Spec -> AI/human implementation -> full verification -> evidence -> report -> done dashboard
+gsd ship
+gsd share
 ```
 
-Demo repo:
+Useful extras:
 
-https://github.com/shipspec-dev/PixelQuestBoard
+```bash
+gsd ui       # open .gsd/ui/index.html
+gsd next     # see next suggested action
+gsd clean    # preview demo/test files that can be removed
+```
 
-## Requirements
+For small fixes:
 
-- Node.js 20 or newer
-- npm
-- Git, recommended for diff and review summaries
+```bash
+gsd fix "Navbar spacing"
+```
 
-## Install For Local Development
+## AI Handoff
 
-From this repository:
+`gsd codex` avoids copy-pasting long prompts. It tells Codex to read the ShipSpec files from the repo:
+
+```bash
+gsd codex
+```
+
+For other AI tools, use:
+
+```bash
+gsd share
+```
+
+ShipSpec's basic idea:
+
+```text
+request -> AI context -> implementation -> verification -> review notes
+```
+
+## Install
 
 ```bash
 npm install
@@ -74,238 +90,33 @@ npm run install:local
 gsd --help
 ```
 
-You can also run the CLI without linking:
+Requirements:
 
-```bash
-node bin/gsd.mjs --help
-```
+- Node.js 20 or newer
+- npm
+- Git, recommended
 
-## Use ShipSpec In A Project
+## What ShipSpec Creates
 
-Go to the project you want to manage:
+ShipSpec writes local workflow files:
 
-```bash
-cd /path/to/your/project
-```
+- `.gsd/` for missions, prompts, reports, evidence summaries, and UI
+- `.agent/` for agent notes, roles, memory, and messages
+- `openspec/` for proposals and task checklists
 
-Fast path:
-
-```bash
-gsd run "Add user profile page"
-gsd next
-```
-
-Light path for small changes:
-
-```bash
-gsd quickstart --light "Fix navbar alignment"
-gsd next
-```
-
-Manual setup, when you want each step visible:
-
-```bash
-gsd init
-gsd configure
-gsd agents
-gsd next
-```
-
-Start a feature:
-
-```bash
-gsd start "Add user profile page"
-gsd spec
-gsd validate
-```
-
-Implement your code normally, then verify:
-
-```bash
-gsd verify
-gsd verify --full
-gsd validate --ready
-```
-
-Verification evidence includes a human-readable summary:
-
-```text
-Verified:
-- unit passed
-
-Skipped:
-- e2e skipped: full-only check not run in fast mode
-
-Risk:
-- Full verification still needed for skipped checks.
-```
-
-Open the ShipSpec Cockpit when you want a visual delivery console:
-
-```bash
-gsd ui
-open .gsd/ui/index.html
-```
-
-Prepare review and release notes:
-
-```bash
-gsd diff
-gsd report
-gsd release
-gsd done
-```
-
-## ShipSpec Workflow Package
-
-For AI-assisted work, ShipSpec can prepare a complete implementation package before coding starts:
-
-```bash
-gsd deliver --adaptive "JIRA-123 Add invoice export"
-```
-
-That creates:
-
-- request intake under `.gsd/intake/`
-- OpenSpec-style proposal and tasks under `openspec/changes/`
-- implementation contract under `.gsd/contracts/`
-- role-based agent room under `.agent/room/`
-- adaptive reasoning under `.gsd/reasoning/`
-- validation output from `gsd validate`
-
-You can also run each step directly:
-
-```bash
-gsd intake "JIRA-123 Add invoice export"
-gsd start "JIRA-123 Add invoice export"
-gsd contract
-gsd room
-gsd reason
-gsd audit
-```
-
-For a safe one-command control loop, use:
-
-```bash
-gsd operate "JIRA-123 Add invoice export"
-```
-
-`gsd operate` prepares the adaptive package when a request is provided, runs reasoning, runs one safe verification/reflection loop, refreshes the pixel dashboard, and writes `.gsd/operations/<change>.md`. It does not edit code, deploy, or call external services.
-
-To hand the active ShipSpec change into Codex without pasting long context, generate the short handoff:
-
-```bash
-gsd codex
-```
-
-`gsd codex` prints a compact instruction that tells Codex to use the ShipSpec skill and read the active mission files directly from the repo.
-
-To hand the active ShipSpec change into any AI planning pass, generate a focused prompt:
-
-```bash
-gsd decision "Approved +10 XP streak bonus formula"
-gsd prompt
-```
-
-`gsd decision` records human approvals under `.gsd/decisions/<change>.md`. `gsd prompt` writes `.gsd/prompts/<change>.md` and prints a ready-to-paste prompt that tells an AI agent what ShipSpec files to read, what human decisions were made, what to plan, what tests to propose, and where to stop for approval before coding. After implementation, `gsd review` writes a decision-aware review checklist under `.gsd/reviews/<change>.md`.
-
-To hand any AI tool a compact project-state package, use:
-
-```bash
-gsd pack
-```
-
-`gsd pack` writes `.gsd/packs/<change>.md` with the active change, spec paths, changed files, evidence summary, human decisions, risks, and next recommended action.
-
-The intended agent workflow is:
-
-```text
-Request -> ShipSpec package -> AI/human implementation -> verification -> report -> release -> done
-```
-
-## Agent Integrations
-
-ShipSpec is not tied to one coding agent. `gsd agents` writes shared instructions for common agent surfaces:
-
-- `AGENTS.md` for OpenAI Codex and other AGENTS-aware tools
-- `CLAUDE.md` for Claude-style project instructions
-- `GEMINI.md` for Gemini-style project instructions
-- `.cursor/rules/gsd.mdc` for Cursor
-- `.agent/roles/` and `.agent/messages/` for planner, builder, tester, reviewer, and release handoffs
-
-### Codex Skill
-
-ShipSpec includes a Codex skill at:
-
-```text
-skills/shipspec/
-```
-
-The skill teaches Codex when to use ShipSpec for feature requests, task links, spec validation, agent coordination, verification evidence, and handoff preparation.
-
-Install or copy that folder into your Codex skills directory, then ask Codex to use ShipSpec:
-
-```bash
-gsd skill install
-```
-
-```text
-Use $shipspec to implement JIRA-123 Add invoice export.
-```
-
-To inspect where the bundled skill lives and where it installs:
-
-```bash
-gsd skill path
-```
-
-The skill keeps the CLI as the engine:
-
-```text
-ShipSpec CLI -> ShipSpec skill -> agent workflow -> verified handoff
-```
-
-Other agents can still use the same repo files and CLI commands without installing the Codex skill.
+Commit these files when you want delivery history in Git.
 
 ## When Not To Use ShipSpec
 
-ShipSpec is useful when verification evidence, handoff notes, and repeatable agent context matter. It may be too much for:
+Skip ShipSpec for:
 
 - tiny throwaway scripts
-- one-line fixes you can safely review in place
-- projects with no tests or review process yet
+- one-line changes
 - experiments where speed matters more than traceability
 
-For those cases, use your normal workflow. Bring ShipSpec in when the cost of confusion, missed checks, or weak handoff is higher than the setup.
+## Core Commands
 
-## Daily Feature Flow
-
-```bash
-cd /path/to/your/project
-gsd quickstart "Add checkout discounts"
-
-# implement the feature
-
-gsd verify --full
-gsd validate --ready
-gsd report
-gsd release
-gsd done
-```
-
-## Generated Project State
-
-ShipSpec writes workflow state inside the project where you run it:
-
-- `.gsd/` stores workflow config, active change state, reports, releases, and done reports.
-- `.agent/` stores agent memory, rules, roles, messages, decisions, and evidence.
-- `openspec/` stores change proposals and task checklists.
-
-These files are meant to make delivery visible and reviewable. Commit them when your team wants the workflow history in Git.
-
-## Commands To Remember
-
-Most people only need this small command set:
+Most people only need these:
 
 ```bash
 gsd
@@ -318,16 +129,16 @@ gsd ui
 
 | Command | Purpose |
 | --- | --- |
-| `gsd` | Show the ShipSpec Operator with next action, risk level, risk reason, and a small menu. |
-| `gsd run "Feature request"` | Start or continue an AGI-style delivery mission with reasoning, risk, prompt, pack, and UI artifacts. |
-| `gsd codex` | Print a no-copy Codex handoff that points Codex at repo-local ShipSpec files. |
-| `gsd ship` | Run full verification, ready validation, and report generation. |
-| `gsd share` | Create a portable AI context pack with spec, evidence, risk, and next action. |
-| `gsd ui` | Refresh the ShipSpec Cockpit dashboard. |
+| `gsd` | Show next action. |
+| `gsd run "Feature"` | Start or continue work. |
+| `gsd codex` | Hand work to Codex without long paste. |
+| `gsd ship` | Verify and write review report. |
+| `gsd share` | Create AI context pack. |
+| `gsd ui` | Refresh the local dashboard. |
 
 Use `gsd next` when you want ShipSpec to explain the next best action.
 
-Natural shortcuts:
+Shortcuts:
 
 ```bash
 gsd fix "Navbar spacing"  # light quickstart for small fixes
