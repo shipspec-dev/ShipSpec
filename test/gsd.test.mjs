@@ -882,7 +882,12 @@ test("generateUiDashboard writes a single-page pixel dashboard", async () => {
   assert.equal(result.ok, true);
   assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
   const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
-  assert.match(html, /ShipSpec Pixel Console/);
+  assert.match(html, /ShipSpec Cockpit/);
+  assert.match(html, /Next Command/);
+  assert.match(html, /Readiness/);
+  assert.match(html, /Workflow/);
+  assert.match(html, /Human \+ AI Context/);
+  assert.match(html, /Ship Evidence/);
   assert.match(html, /Pixel Dashboard/);
   assert.match(html, /Spec/);
   assert.match(html, /Verify/);

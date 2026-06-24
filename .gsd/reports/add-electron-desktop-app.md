@@ -14,9 +14,6 @@ openspec/changes/add-electron-desktop-app
 
 ## Changed Files
 
-- CHANGELOG.md
-- README.md
-- skills/shipspec/SKILL.md
 - src/gsd.mjs
 - test/gsd.test.mjs
 

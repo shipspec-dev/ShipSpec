@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ShipSpec Pixel Console</title>
+  <title>ShipSpec Cockpit</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap');
     :root {
-      --bg: #11131f;
-      --panel: #1b2033;
-      --panel-2: #232944;
-      --grid: rgba(255,255,255,.06);
+      --bg: #10131d;
+      --panel: #181e2f;
+      --panel-2: #202844;
+      --panel-3: #11182a;
+      --grid: rgba(255,255,255,.055);
       --text: #f8f4d8;
       --muted: #aeb7d8;
       --green: #67f58c;
@@ -31,52 +32,84 @@
       color: var(--text);
       min-height: 100vh;
     }
-    .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
-    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 22px; }
-    h1, h2, p { margin: 0; }
-    h1 { font-size: clamp(30px, 5vw, 56px); line-height: .95; color: var(--green); text-shadow: 4px 4px 0 #000; }
-    h2 { font-size: 20px; margin-bottom: 14px; color: var(--blue); }
-    .slug { color: var(--muted); margin-top: 10px; font-size: 18px; }
-    .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+    .shell { max-width: 1320px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 16px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(32px, 5vw, 58px); line-height: .95; color: var(--green); text-shadow: 4px 4px 0 #000; }
+    h2 { font-size: 20px; margin-bottom: 12px; color: var(--blue); }
+    h3 { font-size: 16px; margin: 14px 0 8px; color: var(--yellow); }
+    .slug { color: var(--muted); margin-top: 8px; font-size: 18px; overflow-wrap: anywhere; }
+    .top-meta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
     .panel {
       background: var(--panel);
       border: 3px solid var(--line);
       box-shadow: 8px 8px 0 #05060b;
-      padding: 18px;
+      padding: 16px;
     }
-    .pipeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
-    .stage {
-      min-height: 84px;
+    .action {
       background: var(--panel-2);
+      border: 3px solid var(--blue);
+      box-shadow: 8px 8px 0 #05060b;
+      padding: 18px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr);
+      gap: 16px;
+      align-items: center;
+    }
+    .action-label { color: var(--blue); font-size: 17px; margin-bottom: 6px; }
+    .action-command { color: var(--yellow); font-size: clamp(24px, 4vw, 42px); line-height: 1; overflow-wrap: anywhere; }
+    .reason { color: var(--muted); font-size: 18px; line-height: 1.25; }
+    .readiness {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(92px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .ready-chip {
+      min-height: 62px;
+      background: var(--panel);
       border: 2px solid var(--line);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
-      padding: 10px;
+      gap: 6px;
+      padding: 8px;
       text-align: center;
     }
-    .stage strong { font-size: 15px; }
-    .chip { display: inline-block; padding: 5px 7px; border: 2px solid currentColor; font-size: 13px; }
+    .ready-chip strong { color: var(--muted); font-size: 13px; }
+    .chip { display: inline-block; padding: 4px 7px; border: 2px solid currentColor; font-size: 13px; }
     .pass { color: var(--green); }
     .warn { color: var(--yellow); }
     .fail { color: var(--red); }
-    .commands, .files, .messages { display: grid; gap: 9px; }
-    .cmd, .row {
-      background: #11172a;
+    .cockpit {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .section { display: grid; gap: 10px; }
+    .rows, .messages { display: grid; gap: 8px; }
+    .row {
+      background: var(--panel-3);
       border: 2px solid var(--line);
-      padding: 10px;
+      padding: 9px 10px;
       color: var(--text);
       overflow-wrap: anywhere;
+      line-height: 1.2;
     }
-    .cmd { color: var(--yellow); }
+    .cmd { color: var(--yellow); background: var(--panel-3); border: 2px solid var(--line); padding: 9px 10px; overflow-wrap: anywhere; }
     .messages .row b { color: var(--green); }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
-    .footer { margin-top: 18px; color: var(--muted); font-size: 15px; }
-    @media (max-width: 840px) {
-      header, .grid, .split { grid-template-columns: 1fr; display: grid; }
+    .pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .stage { background: var(--panel-3); border: 2px solid var(--line); padding: 9px; min-height: 64px; display: grid; align-content: center; gap: 6px; text-align: center; }
+    .stage strong { font-size: 14px; }
+    .footer { margin-top: 16px; color: var(--muted); font-size: 15px; }
+    @media (max-width: 980px) {
+      header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
+      .top-meta { justify-content: flex-start; }
+      .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .shell { padding: 18px; }
+      .shell { padding: 16px; }
     }
   </style>
 </head>
@@ -84,130 +117,100 @@
   <main class="shell">
     <header>
       <div>
-        <h1>ShipSpec Pixel Console</h1>
+        <h1>ShipSpec Cockpit</h1>
         <p class="slug">Add Electron Desktop App / add-electron-desktop-app</p>
       </div>
-      <div class="panel">
-        <h2>Quest Commands</h2>
-        <div class="commands">
-          <div class="cmd">gsd validate</div><div class="cmd">gsd verify --full</div><div class="cmd">gsd report</div><div class="cmd">gsd release</div><div class="cmd">gsd inbox</div>
-        </div>
+      <div class="top-meta">
+        <span class="chip pass">Spec PASS</span>
+        <span class="chip pass">Ready PASS</span>
+        <span class="chip">Branch main</span>
       </div>
     </header>
 
-    <section class="grid">
-      <div class="panel">
-        <h2>Pipeline</h2>
-        <div class="pipeline">
-          <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Report</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Release</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Ready</strong><span class="chip pass">PASS</span></div>
-        </div>
+    <section class="action">
+      <div>
+        <div class="action-label">Next Command</div>
+        <div class="action-command">gsd operate</div>
       </div>
-      <div class="panel">
-        <h2>Status</h2>
-        <div class="files">
-          <div class="row">Branch: main</div>
+      <div class="reason">Reason: Operation report is missing for the active change.</div>
+    </section>
+
+    <section aria-label="Readiness" class="readiness">
+      <div class="ready-chip"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Reasoning</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Operation</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Decisions</strong><span class="chip pass">1</span></div><div class="ready-chip"><strong>Prompt</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Evidence</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Review</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Report</strong><span class="chip pass">PASS</span></div>
+    </section>
+
+    <section class="cockpit">
+      <div class="panel section">
+        <h2>Workflow</h2>
+        <div class="rows">
+          <div class="row">Active change: add-electron-desktop-app</div>
           <div class="row">Evidence: present</div>
           <div class="row">Report: present</div>
           <div class="row">Release: present</div>
         </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Changed Files</h2>
-        <div class="files">
-          <div class="row">CHANGELOG.md</div><div class="row">README.md</div><div class="row">skills/shipspec/SKILL.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
+        <h3>Pipeline</h3>
+        <div class="pipeline">
+          <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Report</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Release</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Ready</strong><span class="chip pass">PASS</span></div>
         </div>
-      </div>
-      <div class="panel">
-        <h2>Agent Inbox</h2>
-        <div class="messages">
-          <div class="row"><b>planner</b>: Spec is ready for builder</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>ShipSpec Audit</h2>
-        <div class="files">
-          <div class="row">WAIT Request intake</div><div class="row">PASS Spec</div><div class="row">WAIT Contract</div><div class="row">WAIT Agent room</div><div class="row">PASS Evidence</div><div class="row">PASS Report</div><div class="row">PASS Release</div><div class="row">WAIT Done</div>
-        </div>
-      </div>
-      <div class="panel">
-        <h2>ShipSpec Files</h2>
-        <div class="files">
-          <div class="row">Contract: missing</div>
-          <div class="row">Agent room: missing</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="split">
-      <div class="panel">
-        <h2>Self-Improving Loop</h2>
-        <div class="files">
+        <h3>Self-Improving Loop</h3>
+        <div class="rows">
           <div class="row">Loop: missing</div>
           <div class="row">Reflection: missing</div>
           <div class="row">Learn: skipped</div>
         </div>
-      </div>
-      <div class="panel">
-        <h2>Next Actions</h2>
-        <div class="files">
-          <div class="row">Run gsd loop to generate next actions.</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Adaptive Reasoning</h2>
-        <div class="files">
-          <div class="row">Reasoning: present</div>
-          <div class="row">No deterministic risks detected from local ShipSpec state.</div>
+        <h3>Next Actions</h3>
+        <div class="rows">
+          <div class="row">Operation report is missing for the active change.</div>
         </div>
-      </div>
-      <div class="panel">
-        <h2>Reasoning Plan</h2>
-        <div class="files">
-          <div class="row">gsd validate</div><div class="row">gsd verify --full</div><div class="row">gsd reflect</div><div class="row">gsd loop</div>
-          <div class="row">npm run lint</div><div class="row">npm test</div><div class="row">npm run typecheck</div><div class="row">npm run test:e2e</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Operator</h2>
-        <div class="files">
-          <div class="row">Operation: missing</div>
-          <div class="row">Mode: missing</div>
-          <div class="row">No operation safety notes recorded.</div>
+        <h3>ShipSpec Audit</h3>
+        <div class="rows">
+          <div class="row">WAIT Request intake</div><div class="row">PASS Spec</div><div class="row">WAIT Contract</div><div class="row">WAIT Agent room</div><div class="row">PASS Evidence</div><div class="row">PASS Report</div><div class="row">PASS Release</div><div class="row">WAIT Done</div>
         </div>
       </div>
-      <div class="panel">
-        <h2>Operator Next</h2>
-        <div class="files">
-          <div class="row">Run gsd operate to generate the safe control loop.</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Human Decisions</h2>
-        <div class="files">
+      <div class="panel section">
+        <h2>Human + AI Context</h2>
+        <h3>Human Decisions</h3>
+        <div class="rows">
           <div class="row">2026-06-24T09:50:18.112Z Human decision: Approved gsd decision command for recording human approvals in ShipSpec prompts</div>
         </div>
+
+        <h3>Adaptive Reasoning</h3>
+        <div class="rows">
+          <div class="row">Reasoning: present</div><div class="row">No deterministic risks detected from local ShipSpec state.</div><div class="row">gsd validate</div><div class="row">gsd verify --full</div><div class="row">gsd reflect</div><div class="row">gsd loop</div><div class="row">npm run lint</div><div class="row">npm test</div><div class="row">npm run typecheck</div><div class="row">npm run test:e2e</div>
+        </div>
+
+        <h3>Operator</h3>
+        <div class="rows">
+          <div class="row">Operation: missing</div><div class="row">Mode: missing</div><div class="row">No operation safety notes recorded.</div>
+        </div>
       </div>
-      <div class="panel">
-        <h2>Review</h2>
-        <div class="files">
-          <div class="row">Review: present</div>
-          <div class="row">Checklist: ready</div>
-          <div class="row">PASS lint (required: yes)</div><div class="row">PASS unit (required: yes)</div><div class="row">PASS typecheck (required: yes)</div><div class="row">PASS e2e (required: no)</div>
+
+      <div class="panel section">
+        <h2>Ship Evidence</h2>
+        <h3>Review</h3>
+        <div class="rows">
+          <div class="row">Review: present</div><div class="row">Checklist: ready</div><div class="row">PASS lint (required: yes)</div><div class="row">PASS unit (required: yes)</div><div class="row">PASS typecheck (required: yes)</div><div class="row">PASS e2e (required: no)</div>
+        </div>
+
+        <h3>Changed Files</h3>
+        <div class="rows">
+          <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
+        </div>
+
+        <h3>Agent Inbox</h3>
+        <div class="messages">
+          <div class="row"><b>planner</b>: Spec is ready for builder</div>
+        </div>
+
+        <h3>ShipSpec Files</h3>
+        <div class="rows">
+          <div class="row">Contract: missing</div>
+          <div class="row">Agent room: missing</div>
         </div>
       </div>
     </section>

@@ -796,11 +796,13 @@ export async function generateUiDashboard(root) {
   const activeChange = status.activeChange;
   const reportExists = activeChange ? await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`)) : false;
   const releaseExists = activeChange ? await exists(join(root, ".gsd", "releases", `${activeChange.slug}.md`)) : false;
+  const promptExists = activeChange ? await exists(join(root, ".gsd", "prompts", `${activeChange.slug}.md`)) : false;
   const loop = activeChange ? await getLoopUiState(root, activeChange.slug) : null;
   const reasoning = activeChange ? await getReasoningUiState(root, activeChange.slug) : null;
   const operation = activeChange ? await getOperationUiState(root, activeChange.slug) : null;
   const decisions = activeChange ? await readDecisionEntries(root, activeChange.slug) : [];
   const review = activeChange ? await getReviewUiState(root, activeChange.slug) : null;
+  const next = await getNextRecommendation(root);
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
   await mkdir(join(root, ".gsd", "ui"), { recursive: true });
@@ -816,11 +818,13 @@ export async function generateUiDashboard(root) {
       audit,
       reportExists,
       releaseExists,
+      promptExists,
       loop,
       reasoning,
       operation,
       decisions,
       review,
+      next,
     }),
   );
 
@@ -3075,20 +3079,48 @@ function buildUiHtml(model) {
     ["Release", model.releaseExists],
     ["Ready", model.readyValidation.ok],
   ];
+  const readiness = [
+    ["Spec", model.specStatus.proposal && model.specStatus.tasks, "PASS", "WAIT"],
+    ["Reasoning", model.reasoning?.present, "PASS", "WAIT"],
+    ["Operation", model.operation?.present, "PASS", "WAIT"],
+    ["Decisions", model.decisions?.length > 0, `${model.decisions?.length ?? 0}`, "0"],
+    ["Prompt", model.promptExists, "PASS", "WAIT"],
+    ["Evidence", model.specStatus.evidence, "PASS", "WAIT"],
+    ["Review", model.review?.present, "PASS", "WAIT"],
+    ["Report", model.reportExists, "PASS", "WAIT"],
+  ];
+  const nextActions = model.loop?.nextActions?.length ? model.loop.nextActions : [model.next?.reason ?? "Run gsd next for guidance."];
+  const reasoningItems = [
+    `Reasoning: ${model.reasoning?.present ? "present" : "missing"}`,
+    ...(model.reasoning?.risks?.length ? model.reasoning.risks : ["Risks: none recorded."]),
+    ...(model.reasoning?.recommendedWorkflow?.length ? model.reasoning.recommendedWorkflow : ["Run gsd reason to generate adaptive workflow."]),
+    ...(model.reasoning?.requiredVerification?.length ? model.reasoning.requiredVerification : []),
+  ];
+  const operatorItems = [
+    `Operation: ${model.operation?.present ? "present" : "missing"}`,
+    `Mode: ${model.operation?.mode ?? "missing"}`,
+    ...(model.operation?.safety?.length ? model.operation.safety : ["No operation safety notes recorded."]),
+  ];
+  const reviewItems = [
+    `Review: ${model.review?.present ? "present" : "missing"}`,
+    `Checklist: ${model.review?.checklist?.length ? "ready" : "missing"}`,
+    ...(model.review?.evidence?.length ? model.review.evidence : ["No review evidence summary recorded."]),
+  ];
 
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ShipSpec Pixel Console</title>
+  <title>ShipSpec Cockpit</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap');
     :root {
-      --bg: #11131f;
-      --panel: #1b2033;
-      --panel-2: #232944;
-      --grid: rgba(255,255,255,.06);
+      --bg: #10131d;
+      --panel: #181e2f;
+      --panel-2: #202844;
+      --panel-3: #11182a;
+      --grid: rgba(255,255,255,.055);
       --text: #f8f4d8;
       --muted: #aeb7d8;
       --green: #67f58c;
@@ -3109,52 +3141,84 @@ function buildUiHtml(model) {
       color: var(--text);
       min-height: 100vh;
     }
-    .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
-    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 22px; }
-    h1, h2, p { margin: 0; }
-    h1 { font-size: clamp(30px, 5vw, 56px); line-height: .95; color: var(--green); text-shadow: 4px 4px 0 #000; }
-    h2 { font-size: 20px; margin-bottom: 14px; color: var(--blue); }
-    .slug { color: var(--muted); margin-top: 10px; font-size: 18px; }
-    .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+    .shell { max-width: 1320px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 16px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(32px, 5vw, 58px); line-height: .95; color: var(--green); text-shadow: 4px 4px 0 #000; }
+    h2 { font-size: 20px; margin-bottom: 12px; color: var(--blue); }
+    h3 { font-size: 16px; margin: 14px 0 8px; color: var(--yellow); }
+    .slug { color: var(--muted); margin-top: 8px; font-size: 18px; overflow-wrap: anywhere; }
+    .top-meta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
     .panel {
       background: var(--panel);
       border: 3px solid var(--line);
       box-shadow: 8px 8px 0 #05060b;
-      padding: 18px;
+      padding: 16px;
     }
-    .pipeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
-    .stage {
-      min-height: 84px;
+    .action {
       background: var(--panel-2);
+      border: 3px solid var(--blue);
+      box-shadow: 8px 8px 0 #05060b;
+      padding: 18px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr);
+      gap: 16px;
+      align-items: center;
+    }
+    .action-label { color: var(--blue); font-size: 17px; margin-bottom: 6px; }
+    .action-command { color: var(--yellow); font-size: clamp(24px, 4vw, 42px); line-height: 1; overflow-wrap: anywhere; }
+    .reason { color: var(--muted); font-size: 18px; line-height: 1.25; }
+    .readiness {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(92px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .ready-chip {
+      min-height: 62px;
+      background: var(--panel);
       border: 2px solid var(--line);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
-      padding: 10px;
+      gap: 6px;
+      padding: 8px;
       text-align: center;
     }
-    .stage strong { font-size: 15px; }
-    .chip { display: inline-block; padding: 5px 7px; border: 2px solid currentColor; font-size: 13px; }
+    .ready-chip strong { color: var(--muted); font-size: 13px; }
+    .chip { display: inline-block; padding: 4px 7px; border: 2px solid currentColor; font-size: 13px; }
     .pass { color: var(--green); }
     .warn { color: var(--yellow); }
     .fail { color: var(--red); }
-    .commands, .files, .messages { display: grid; gap: 9px; }
-    .cmd, .row {
-      background: #11172a;
+    .cockpit {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .section { display: grid; gap: 10px; }
+    .rows, .messages { display: grid; gap: 8px; }
+    .row {
+      background: var(--panel-3);
       border: 2px solid var(--line);
-      padding: 10px;
+      padding: 9px 10px;
       color: var(--text);
       overflow-wrap: anywhere;
+      line-height: 1.2;
     }
-    .cmd { color: var(--yellow); }
+    .cmd { color: var(--yellow); background: var(--panel-3); border: 2px solid var(--line); padding: 9px 10px; overflow-wrap: anywhere; }
     .messages .row b { color: var(--green); }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
-    .footer { margin-top: 18px; color: var(--muted); font-size: 15px; }
-    @media (max-width: 840px) {
-      header, .grid, .split { grid-template-columns: 1fr; display: grid; }
+    .pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .stage { background: var(--panel-3); border: 2px solid var(--line); padding: 9px; min-height: 64px; display: grid; align-content: center; gap: 6px; text-align: center; }
+    .stage strong { font-size: 14px; }
+    .footer { margin-top: 16px; color: var(--muted); font-size: 15px; }
+    @media (max-width: 980px) {
+      header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
+      .top-meta { justify-content: flex-start; }
+      .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .shell { padding: 18px; }
+      .shell { padding: 16px; }
     }
   </style>
 </head>
@@ -3162,130 +3226,100 @@ function buildUiHtml(model) {
   <main class="shell">
     <header>
       <div>
-        <h1>ShipSpec Pixel Console</h1>
+        <h1>ShipSpec Cockpit</h1>
         <p class="slug">${escapeHtml(changeTitle)} / ${escapeHtml(changeSlug)}</p>
       </div>
-      <div class="panel">
-        <h2>Quest Commands</h2>
-        <div class="commands">
-          ${["gsd validate", "gsd verify --full", "gsd report", "gsd release", "gsd inbox"].map((command) => `<div class="cmd">${command}</div>`).join("")}
-        </div>
+      <div class="top-meta">
+        <span class="chip ${model.validation.ok ? "pass" : "warn"}">Spec ${model.validation.ok ? "PASS" : "WAIT"}</span>
+        <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">Ready ${model.readyValidation.ok ? "PASS" : "WAIT"}</span>
+        <span class="chip">Branch ${escapeHtml(model.diff.branch)}</span>
       </div>
     </header>
 
-    <section class="grid">
-      <div class="panel">
-        <h2>Pipeline</h2>
-        <div class="pipeline">
-          ${stages.map(([name, ok]) => `<div class="stage"><strong>${name}</strong><span class="chip ${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span></div>`).join("")}
-        </div>
+    <section class="action">
+      <div>
+        <div class="action-label">Next Command</div>
+        <div class="action-command">${escapeHtml(model.next?.command ?? "gsd next")}</div>
       </div>
-      <div class="panel">
-        <h2>Status</h2>
-        <div class="files">
-          <div class="row">Branch: ${escapeHtml(model.diff.branch)}</div>
+      <div class="reason">Reason: ${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</div>
+    </section>
+
+    <section aria-label="Readiness" class="readiness">
+      ${readiness.map(([name, ok, passText, waitText]) => `<div class="ready-chip"><strong>${escapeHtml(name)}</strong><span class="chip ${ok ? "pass" : "warn"}">${escapeHtml(ok ? passText : waitText)}</span></div>`).join("")}
+    </section>
+
+    <section class="cockpit">
+      <div class="panel section">
+        <h2>Workflow</h2>
+        <div class="rows">
+          <div class="row">Active change: ${escapeHtml(changeSlug)}</div>
           <div class="row">Evidence: ${model.specStatus.evidence ? "present" : "missing"}</div>
           <div class="row">Report: ${model.reportExists ? "present" : "missing"}</div>
           <div class="row">Release: ${model.releaseExists ? "present" : "missing"}</div>
         </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>${changedFilesTitle}</h2>
-        <div class="files">
-          ${(changedFiles.length ? changedFiles : [changedFilesEmptyText]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+        <h3>Pipeline</h3>
+        <div class="pipeline">
+          ${stages.map(([name, ok]) => `<div class="stage"><strong>${escapeHtml(name)}</strong><span class="chip ${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span></div>`).join("")}
         </div>
-      </div>
-      <div class="panel">
-        <h2>Agent Inbox</h2>
-        <div class="messages">
-          ${(model.messages.length ? model.messages.slice(0, 6) : [{ role: "system", text: "No agent messages yet." }]).map((message) => `<div class="row"><b>${escapeHtml(message.role)}</b>: ${escapeHtml(message.text)}</div>`).join("")}
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>ShipSpec Audit</h2>
-        <div class="files">
-          ${model.audit.checks.map((check) => `<div class="row">${check.ok ? "PASS" : "WAIT"} ${escapeHtml(check.name)}</div>`).join("")}
-        </div>
-      </div>
-      <div class="panel">
-        <h2>ShipSpec Files</h2>
-        <div class="files">
-          <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
-          <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="split">
-      <div class="panel">
-        <h2>Self-Improving Loop</h2>
-        <div class="files">
+        <h3>Self-Improving Loop</h3>
+        <div class="rows">
           <div class="row">Loop: ${model.loop?.loop ? "present" : "missing"}</div>
           <div class="row">Reflection: ${model.loop?.reflection ? "present" : "missing"}</div>
           <div class="row">Learn: ${model.loop?.learned ? "learned" : "skipped"}</div>
         </div>
-      </div>
-      <div class="panel">
-        <h2>Next Actions</h2>
-        <div class="files">
-          ${(model.loop?.nextActions?.length ? model.loop.nextActions : ["Run gsd loop to generate next actions."]).map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Adaptive Reasoning</h2>
-        <div class="files">
-          <div class="row">Reasoning: ${model.reasoning?.present ? "present" : "missing"}</div>
-          ${(model.reasoning?.risks?.length ? model.reasoning.risks : ["Risks: none recorded."]).map((risk) => `<div class="row">${escapeHtml(risk)}</div>`).join("")}
+        <h3>Next Actions</h3>
+        <div class="rows">
+          ${nextActions.map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
         </div>
-      </div>
-      <div class="panel">
-        <h2>Reasoning Plan</h2>
-        <div class="files">
-          ${(model.reasoning?.recommendedWorkflow?.length ? model.reasoning.recommendedWorkflow : ["Run gsd reason to generate adaptive workflow."]).map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
-          ${(model.reasoning?.requiredVerification?.length ? model.reasoning.requiredVerification : []).map((check) => `<div class="row">${escapeHtml(check)}</div>`).join("")}
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Operator</h2>
-        <div class="files">
-          <div class="row">Operation: ${model.operation?.present ? "present" : "missing"}</div>
-          <div class="row">Mode: ${escapeHtml(model.operation?.mode ?? "missing")}</div>
-          ${(model.operation?.safety?.length ? model.operation.safety : ["No operation safety notes recorded."]).map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+        <h3>ShipSpec Audit</h3>
+        <div class="rows">
+          ${model.audit.checks.map((check) => `<div class="row">${check.ok ? "PASS" : "WAIT"} ${escapeHtml(check.name)}</div>`).join("")}
         </div>
       </div>
-      <div class="panel">
-        <h2>Operator Next</h2>
-        <div class="files">
-          ${(model.operation?.nextActions?.length ? model.operation.nextActions : ["Run gsd operate to generate the safe control loop."]).map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
-        </div>
-      </div>
-    </section>
 
-    <section class="split">
-      <div class="panel">
-        <h2>Human Decisions</h2>
-        <div class="files">
+      <div class="panel section">
+        <h2>Human + AI Context</h2>
+        <h3>Human Decisions</h3>
+        <div class="rows">
           ${(model.decisions?.length ? model.decisions : ["No recorded human decisions."]).map((decision) => `<div class="row">${escapeHtml(decision)}</div>`).join("")}
         </div>
+
+        <h3>Adaptive Reasoning</h3>
+        <div class="rows">
+          ${reasoningItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+        </div>
+
+        <h3>Operator</h3>
+        <div class="rows">
+          ${operatorItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+        </div>
       </div>
-      <div class="panel">
-        <h2>Review</h2>
-        <div class="files">
-          <div class="row">Review: ${model.review?.present ? "present" : "missing"}</div>
-          <div class="row">Checklist: ${model.review?.checklist?.length ? "ready" : "missing"}</div>
-          ${(model.review?.evidence?.length ? model.review.evidence : ["No review evidence summary recorded."]).map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+
+      <div class="panel section">
+        <h2>Ship Evidence</h2>
+        <h3>Review</h3>
+        <div class="rows">
+          ${reviewItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+        </div>
+
+        <h3>${changedFilesTitle}</h3>
+        <div class="rows">
+          ${(changedFiles.length ? changedFiles : [changedFilesEmptyText]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+        </div>
+
+        <h3>Agent Inbox</h3>
+        <div class="messages">
+          ${(model.messages.length ? model.messages.slice(0, 6) : [{ role: "system", text: "No agent messages yet." }]).map((message) => `<div class="row"><b>${escapeHtml(message.role)}</b>: ${escapeHtml(message.text)}</div>`).join("")}
+        </div>
+
+        <h3>ShipSpec Files</h3>
+        <div class="rows">
+          <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
+          <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
         </div>
       </div>
     </section>
