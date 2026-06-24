@@ -84,6 +84,13 @@ gsd verify --full
 gsd validate --ready
 ```
 
+Open the ShipSpec Cockpit when you want a visual delivery console:
+
+```bash
+gsd ui
+open .gsd/ui/index.html
+```
+
 Prepare review and release notes:
 
 ```bash
@@ -245,7 +252,7 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 | `gsd prompt [--json]` | Generate a Codex Plan mode prompt from the active ShipSpec change. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |
 | `gsd deliver <request>` | Prepare intake, spec, contract, room, and validation in one command. |
-| `gsd ui` | Generate a static pixel dashboard under `.gsd/ui/index.html`. |
+| `gsd ui` | Generate the static ShipSpec Cockpit dashboard under `.gsd/ui/index.html`. |
 | `gsd desktop` | Generate an Electron desktop app under `apps/desktop/`. |
 
 ## Adapters
@@ -281,7 +288,7 @@ npm start
 
 The desktop app keeps the CLI as the engine. It lets you choose a project folder, run core commands, read agent inbox messages, and view command output.
 
-## Static Pixel Dashboard
+## ShipSpec Cockpit
 
 Generate a single-page dashboard:
 
@@ -294,6 +301,15 @@ Open:
 ```bash
 .gsd/ui/index.html
 ```
+
+The Cockpit is a static HTML console for the active change. It shows:
+
+- next recommended command and reason
+- readiness chips for spec, reasoning, operation, decisions, prompt, evidence, review, and report
+- workflow status, self-improving loop state, next actions, and audit trail
+- human decisions, adaptive reasoning, operator safety notes, review evidence, changed files, and agent inbox
+
+Command buttons in the static dashboard are safe by design. They copy commands such as `gsd validate`, `gsd verify --full`, `gsd report`, and `gsd next` to your clipboard; they do not execute shell commands from the browser.
 
 Regenerate it after workflow state changes:
 

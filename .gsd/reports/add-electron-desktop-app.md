@@ -14,8 +14,7 @@ openspec/changes/add-electron-desktop-app
 
 ## Changed Files
 
-- src/gsd.mjs
-- test/gsd.test.mjs
+- README.md
 
 ## Risks
 
