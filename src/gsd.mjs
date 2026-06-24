@@ -835,18 +835,18 @@ export async function generateUiDashboard(root) {
   };
 }
 
-export async function quickstartProject(root, request) {
+export async function quickstartProject(root, request, options = {}) {
   const title = request.trim();
   if (!title) {
     return {
       ok: false,
-      message: "Usage: gsd quickstart <feature>",
+      message: "Usage: gsd quickstart [--light] <feature>",
     };
   }
 
   const initialized = await initWorkspace(root);
   const configured = await configureWorkflow(root);
-  const agents = await generateAgentInstructions(root);
+  const agents = options.light ? { ok: true, message: "Agent instructions skipped in light mode" } : await generateAgentInstructions(root);
   const change = await startChange(root, title);
   const validation = await validateChange(root, { ready: false });
   const ui = await generateUiDashboard(root);
@@ -857,6 +857,7 @@ export async function quickstartProject(root, request) {
     ok,
     message: [
       `Quickstart ready for ${change.change.slug}`,
+      `Mode: ${options.light ? "light" : "standard"}`,
       `Spec: openspec/changes/${change.change.slug}`,
       "Cockpit: .gsd/ui/index.html",
       "Guide: gsd next",
@@ -1448,13 +1449,14 @@ export async function verifyChange(root, options = {}) {
   const activeChange = await requireActiveChange(root);
   const workflow = await readWorkflow(root);
   const checks = workflow.checks.filter((check) => options.full || !check.fullOnly);
+  const skippedChecks = workflow.checks.filter((check) => !options.full && check.fullOnly);
   const results = [];
 
   for (const check of checks) {
     const result = await runCheck(root, check);
     results.push(result);
     if (!result.ok && check.required) {
-      await writeEvidence(root, activeChange, results, options.full);
+      await writeEvidence(root, activeChange, results, options.full, skippedChecks);
       return {
         ok: false,
         message: `Required check failed: ${check.name}`,
@@ -1463,7 +1465,7 @@ export async function verifyChange(root, options = {}) {
     }
   }
 
-  await writeEvidence(root, activeChange, results, options.full);
+  await writeEvidence(root, activeChange, results, options.full, skippedChecks);
   return {
     ok: results.every((result) => result.ok || !result.required),
     message: "Verification evidence written",
@@ -1536,7 +1538,9 @@ export async function runCli(argv, options = {}) {
     }
 
     if (command === "quickstart") {
-      const result = await quickstartProject(cwd, rest.join(" "));
+      const light = rest.includes("--light");
+      const request = rest.filter((part) => part !== "--light").join(" ");
+      const result = await quickstartProject(cwd, request, { light });
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
@@ -2288,13 +2292,34 @@ function isInternalDeliveryFile(file) {
   return file.startsWith(".agent/") || file.startsWith(".gsd/") || file.startsWith("openspec/");
 }
 
-async function writeEvidence(root, activeChange, results, full) {
+async function writeEvidence(root, activeChange, results, full, skippedChecks = []) {
   await mkdir(join(root, ".agent", "evidence"), { recursive: true });
+  const failedRequired = results.filter((result) => !result.ok && result.required);
+  const failedOptional = results.filter((result) => !result.ok && !result.required);
   const lines = [
     `# ${activeChange.title} Verification Evidence`,
     "",
     `Mode: ${full ? "full" : "fast"}`,
     `Generated: ${new Date().toISOString()}`,
+    "",
+    "## Summary",
+    "",
+    "Verified:",
+    ...(results.length ? results.map((result) => `- ${result.name} ${result.ok ? "passed" : "failed"}`) : ["- No checks were configured."]),
+    "",
+    "Skipped:",
+    ...(skippedChecks.length
+      ? skippedChecks.map((check) => `- ${check.name} skipped: full-only check not run in fast mode`)
+      : ["- None"]),
+    "",
+    "Risk:",
+    ...(failedRequired.length
+      ? failedRequired.map((result) => `- Required check failed: ${result.name}`)
+      : failedOptional.length
+        ? failedOptional.map((result) => `- Optional check failed: ${result.name}`)
+        : skippedChecks.length
+          ? ["- Full verification still needed for skipped checks."]
+          : ["- No verification risks detected from configured checks."]),
     "",
     "## Checks",
     "",
@@ -3465,7 +3490,7 @@ function usage() {
     "",
     "Daily path:",
     "  init",
-    "  quickstart <feature>",
+    "  quickstart [--light] <feature>",
     "  configure",
     "  start <change title>",
     "  next [--json]",

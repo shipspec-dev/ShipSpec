@@ -19,6 +19,12 @@ open .gsd/ui/index.html
 
 That single command initializes ShipSpec, detects project checks, writes shared agent instructions, starts the feature spec, validates it, and generates the ShipSpec Cockpit dashboard.
 
+For smaller changes, skip the agent instruction ceremony:
+
+```bash
+gsd quickstart --light "Fix navbar alignment"
+```
+
 After coding:
 
 ```bash
@@ -85,6 +91,13 @@ gsd quickstart "Add user profile page"
 gsd next
 ```
 
+Light path for small changes:
+
+```bash
+gsd quickstart --light "Fix navbar alignment"
+gsd next
+```
+
 Manual setup, when you want each step visible:
 
 ```bash
@@ -108,6 +121,19 @@ Implement your code normally, then verify:
 gsd verify
 gsd verify --full
 gsd validate --ready
+```
+
+Verification evidence includes a human-readable summary:
+
+```text
+Verified:
+- unit passed
+
+Skipped:
+- e2e skipped: full-only check not run in fast mode
+
+Risk:
+- Full verification still needed for skipped checks.
 ```
 
 Open the ShipSpec Cockpit when you want a visual delivery console:
@@ -262,7 +288,7 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 Most people can start with the daily path and let `gsd next` guide the rest:
 
 ```bash
-gsd quickstart "Feature name"
+gsd quickstart [--light] "Feature name"
 gsd next
 gsd ui
 ```
@@ -274,7 +300,7 @@ The full command set is grouped by job below.
 | Command | Purpose |
 | --- | --- |
 | `gsd init` | Create `.gsd/`, `.agent/`, and `openspec/` folders. |
-| `gsd quickstart "Feature name"` | Initialize, configure, write agent instructions, start a spec, validate it, and generate the Cockpit. |
+| `gsd quickstart [--light] "Feature name"` | Initialize, configure, start a spec, validate it, and generate the Cockpit. Standard mode also writes agent instructions; light mode skips them. |
 | `gsd configure` | Detect existing package scripts and write `.gsd/workflow.json`. |
 | `gsd start "Feature name"` | Create an active change with proposal and tasks. |
 | `gsd status` | Show initialization, active change, and evidence status. |

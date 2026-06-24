@@ -151,6 +151,22 @@ test("runCli quickstart prepares the low-ceremony project path", async () => {
   assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
 });
 
+test("runCli quickstart --light avoids agent ceremony", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["quickstart", "--light", "Fix Navbar"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Mode: light/);
+  assert.equal(await exists(join(root, ".gsd", "workflow.json")), true);
+  assert.equal(await exists(join(root, "openspec", "changes", "fix-navbar", "proposal.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
+  assert.equal(await exists(join(root, "AGENTS.md")), false);
+  assert.equal(await exists(join(root, "CLAUDE.md")), false);
+  assert.equal(await exists(join(root, "GEMINI.md")), false);
+  assert.equal(await exists(join(root, ".agent", "roles", "planner.md")), false);
+});
+
 test("runCli supports help and version for an installable CLI", async () => {
   const root = await tempRoot();
 
@@ -158,7 +174,7 @@ test("runCli supports help and version for an installable CLI", async () => {
   assert.equal(help.exitCode, 0);
   assert.match(help.stdout, /Usage: gsd <command>/);
   assert.match(help.stdout, /Daily path:/);
-  assert.match(help.stdout, /quickstart <feature>/);
+  assert.match(help.stdout, /quickstart \[--light\] <feature>/);
   assert.match(help.stdout, /Verification:/);
   assert.match(help.stdout, /AI workflow:/);
   assert.match(help.stdout, /Handoff:/);
@@ -1486,8 +1502,14 @@ test("verifyChange runs fast checks by default and writes evidence", async () =>
     ["unit"],
   );
   const evidence = await readFile(join(root, ".agent", "evidence", "add-audit-log.md"), "utf8");
+  assert.match(evidence, /## Summary/);
+  assert.match(evidence, /Verified:/);
+  assert.match(evidence, /- unit passed/);
+  assert.match(evidence, /Skipped:/);
+  assert.match(evidence, /- e2e skipped: full-only check not run in fast mode/);
+  assert.match(evidence, /Risk:/);
   assert.match(evidence, /unit/);
-  assert.doesNotMatch(evidence, /e2e/);
+  assert.doesNotMatch(evidence, /### e2e/);
 });
 
 test("verifyChange --full includes full-only checks", async () => {
