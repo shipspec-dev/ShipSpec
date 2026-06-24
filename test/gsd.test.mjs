@@ -168,6 +168,65 @@ test("runCli quickstart --light avoids agent ceremony", async () => {
   assert.equal(await exists(join(root, ".agent", "roles", "planner.md")), false);
 });
 
+test("runCli with no args shows the operator guide instead of raw help", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Operator Guide");
+
+  const result = await runCli([], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /ShipSpec Operator/);
+  assert.match(result.stdout, /Next:/);
+  assert.match(result.stdout, /Main commands:/);
+  assert.match(result.stdout, /gsd "Feature request"/);
+  assert.match(result.stdout, /gsd share/);
+  assert.match(result.stdout, /Advanced:/);
+});
+
+test("runCli routes plain text to quickstart", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["Add", "Billing", "Export"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Quickstart ready/);
+  assert.match(result.stdout, /add-billing-export/);
+  assert.equal(await exists(join(root, "openspec", "changes", "add-billing-export", "proposal.md")), true);
+});
+
+test("runCli share aliases pack", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Share Pack");
+
+  const result = await runCli(["share"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /\.gsd\/packs\/share-pack\.md/);
+  assert.equal(await exists(join(root, ".gsd", "packs", "share-pack.md")), true);
+});
+
+test("runCli ship runs ready verification, validation, and report", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Ship Flow");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+
+  const result = await runCli(["ship"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Ship flow ready/);
+  assert.match(result.stdout, /PASS unit/);
+  assert.match(result.stdout, /Spec validation passed/);
+  assert.match(result.stdout, /\.gsd\/reports\/ship-flow\.md/);
+  assert.equal(await exists(join(root, ".agent", "evidence", "ship-flow.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "reports", "ship-flow.md")), true);
+});
+
 test("runCli supports help and version for an installable CLI", async () => {
   const root = await tempRoot();
 

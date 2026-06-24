@@ -1554,12 +1554,46 @@ export async function completeChange(root) {
   };
 }
 
+export async function runShipFlow(root) {
+  const verification = await verifyChange(root, { full: true });
+  if (!verification.ok) {
+    return {
+      ok: false,
+      message: [`Ship flow blocked: ${verification.message}`, formatCheckResults(verification.checks)].join("\n"),
+      verification,
+    };
+  }
+
+  const ready = await validateChange(root, { ready: true });
+  if (!ready.ok) {
+    return {
+      ok: false,
+      message: ["Ship flow blocked: ready validation failed", formatValidationErrors(ready.errors)].join("\n"),
+      verification,
+      ready,
+    };
+  }
+
+  const report = await generateReport(root);
+  return {
+    ok: report.ok,
+    message: ["Ship flow ready", formatCheckResults(verification.checks), "Spec validation passed", report.message].join("\n"),
+    verification,
+    ready,
+    report,
+  };
+}
+
 export async function runCli(argv, options = {}) {
   const cwd = options.cwd ?? process.cwd();
   const [command, ...rest] = argv;
 
   try {
-    if (!command || command === "--help" || command === "-h" || command === "help") {
+    if (!command) {
+      return cliResult(0, `${await formatOperatorGuide(cwd)}\n`);
+    }
+
+    if (command === "--help" || command === "-h" || command === "help") {
       return cliResult(0, usage());
     }
 
@@ -1602,6 +1636,16 @@ export async function runCli(argv, options = {}) {
       const result = await getNextRecommendation(cwd);
       if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
       return cliResult(0, `${formatNextRecommendation(result)}\n`);
+    }
+
+    if (command === "share") {
+      const result = await generateContextPack(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "ship") {
+      const result = await runShipFlow(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
     if (command === "doctor") {
@@ -1807,10 +1851,51 @@ export async function runCli(argv, options = {}) {
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
+    if (isPlainTextIntent(command, rest)) {
+      const result = await quickstartProject(cwd, [command, ...rest].join(" "), { light: false });
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
     return cliResult(1, usage());
   } catch (error) {
+    if (isPlainTextIntent(command, rest)) {
+      const result = await quickstartProject(cwd, [command, ...rest].join(" "), { light: false });
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
     return cliResult(1, `${error.message}\n`);
   }
+}
+
+async function formatOperatorGuide(root) {
+  const status = await getStatus(root);
+  const next = await getNextRecommendation(root);
+  const activeLine = status.activeChange ? `Active change: ${status.activeChange.slug}` : "Active change: none";
+
+  return [
+    "ShipSpec Operator",
+    "",
+    activeLine,
+    `Next: ${next.command}`,
+    `Why: ${next.reason}`,
+    "",
+    "Main commands:",
+    '- gsd "Feature request"  Start a new feature',
+    "- gsd next               Show the next best action",
+    "- gsd ship               Verify, validate ready, and report",
+    "- gsd share              Create a portable AI context pack",
+    "- gsd ui                 Refresh the Cockpit dashboard",
+    "",
+    "Advanced:",
+    "- gsd --help             Show every command",
+    "",
+  ].join("\n");
+}
+
+function isPlainTextIntent(command, rest) {
+  const value = [command, ...rest].join(" ").trim();
+  if (!value) return false;
+  if (command.startsWith("-")) return false;
+  return /\s/.test(value) || /^[A-Z]/.test(command);
 }
 
 function slugify(value) {
@@ -3631,6 +3716,7 @@ function usage() {
     "",
     "Daily path:",
     "  init",
+    '  "feature request"',
     "  quickstart [--light] <feature>",
     "  configure",
     "  start <change title>",
@@ -3653,6 +3739,7 @@ function usage() {
     "  decision <human decision>",
     "  prompt [--json]",
     "  pack [--json]",
+    "  share",
     "  review [--json]",
     "",
     "Self-improvement:",
@@ -3662,6 +3749,7 @@ function usage() {
     "  memory [--json]",
     "",
     "Handoff:",
+    "  ship",
     "  report",
     "  release",
     "  done",

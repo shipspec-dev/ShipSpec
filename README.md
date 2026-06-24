@@ -13,11 +13,11 @@ gsd
 From any project folder:
 
 ```bash
-gsd quickstart "Add user profile page"
+gsd "Add user profile page"
 open .gsd/ui/index.html
 ```
 
-That single command initializes ShipSpec, detects project checks, writes shared agent instructions, starts the feature spec, validates it, and generates the ShipSpec Cockpit dashboard.
+That single command routes plain text into ShipSpec quickstart: it initializes ShipSpec, detects project checks, writes shared agent instructions, starts the feature spec, validates it, and generates the ShipSpec Cockpit dashboard.
 
 For smaller changes, skip the agent instruction ceremony:
 
@@ -28,10 +28,11 @@ gsd quickstart --light "Fix navbar alignment"
 After coding:
 
 ```bash
-gsd verify --full
-gsd validate --ready
-gsd report
+gsd ship
+gsd share
 ```
+
+`gsd ship` runs full verification, ready validation, and report generation. `gsd share` creates a portable context pack for any AI tool.
 
 ## What It Helps With
 
@@ -293,11 +294,14 @@ These files are meant to make delivery visible and reviewable. Commit them when 
 
 ## Command Reference
 
-Most people can start with the daily path and let `gsd next` guide the rest:
+Most people only need the operator surface:
 
 ```bash
-gsd quickstart [--light] "Feature name"
+gsd
+gsd "Feature request"
 gsd next
+gsd ship
+gsd share
 gsd ui
 ```
 
@@ -307,6 +311,8 @@ The full command set is grouped by job below.
 
 | Command | Purpose |
 | --- | --- |
+| `gsd` | Show the ShipSpec Operator with next action and the small command menu. |
+| `gsd "Feature request"` | Start a feature through quickstart without remembering the command name. |
 | `gsd init` | Create `.gsd/`, `.agent/`, and `openspec/` folders. |
 | `gsd quickstart [--light] "Feature name"` | Initialize, configure, start a spec, validate it, and generate the Cockpit. Standard mode also writes agent instructions; light mode skips them. |
 | `gsd configure` | Detect existing package scripts and write `.gsd/workflow.json`. |
@@ -339,6 +345,7 @@ The full command set is grouped by job below.
 | `gsd decision <human decision>` | Record a human approval or product choice for the active change. |
 | `gsd prompt [--json]` | Generate an AI planning prompt from the active ShipSpec change. |
 | `gsd pack [--json]` | Generate a compact, agent-neutral context pack with spec, diff, evidence, decisions, risks, and next action. |
+| `gsd share` | Alias for `gsd pack`, optimized for the small command surface. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |
 
 ### Self-Improvement
@@ -357,6 +364,7 @@ The full command set is grouped by job below.
 | `gsd report` | Write a PR-ready review report under `.gsd/reports/`. |
 | `gsd release` | Write a release handoff under `.gsd/releases/`. |
 | `gsd done` | Write a final done report with evidence, changed files, and risks. |
+| `gsd ship` | Run `verify --full`, `validate --ready`, and `report` as one ready-to-review flow. |
 
 ### Project Tools
 
