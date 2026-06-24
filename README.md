@@ -418,6 +418,7 @@ The full command set is still available for teams that want explicit control.
 | `gsd skill install` | Install the bundled ShipSpec skill into the local Codex skills directory. |
 | `gsd audit` | Show the ShipSpec trail from intake through done. |
 | `gsd desktop` | Generate an Electron desktop app under `apps/desktop/`. |
+| `gsd clean [--apply]` | Preview or delete demo/test ShipSpec files. Keeps your active change and source code. |
 
 </details>
 
