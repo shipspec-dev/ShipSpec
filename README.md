@@ -197,6 +197,14 @@ gsd prompt
 
 `gsd decision` records human approvals under `.gsd/decisions/<change>.md`. `gsd prompt` writes `.gsd/prompts/<change>.md` and prints a ready-to-paste prompt that tells an AI agent what ShipSpec files to read, what human decisions were made, what to plan, what tests to propose, and where to stop for approval before coding. After implementation, `gsd review` writes a decision-aware review checklist under `.gsd/reviews/<change>.md`.
 
+To hand any AI tool a compact project-state package, use:
+
+```bash
+gsd pack
+```
+
+`gsd pack` writes `.gsd/packs/<change>.md` with the active change, spec paths, changed files, evidence summary, human decisions, risks, and next recommended action.
+
 The intended agent workflow is:
 
 ```text
@@ -330,6 +338,7 @@ The full command set is grouped by job below.
 | `gsd operate [--dry-run] [--json] <request>` | Run the safe delivery control loop and write an operation report without editing code. |
 | `gsd decision <human decision>` | Record a human approval or product choice for the active change. |
 | `gsd prompt [--json]` | Generate an AI planning prompt from the active ShipSpec change. |
+| `gsd pack [--json]` | Generate a compact, agent-neutral context pack with spec, diff, evidence, decisions, risks, and next action. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |
 
 ### Self-Improvement

@@ -18,6 +18,7 @@ import {
   generateCiWorkflow,
   generateRelease,
   generatePlanPrompt,
+  generateContextPack,
   generateReasoning,
   generateReview,
   getMemorySummary,
@@ -681,7 +682,7 @@ test("generateReview writes a decision-aware review checklist", async () => {
   assert.match(review, /Human Decisions To Verify/);
   assert.match(review, /Approved \+10 XP streak bonus formula/);
   assert.match(review, /src\.js/);
-  assert.match(review, /PASS unit/);
+  assert.match(review, /Verified: unit passed/);
   assert.match(review, /Confirm implementation follows each recorded human decision/);
 });
 
@@ -804,6 +805,53 @@ test("runCli prompt prints Plan mode prompt and supports json output", async () 
 
   const help = await runCli(["--help"], { cwd: root });
   assert.match(help.stdout, /prompt/);
+});
+
+test("generateContextPack writes a portable AI handoff pack", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Pack Review Context");
+  await recordDecision(root, "Approved compact context package.");
+  await writeFile(join(root, "feature.js"), "export const packed = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: false });
+
+  const result = await generateContextPack(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(await exists(join(root, ".gsd", "packs", "pack-review-context.md")), true);
+  assert.match(result.pack, /# ShipSpec Context Pack/);
+  assert.match(result.pack, /## Active Change/);
+  assert.match(result.pack, /pack-review-context/);
+  assert.match(result.pack, /## Spec Files/);
+  assert.match(result.pack, /openspec\/changes\/pack-review-context\/proposal\.md/);
+  assert.match(result.pack, /## Changed Files/);
+  assert.match(result.pack, /feature\.js/);
+  assert.match(result.pack, /## Evidence Summary/);
+  assert.match(result.pack, /unit passed/);
+  assert.match(result.pack, /## Human Decisions/);
+  assert.match(result.pack, /Approved compact context package/);
+  assert.match(result.pack, /## Next Action/);
+  assert.match(result.pack, /## AI Instructions/);
+});
+
+test("runCli pack writes and prints the context pack path", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Pack Cli");
+
+  const result = await runCli(["pack"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /\.gsd\/packs\/pack-cli\.md/);
+  assert.equal(await exists(join(root, ".gsd", "packs", "pack-cli.md")), true);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.match(help.stdout, /pack/);
 });
 
 test("getMemorySummary reads lessons, patterns, reflections, and loop actions", async () => {

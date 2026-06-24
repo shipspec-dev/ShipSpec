@@ -548,6 +548,41 @@ export async function generateReview(root) {
   };
 }
 
+export async function generateContextPack(root) {
+  const activeChange = await requireActiveChange(root);
+  const specStatus = await getSpecStatus(root);
+  const validation = await validateChange(root, { ready: false });
+  const readyValidation = await validateChange(root, { ready: true });
+  const diff = await getDiffSummary(root);
+  const evidenceSummary = await readEvidenceSummary(root, activeChange.slug);
+  const decisions = await readDecisionEntries(root, activeChange.slug);
+  const next = await getNextRecommendation(root);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const packPath = join(root, ".gsd", "packs", `${activeChange.slug}.md`);
+  const pack = buildContextPackMarkdown({
+    activeChange,
+    specStatus,
+    validation,
+    readyValidation,
+    diff,
+    changedFiles,
+    evidenceSummary,
+    decisions,
+    next,
+  });
+
+  await mkdir(join(root, ".gsd", "packs"), { recursive: true });
+  await writeFile(packPath, pack);
+
+  return {
+    ok: true,
+    activeChange,
+    pack,
+    packPath,
+    message: `Context pack written to .gsd/packs/${activeChange.slug}.md`,
+  };
+}
+
 export async function generateRelease(root) {
   const activeChange = await requireActiveChange(root);
   const specValidation = await validateChange(root, { ready: false });
@@ -1739,6 +1774,12 @@ export async function runCli(argv, options = {}) {
       return cliResult(0, `${result.prompt}\n`);
     }
 
+    if (command === "pack") {
+      const result = await generateContextPack(cwd);
+      if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
     if (command === "deliver") {
       const adaptive = rest.includes("--adaptive");
       const request = rest.filter((part) => part !== "--adaptive").join(" ");
@@ -2076,6 +2117,8 @@ function extractMarkdownField(markdown, field) {
 async function readEvidenceSummary(root, slug) {
   const evidence = await readTextSnippetIfExists(join(root, ".agent", "evidence", `${slug}.md`));
   if (!evidence) return [];
+  const summaryBullets = extractEvidenceSummaryBullets(evidence);
+  if (summaryBullets.length > 0) return summaryBullets;
 
   const lines = evidence.split("\n");
   const checks = [];
@@ -2093,6 +2136,24 @@ async function readEvidenceSummary(root, slug) {
   }
 
   return checks.map((check) => `${check.result === "pass" ? "PASS" : "CHECK"} ${check.name} (required: ${check.required})`);
+}
+
+function extractEvidenceSummaryBullets(evidence) {
+  const lines = evidence.split("\n");
+  const headingIndex = lines.findIndex((line) => line.trim() === "## Summary");
+  if (headingIndex === -1) return [];
+
+  const bullets = [];
+  let label = "";
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (line.startsWith("## ")) break;
+    if (/^(Verified|Skipped|Risk):$/.test(line.trim())) {
+      label = line.trim().replace(/:$/, "");
+    } else if (line.startsWith("- ")) {
+      bullets.push(label ? `${label}: ${line.slice(2).trim()}` : line.slice(2).trim());
+    }
+  }
+  return bullets;
 }
 
 function buildReflectionGaps({ specValidation, readyValidation, audit, reportExists, releaseExists, doneExists }) {
@@ -2785,6 +2846,86 @@ function buildPlanPromptMarkdown({ activeChange, contextFiles, decisions }) {
     "- gsd report",
     "",
   ].join("\n");
+}
+
+function buildContextPackMarkdown({
+  activeChange,
+  specStatus,
+  validation,
+  readyValidation,
+  diff,
+  changedFiles,
+  evidenceSummary,
+  decisions,
+  next,
+}) {
+  const proposalPath = `openspec/changes/${activeChange.slug}/proposal.md`;
+  const tasksPath = `openspec/changes/${activeChange.slug}/tasks.md`;
+  const evidencePath = `.agent/evidence/${activeChange.slug}.md`;
+  const reportPath = `.gsd/reports/${activeChange.slug}.md`;
+
+  return [
+    "# ShipSpec Context Pack",
+    "",
+    "Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning.",
+    "",
+    "## Active Change",
+    "",
+    `- Title: ${activeChange.title}`,
+    `- Slug: ${activeChange.slug}`,
+    `- Branch: ${diff.branch}`,
+    "",
+    "## Spec Files",
+    "",
+    `- Proposal: ${proposalPath}`,
+    `- Tasks: ${tasksPath}`,
+    `- Acceptance criteria: ${specStatus.acceptanceCriteria ? "present" : "missing"}`,
+    `- Verification plan: ${specStatus.verificationPlan ? "present" : "missing"}`,
+    "",
+    "## Validation",
+    "",
+    `- Spec validation: ${validation.ok ? "pass" : "fail"}`,
+    `- Ready validation: ${readyValidation.ok ? "pass" : "fail"}`,
+    ...formatContextPackValidationErrors(validation.errors, readyValidation.errors),
+    "",
+    "## Changed Files",
+    "",
+    ...formatChangedFiles(changedFiles),
+    "",
+    "## Evidence Summary",
+    "",
+    specStatus.evidence ? `- Evidence file: ${evidencePath}` : "- Evidence file: missing",
+    ...formatBulletList(evidenceSummary, "No verification evidence summary available."),
+    "",
+    "## Human Decisions",
+    "",
+    ...formatBulletList(decisions, "No recorded human decisions."),
+    "",
+    "## Next Action",
+    "",
+    `- Command: ${next.command}`,
+    `- Reason: ${next.reason}`,
+    ...next.otherCommands.map((command) => `- Also useful: ${command}`),
+    "",
+    "## Review Report",
+    "",
+    `- ${reportPath}`,
+    "",
+    "## AI Instructions",
+    "",
+    "- Read the spec files before proposing changes.",
+    "- Use the changed files and evidence summary to focus review.",
+    "- Call out missing verification, skipped checks, and risky affected areas.",
+    "- Keep implementation scoped to the active change.",
+    "- Do not deploy or access secrets from this pack.",
+    "",
+  ].join("\n");
+}
+
+function formatContextPackValidationErrors(...errorLists) {
+  const errors = errorLists.flat().filter(Boolean);
+  if (errors.length === 0) return [];
+  return ["- Validation gaps:", ...errors.map((error) => `  - ${error}`)];
 }
 
 function buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary }) {
@@ -3511,6 +3652,7 @@ function usage() {
     "  operate [--dry-run] [--json] <request>",
     "  decision <human decision>",
     "  prompt [--json]",
+    "  pack [--json]",
     "  review [--json]",
     "",
     "Self-improvement:",
