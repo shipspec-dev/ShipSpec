@@ -1305,13 +1305,17 @@ export async function runMission(root, request = "", options = {}) {
   const prepared = title ? await quickstartProject(root, title, { light: options.light ?? false }) : null;
   const activeChange = await requireActiveChange(root);
   const specValidation = await validateChange(root, { ready: false });
+  const readyValidation = title ? null : await validateChange(root, { ready: true });
   const reasoning = specValidation.ok ? await generateReasoning(root) : null;
   const prompt = specValidation.ok ? await generatePlanPrompt(root) : null;
-  const pack = specValidation.ok ? await generateContextPack(root) : null;
+  let pack = specValidation.ok ? await generateContextPack(root) : null;
+  const report = readyValidation?.ok ? await generateReport(root) : null;
+  if (report?.ok) pack = await generateContextPack(root);
+  const reflection = !title && readyValidation && !readyValidation.ok ? await generateReflection(root) : null;
   const ui = await generateUiDashboard(root);
   const next = await getNextRecommendation(root);
   const risk = await getRiskSummary(root, next);
-  const phase = classifyMissionPhase({ specValidation, readyValidation: null, risk, hasRequest: Boolean(title) });
+  const phase = classifyMissionPhase({ specValidation, readyValidation, risk, hasRequest: Boolean(title) });
 
   const mission = buildMissionState({
     activeChange,
@@ -1320,14 +1324,15 @@ export async function runMission(root, request = "", options = {}) {
     risk,
     next,
     specValidation,
-    readyValidation: null,
+    readyValidation,
     artifacts: {
       mission: `.gsd/missions/${activeChange.slug}.md`,
       missionJson: `.gsd/missions/${activeChange.slug}.json`,
       reasoning: reasoning ? `.gsd/reasoning/${activeChange.slug}.md` : null,
       prompt: prompt ? `.gsd/prompts/${activeChange.slug}.md` : null,
       pack: pack ? `.gsd/packs/${activeChange.slug}.md` : null,
-      report: null,
+      report: report?.ok ? `.gsd/reports/${activeChange.slug}.md` : null,
+      reflection: reflection ? `.gsd/reflections/${activeChange.slug}.md` : null,
       ui: ".gsd/ui/index.html",
     },
   });
@@ -1344,6 +1349,9 @@ export async function runMission(root, request = "", options = {}) {
     reasoning,
     prompt,
     pack,
+    readyValidation,
+    report,
+    reflection,
     ui,
     mission,
     missionFiles,
