@@ -694,6 +694,8 @@ export async function generateUiDashboard(root) {
   const loop = activeChange ? await getLoopUiState(root, activeChange.slug) : null;
   const reasoning = activeChange ? await getReasoningUiState(root, activeChange.slug) : null;
   const operation = activeChange ? await getOperationUiState(root, activeChange.slug) : null;
+  const decisions = activeChange ? await readDecisionEntries(root, activeChange.slug) : [];
+  const review = activeChange ? await getReviewUiState(root, activeChange.slug) : null;
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
   await mkdir(join(root, ".gsd", "ui"), { recursive: true });
@@ -712,6 +714,8 @@ export async function generateUiDashboard(root) {
       loop,
       reasoning,
       operation,
+      decisions,
+      review,
     }),
   );
 
@@ -1844,6 +1848,17 @@ async function readDecisionEntries(root, slug) {
   const decisionPath = join(root, ".gsd", "decisions", `${slug}.md`);
   const decisionContent = await readTextSnippetIfExists(decisionPath, 16_000);
   return extractMarkdownBulletsAfterHeading(decisionContent, "Human Decisions").slice(-6);
+}
+
+async function getReviewUiState(root, slug) {
+  const reviewPath = join(root, ".gsd", "reviews", `${slug}.md`);
+  const reviewContent = await readTextSnippetIfExists(reviewPath, 16_000);
+
+  return {
+    present: Boolean(reviewContent),
+    checklist: extractMarkdownBulletsAfterHeading(reviewContent, "Reviewer Checklist").slice(0, 5),
+    evidence: extractMarkdownBulletsAfterHeading(reviewContent, "Verification Evidence").slice(0, 4),
+  };
 }
 
 async function readMemoryArtifacts(root, relativeDir) {
@@ -3120,6 +3135,23 @@ function buildUiHtml(model) {
         <h2>Operator Next</h2>
         <div class="files">
           ${(model.operation?.nextActions?.length ? model.operation.nextActions : ["Run gsd operate to generate the safe control loop."]).map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="split">
+      <div class="panel">
+        <h2>Human Decisions</h2>
+        <div class="files">
+          ${(model.decisions?.length ? model.decisions : ["No recorded human decisions."]).map((decision) => `<div class="row">${escapeHtml(decision)}</div>`).join("")}
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Review</h2>
+        <div class="files">
+          <div class="row">Review: ${model.review?.present ? "present" : "missing"}</div>
+          <div class="row">Checklist: ${model.review?.checklist?.length ? "ready" : "missing"}</div>
+          ${(model.review?.evidence?.length ? model.review.evidence : ["No review evidence summary recorded."]).map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
         </div>
       </div>
     </section>

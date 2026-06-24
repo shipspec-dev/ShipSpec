@@ -947,6 +947,28 @@ test("generateUiDashboard shows operator state", async () => {
   assert.match(html, /No code edits were made/);
 });
 
+test("generateUiDashboard shows human decisions and review state", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Dashboard Review Trail");
+  await recordDecision(root, "Approved +10 XP streak bonus formula");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+  await generateReview(root);
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  assert.match(html, /Human Decisions/);
+  assert.match(html, /Approved \+10 XP streak bonus formula/);
+  assert.match(html, /Review/);
+  assert.match(html, /Review: present/);
+  assert.match(html, /Checklist: ready/);
+});
+
 test("generateDesktopApp writes a renderer that serializes command refreshes", async () => {
   const root = await tempRoot();
 
