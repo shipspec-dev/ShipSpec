@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1694,6 +1694,132 @@ export async function runShipFlow(root) {
   };
 }
 
+const CLEANABLE_SLUGS = new Set(["your-feature", "add-sample-mission"]);
+
+const CLEANABLE_FILE_DIRS = [
+  ".agent/evidence",
+  ".gsd/contracts",
+  ".gsd/done",
+  ".gsd/intake",
+  ".gsd/loops",
+  ".gsd/missions",
+  ".gsd/operations",
+  ".gsd/packs",
+  ".gsd/prompts",
+  ".gsd/reasoning",
+  ".gsd/reflections",
+  ".gsd/releases",
+  ".gsd/reports",
+  ".gsd/reviews",
+  ".gsd/tasks",
+];
+
+const CLEANABLE_DIRECTORY_DIRS = ["openspec/changes", ".agent/room"];
+
+export async function cleanWorkspace(root, options = {}) {
+  const activeChange = await readJsonIfExists(join(root, ".gsd", "current.json"));
+  const activeSlug = activeChange?.slug ?? null;
+  const slugs = await collectCleanableSlugs(root);
+  const candidates = [];
+
+  for (const slug of [...slugs].sort()) {
+    if (slug === activeSlug || !isCleanableSlug(slug)) continue;
+    candidates.push(...(await getExistingCleanupCandidates(root, slug)));
+  }
+
+  const uniqueCandidates = uniqueCleanupCandidates(candidates);
+  const removed = [];
+
+  if (options.apply) {
+    for (const candidate of uniqueCandidates) {
+      await rm(join(root, candidate.path), { force: true, recursive: candidate.kind === "directory" });
+      removed.push(candidate);
+    }
+  }
+
+  return {
+    ok: true,
+    applied: Boolean(options.apply),
+    activeChange,
+    candidates: uniqueCandidates,
+    removed,
+  };
+}
+
+async function collectCleanableSlugs(root) {
+  const slugs = new Set();
+
+  for (const relativeDir of CLEANABLE_FILE_DIRS) {
+    const dir = join(root, relativeDir);
+    if (!(await exists(dir))) continue;
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const slug = entry.name.replace(/\.(json|md)$/u, "");
+      if (slug !== entry.name) slugs.add(slug);
+    }
+  }
+
+  for (const relativeDir of CLEANABLE_DIRECTORY_DIRS) {
+    const dir = join(root, relativeDir);
+    if (!(await exists(dir))) continue;
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) slugs.add(entry.name);
+    }
+  }
+
+  return slugs;
+}
+
+function isCleanableSlug(slug) {
+  return CLEANABLE_SLUGS.has(slug) || /^test[-_]/u.test(slug);
+}
+
+async function getExistingCleanupCandidates(root, slug) {
+  const candidates = [];
+
+  for (const relativeDir of CLEANABLE_DIRECTORY_DIRS) {
+    const path = `${relativeDir}/${slug}`;
+    if (await exists(join(root, path))) candidates.push({ path, kind: "directory" });
+  }
+
+  for (const relativeDir of CLEANABLE_FILE_DIRS) {
+    for (const extension of [".md", ".json"]) {
+      const path = `${relativeDir}/${slug}${extension}`;
+      if (await exists(join(root, path))) candidates.push({ path, kind: "file" });
+    }
+  }
+
+  return candidates;
+}
+
+function uniqueCleanupCandidates(candidates) {
+  const seen = new Set();
+  const unique = [];
+  for (const candidate of candidates) {
+    if (seen.has(candidate.path)) continue;
+    seen.add(candidate.path);
+    unique.push(candidate);
+  }
+  return unique.sort((left, right) => left.path.localeCompare(right.path));
+}
+
+function formatCleanResult(result) {
+  if (result.candidates.length === 0) {
+    return "No safe cleanup candidates found.";
+  }
+
+  const paths = result.candidates.map((candidate) => candidate.path);
+  if (!result.applied) {
+    return ["Cleanup candidates:", ...paths.map((path) => `- ${path}`), "", "Nothing deleted. Run `gsd clean --apply` to remove."].join(
+      "\n",
+    );
+  }
+
+  return ["Removed cleanup candidates:", ...paths.map((path) => `- ${path}`)].join("\n");
+}
+
 export async function runCli(argv, options = {}) {
   const cwd = options.cwd ?? process.cwd();
   const [command, ...rest] = argv;
@@ -1784,6 +1910,11 @@ export async function runCli(argv, options = {}) {
     if (command === "ship") {
       const result = await runShipFlow(cwd);
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "clean") {
+      const result = await cleanWorkspace(cwd, { apply: rest.includes("--apply") });
+      return cliResult(result.ok ? 0 : 1, `${formatCleanResult(result)}\n`);
     }
 
     if (command === "doctor") {
@@ -4142,6 +4273,7 @@ function usage() {
     "  skill <path|install>",
     "  audit",
     "  desktop",
+    "  clean [--apply]",
     "",
   ].join("\n");
 }

@@ -60,6 +60,23 @@ async function exists(path) {
   }
 }
 
+async function writeShipSpecArtifact(root, slug) {
+  await mkdir(join(root, "openspec", "changes", slug), { recursive: true });
+  await writeFile(join(root, "openspec", "changes", slug, "proposal.md"), `# ${slug}\n`);
+  await writeFile(join(root, "openspec", "changes", slug, "tasks.md"), `# ${slug} tasks\n`);
+
+  for (const dir of ["prompts", "packs", "reports", "reflections", "reasoning", "missions"]) {
+    await mkdir(join(root, ".gsd", dir), { recursive: true });
+    await writeFile(join(root, ".gsd", dir, `${slug}.md`), `# ${slug}\n`);
+  }
+
+  await writeFile(join(root, ".gsd", "missions", `${slug}.json`), `${JSON.stringify({ slug }, null, 2)}\n`);
+  await mkdir(join(root, ".agent", "evidence"), { recursive: true });
+  await writeFile(join(root, ".agent", "evidence", `${slug}.md`), `# ${slug} evidence\n`);
+  await mkdir(join(root, ".agent", "room", slug), { recursive: true });
+  await writeFile(join(root, ".agent", "room", slug, "handoff.md"), `# ${slug} handoff\n`);
+}
+
 test("initWorkspace creates repo-local delivery folders and default workflow", async () => {
   const root = await tempRoot();
 
@@ -326,6 +343,70 @@ test("runCli supports help and version for an installable CLI", async () => {
   const version = await runCli(["--version"], { cwd: root });
   assert.equal(version.exitCode, 0);
   assert.match(version.stdout, /0\.4\.0/);
+});
+
+test("runCli clean previews safe dummy ShipSpec artifacts without deleting them", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Real Feature");
+  await writeShipSpecArtifact(root, "your-feature");
+  await writeShipSpecArtifact(root, "add-sample-mission");
+  await writeShipSpecArtifact(root, "test-sandbox");
+  await writeShipSpecArtifact(root, "real-feature");
+  await writeFile(join(root, "src.js"), "console.log('keep me');\n");
+
+  const result = await runCli(["clean"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Cleanup candidates/);
+  assert.match(result.stdout, /\.gsd\/prompts\/your-feature\.md/);
+  assert.match(result.stdout, /openspec\/changes\/add-sample-mission/);
+  assert.match(result.stdout, /\.agent\/room\/test-sandbox/);
+  assert.match(result.stdout, /Nothing deleted/);
+  assert.doesNotMatch(result.stdout, /real-feature/);
+  assert.equal(await exists(join(root, ".gsd", "prompts", "your-feature.md")), true);
+  assert.equal(await exists(join(root, "openspec", "changes", "add-sample-mission", "proposal.md")), true);
+  assert.equal(await exists(join(root, ".agent", "room", "test-sandbox", "handoff.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "prompts", "real-feature.md")), true);
+  assert.equal(await exists(join(root, "src.js")), true);
+});
+
+test("runCli clean --apply removes only safe dummy ShipSpec artifacts", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Real Feature");
+  await writeShipSpecArtifact(root, "your-feature");
+  await writeShipSpecArtifact(root, "test-sandbox");
+  await writeShipSpecArtifact(root, "real-feature");
+
+  const result = await runCli(["clean", "--apply"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Removed cleanup candidates/);
+  assert.match(result.stdout, /\.gsd\/prompts\/your-feature\.md/);
+  assert.match(result.stdout, /\.agent\/room\/test-sandbox/);
+  assert.doesNotMatch(result.stdout, /real-feature/);
+  assert.equal(await exists(join(root, ".gsd", "prompts", "your-feature.md")), false);
+  assert.equal(await exists(join(root, "openspec", "changes", "your-feature", "proposal.md")), false);
+  assert.equal(await exists(join(root, ".agent", "room", "test-sandbox", "handoff.md")), false);
+  assert.equal(await exists(join(root, ".gsd", "prompts", "real-feature.md")), true);
+  assert.equal(await exists(join(root, "openspec", "changes", "real-feature", "proposal.md")), true);
+});
+
+test("runCli clean reports when nothing is safe to clean and appears only in advanced help", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Real Feature");
+
+  const clean = await runCli(["clean"], { cwd: root });
+  assert.equal(clean.exitCode, 0);
+  assert.match(clean.stdout, /No safe cleanup candidates found/);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.doesNotMatch(help.stdout, /clean \[--apply\]/);
+
+  const advanced = await runCli(["help", "advanced"], { cwd: root });
+  assert.match(advanced.stdout, /clean \[--apply\]/);
 });
 
 test("runCli supports the AGI-style run command", async () => {
