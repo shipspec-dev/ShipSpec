@@ -558,6 +558,7 @@ export async function generateContextPack(root) {
   const decisions = await readDecisionEntries(root, activeChange.slug);
   const next = await getNextRecommendation(root);
   const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const risk = buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next });
   const packPath = join(root, ".gsd", "packs", `${activeChange.slug}.md`);
   const pack = buildContextPackMarkdown({
     activeChange,
@@ -569,6 +570,7 @@ export async function generateContextPack(root) {
     evidenceSummary,
     decisions,
     next,
+    risk,
   });
 
   await mkdir(join(root, ".gsd", "packs"), { recursive: true });
@@ -1888,6 +1890,7 @@ async function formatOperatorGuide(root) {
   const status = await getStatus(root);
   const next = await getNextRecommendation(root);
   const activeLine = status.activeChange ? `Active change: ${status.activeChange.slug}` : "Active change: none";
+  const risk = await getRiskSummary(root, next);
 
   return [
     "ShipSpec Operator",
@@ -1895,6 +1898,8 @@ async function formatOperatorGuide(root) {
     activeLine,
     `Next: ${next.command}`,
     `Why: ${next.reason}`,
+    `Risk: ${risk.level}`,
+    `Risk reason: ${risk.reasons.join("; ")}`,
     "",
     "Main commands:",
     '- gsd "Feature request"  Start a new feature',
@@ -1904,9 +1909,46 @@ async function formatOperatorGuide(root) {
     "- gsd ui                 Refresh the Cockpit dashboard",
     "",
     "Advanced:",
-    "- gsd --help             Show every command",
+    "- gsd help advanced      Show every command",
     "",
   ].join("\n");
+}
+
+async function getRiskSummary(root, next = null) {
+  const status = await getStatus(root);
+  if (!status.activeChange) {
+    return { level: "low", reasons: ["no active change"] };
+  }
+
+  const specStatus = await getSpecStatus(root);
+  const readyValidation = await validateChange(root, { ready: true });
+  const diff = await getDiffSummary(root);
+  const evidenceSummary = await readEvidenceSummary(root, status.activeChange.slug);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const recommendation = next ?? (await getNextRecommendation(root));
+  return buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next: recommendation });
+}
+
+function buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next }) {
+  const reasons = [];
+  const sensitiveFiles = changedFiles.filter((file) => /(auth|token|security|payment|billing|db|database|migration)/i.test(file));
+  const uiFiles = changedFiles.filter((file) => /(ui|app|page|component|css|style|view)/i.test(file));
+
+  if (!specStatus.evidence) reasons.push("Verification evidence missing");
+  if (!readyValidation.ok) reasons.push("ready validation failing");
+  if (evidenceSummary.some((entry) => /^Skipped:/i.test(entry))) reasons.push("verification skipped checks");
+  if (sensitiveFiles.length > 0) reasons.push(`Sensitive area changed: ${sensitiveFiles.slice(0, 3).join(", ")}`);
+  if (uiFiles.length > 0) reasons.push("UI changed; consider screenshot or E2E proof");
+  if (next?.command && !["gsd release", "gsd done"].includes(next.command)) reasons.push(`next action pending: ${next.command}`);
+
+  let level = "low";
+  if (reasons.length > 0) level = "medium";
+  if (sensitiveFiles.length > 0 && (!specStatus.evidence || !readyValidation.ok)) level = "high";
+
+  return {
+    level,
+    reasons: reasons.length ? [...new Set(reasons)] : ["no deterministic risks detected"],
+  };
 }
 
 function isPlainTextIntent(command, rest) {
@@ -2961,6 +3003,7 @@ function buildContextPackMarkdown({
   evidenceSummary,
   decisions,
   next,
+  risk,
 }) {
   const proposalPath = `openspec/changes/${activeChange.slug}/proposal.md`;
   const tasksPath = `openspec/changes/${activeChange.slug}/tasks.md`;
@@ -2999,6 +3042,11 @@ function buildContextPackMarkdown({
     "",
     specStatus.evidence ? `- Evidence file: ${evidencePath}` : "- Evidence file: missing",
     ...formatBulletList(evidenceSummary, "No verification evidence summary available."),
+    "",
+    "## Risk",
+    "",
+    `- Level: ${risk.level}`,
+    ...risk.reasons.map((reason) => `- ${reason}`),
     "",
     "## Human Decisions",
     "",

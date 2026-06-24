@@ -306,10 +306,10 @@ gsd ui
 
 | Command | Purpose |
 | --- | --- |
-| `gsd` | Show the ShipSpec Operator with the next action and a small menu. |
+| `gsd` | Show the ShipSpec Operator with next action, risk level, risk reason, and a small menu. |
 | `gsd "Feature request"` | Start a feature without remembering `quickstart`. |
 | `gsd ship` | Run full verification, ready validation, and report generation. |
-| `gsd share` | Create a portable AI context pack. |
+| `gsd share` | Create a portable AI context pack with spec, evidence, risk, and next action. |
 | `gsd ui` | Refresh the ShipSpec Cockpit dashboard. |
 
 Use `gsd next` when you want ShipSpec to explain the next best action.

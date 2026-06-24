@@ -178,6 +178,8 @@ test("runCli with no args shows the operator guide instead of raw help", async (
   assert.equal(result.exitCode, 0);
   assert.match(result.stdout, /ShipSpec Operator/);
   assert.match(result.stdout, /Next:/);
+  assert.match(result.stdout, /Risk: medium/);
+  assert.match(result.stdout, /evidence missing/);
   assert.match(result.stdout, /Main commands:/);
   assert.match(result.stdout, /gsd "Feature request"/);
   assert.match(result.stdout, /gsd share/);
@@ -918,10 +920,30 @@ test("generateContextPack writes a portable AI handoff pack", async () => {
   assert.match(result.pack, /feature\.js/);
   assert.match(result.pack, /## Evidence Summary/);
   assert.match(result.pack, /unit passed/);
+  assert.match(result.pack, /## Risk/);
+  assert.match(result.pack, /Level: medium/);
   assert.match(result.pack, /## Human Decisions/);
   assert.match(result.pack, /Approved compact context package/);
   assert.match(result.pack, /## Next Action/);
   assert.match(result.pack, /## AI Instructions/);
+});
+
+test("generateContextPack flags high-risk auth changes without full proof", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Update Auth Token");
+  await writeFile(join(root, "src", "auth-token.js"), "export const auth = true;\n").catch(async () => {
+    await mkdir(join(root, "src"));
+    await writeFile(join(root, "src", "auth-token.js"), "export const auth = true;\n");
+  });
+
+  const result = await generateContextPack(root);
+
+  assert.match(result.pack, /## Risk/);
+  assert.match(result.pack, /Level: high/);
+  assert.match(result.pack, /Sensitive area changed/);
+  assert.match(result.pack, /Verification evidence missing/);
 });
 
 test("runCli pack writes and prints the context pack path", async () => {
