@@ -36,6 +36,7 @@ import {
   generateReport,
   generateReflection,
   runCli,
+  runMission,
   startChange,
   learnFromChange,
   validateChange,
@@ -168,6 +169,52 @@ test("runCli quickstart --light avoids agent ceremony", async () => {
   assert.equal(await exists(join(root, ".agent", "roles", "planner.md")), false);
 });
 
+test("runMission prepares an AGI-style mission for a new request", async () => {
+  const root = await tempRoot();
+
+  const result = await runMission(root, "Add Checkout Discount");
+
+  assert.equal(result.ok, true);
+  assert.equal(result.activeChange.slug, "add-checkout-discount");
+  assert.equal(result.phase, "planning-ready");
+  assert.match(result.message, /Mission: add-checkout-discount/);
+  assert.match(result.message, /Phase: planning-ready/);
+  assert.match(result.message, /Next:/);
+  assert.equal(await exists(join(root, ".gsd", "missions", "add-checkout-discount.json")), true);
+  assert.equal(await exists(join(root, ".gsd", "missions", "add-checkout-discount.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "reasoning", "add-checkout-discount.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "prompts", "add-checkout-discount.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "packs", "add-checkout-discount.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
+
+  const mission = JSON.parse(await readFile(join(root, ".gsd", "missions", "add-checkout-discount.json"), "utf8"));
+  assert.equal(mission.slug, "add-checkout-discount");
+  assert.equal(mission.phase, "planning-ready");
+  assert.equal(mission.safety.externalActions, false);
+  assert.equal(mission.artifacts.prompt, ".gsd/prompts/add-checkout-discount.md");
+});
+
+test("runMission continues an active change and prepares review when evidence passes", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Ready Mission");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+
+  const result = await runMission(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.phase, "review-ready");
+  assert.match(result.message, /Mission: ready-mission/);
+  assert.match(result.message, /Phase: review-ready/);
+  assert.match(result.message, /Report: \.gsd\/reports\/ready-mission\.md/);
+  assert.equal(await exists(join(root, ".gsd", "reports", "ready-mission.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "packs", "ready-mission.md")), true);
+});
+
 test("runCli with no args shows the operator guide instead of raw help", async () => {
   const root = await tempRoot();
   await initWorkspace(root);
@@ -272,6 +319,24 @@ test("runCli supports help and version for an installable CLI", async () => {
   const version = await runCli(["--version"], { cwd: root });
   assert.equal(version.exitCode, 0);
   assert.match(version.stdout, /0\.4\.0/);
+});
+
+test("runCli supports the AGI-style run command", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["run", "Add", "Mission", "Mode"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Mission: add-mission-mode/);
+  assert.match(result.stdout, /Phase: planning-ready/);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.equal(help.exitCode, 0);
+  assert.match(help.stdout, /gsd run/);
+
+  const advanced = await runCli(["help", "advanced"], { cwd: root });
+  assert.equal(advanced.exitCode, 0);
+  assert.match(advanced.stdout, /run \[request\]/);
 });
 
 test("runCli skill path prints source and default install target", async () => {
