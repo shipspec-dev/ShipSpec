@@ -1313,9 +1313,10 @@ export async function runMission(root, request = "", options = {}) {
   if (report?.ok) pack = await generateContextPack(root);
   const reflection = !title && readyValidation && !readyValidation.ok ? await generateReflection(root) : null;
   const ui = await generateUiDashboard(root);
-  const next = await getNextRecommendation(root);
-  const risk = await getRiskSummary(root, next);
+  const baseNext = await getNextRecommendation(root);
+  const risk = await getRiskSummary(root, baseNext);
   const phase = classifyMissionPhase({ specValidation, readyValidation, risk, hasRequest: Boolean(title) });
+  const next = buildMissionNextAction({ phase, activeChange, baseNext, prompt, pack, report, reflection });
 
   const mission = buildMissionState({
     activeChange,
@@ -2025,6 +2026,37 @@ function buildMissionState({ activeChange, phase, request, risk, next, specValid
     },
     generatedAt: new Date().toISOString(),
   };
+}
+
+function buildMissionNextAction({ phase, activeChange, baseNext, prompt, pack, report, reflection }) {
+  if (phase === "planning-ready" && prompt) {
+    return {
+      activeChange,
+      command: `open .gsd/prompts/${activeChange.slug}.md`,
+      reason: "Mission prompt and context pack are ready for an AI coding pass.",
+      otherCommands: pack ? [`open .gsd/packs/${activeChange.slug}.md`, "gsd ui"] : ["gsd ui"],
+    };
+  }
+
+  if (phase === "review-ready" && report) {
+    return {
+      activeChange,
+      command: `open .gsd/reports/${activeChange.slug}.md`,
+      reason: "Verification evidence passed and the review report is ready.",
+      otherCommands: pack ? ["gsd share", "gsd ui"] : ["gsd ui"],
+    };
+  }
+
+  if ((phase === "implementation-ready" || phase === "blocked-high-risk") && reflection) {
+    return {
+      activeChange,
+      command: `open .gsd/reflections/${activeChange.slug}.md`,
+      reason: "Mission is not ready yet; review the reflection before continuing.",
+      otherCommands: ["gsd verify --full", "gsd ui"],
+    };
+  }
+
+  return baseNext;
 }
 
 async function writeMissionState(root, mission) {

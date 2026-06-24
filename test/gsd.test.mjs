@@ -179,7 +179,9 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   assert.equal(result.phase, "planning-ready");
   assert.match(result.message, /Mission: add-checkout-discount/);
   assert.match(result.message, /Phase: planning-ready/);
-  assert.match(result.message, /Next:/);
+  assert.match(result.message, /Next: open \.gsd\/prompts\/add-checkout-discount\.md/);
+  assert.equal(result.next.command, "open .gsd/prompts/add-checkout-discount.md");
+  assert.match(result.next.reason, /AI coding pass/);
   assert.equal(await exists(join(root, ".gsd", "missions", "add-checkout-discount.json")), true);
   assert.equal(await exists(join(root, ".gsd", "missions", "add-checkout-discount.md")), true);
   assert.equal(await exists(join(root, ".gsd", "reasoning", "add-checkout-discount.md")), true);
@@ -190,6 +192,7 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   const mission = JSON.parse(await readFile(join(root, ".gsd", "missions", "add-checkout-discount.json"), "utf8"));
   assert.equal(mission.slug, "add-checkout-discount");
   assert.equal(mission.phase, "planning-ready");
+  assert.equal(mission.nextAction.command, "open .gsd/prompts/add-checkout-discount.md");
   assert.equal(mission.safety.externalActions, false);
   assert.equal(mission.artifacts.prompt, ".gsd/prompts/add-checkout-discount.md");
 });
@@ -210,7 +213,9 @@ test("runMission continues an active change and prepares review when evidence pa
   assert.equal(result.phase, "review-ready");
   assert.match(result.message, /Mission: ready-mission/);
   assert.match(result.message, /Phase: review-ready/);
+  assert.match(result.message, /Next: open \.gsd\/reports\/ready-mission\.md/);
   assert.match(result.message, /Report: \.gsd\/reports\/ready-mission\.md/);
+  assert.equal(result.next.command, "open .gsd/reports/ready-mission.md");
   assert.equal(await exists(join(root, ".gsd", "reports", "ready-mission.md")), true);
   assert.equal(await exists(join(root, ".gsd", "packs", "ready-mission.md")), true);
 });

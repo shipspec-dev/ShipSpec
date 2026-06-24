@@ -14,7 +14,8 @@ openspec/changes/add-electron-desktop-app
 
 ## Changed Files
 
-- No Git changes detected, or Git is unavailable.
+- src/gsd.mjs
+- test/gsd.test.mjs
 
 ## Risks
 
