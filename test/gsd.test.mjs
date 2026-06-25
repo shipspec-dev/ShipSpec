@@ -317,9 +317,15 @@ test("runCli ship runs ready verification, validation, and report", async () => 
   assert.match(result.stdout, /Ship flow ready/);
   assert.match(result.stdout, /PASS unit/);
   assert.match(result.stdout, /Spec validation passed/);
+  assert.match(result.stdout, /Auto review/);
+  assert.match(result.stdout, /\.gsd\/reviews\/ship-flow\.md/);
   assert.match(result.stdout, /\.gsd\/reports\/ship-flow\.md/);
   assert.equal(await exists(join(root, ".agent", "evidence", "ship-flow.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "reviews", "ship-flow.md")), true);
   assert.equal(await exists(join(root, ".gsd", "reports", "ship-flow.md")), true);
+
+  const report = await readFile(join(root, ".gsd", "reports", "ship-flow.md"), "utf8");
+  assert.match(report, /\.gsd\/reviews\/ship-flow\.md/);
 });
 
 test("runCli supports help and version for an installable CLI", async () => {

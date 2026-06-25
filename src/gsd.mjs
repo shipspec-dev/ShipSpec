@@ -482,7 +482,9 @@ export async function generateReport(root) {
   const activeChange = await requireActiveChange(root);
   const summary = await getDiffSummary(root);
   const evidenceRelativePath = `.agent/evidence/${activeChange.slug}.md`;
+  const reviewRelativePath = `.gsd/reviews/${activeChange.slug}.md`;
   const hasEvidence = await exists(join(root, evidenceRelativePath));
+  const hasReview = await exists(join(root, reviewRelativePath));
   const changedFiles = [...new Set([...summary.stagedFiles, ...summary.unstagedFiles])];
   const reportPath = join(root, ".gsd", "reports", `${activeChange.slug}.md`);
 
@@ -503,6 +505,10 @@ export async function generateReport(root) {
       "## Verification",
       "",
       hasEvidence ? `- Evidence: ${evidenceRelativePath}` : "- Evidence: missing. Run `gsd verify` before review.",
+      "",
+      "## Auto Review",
+      "",
+      hasReview ? `- Review: ${reviewRelativePath}` : "- Review: missing. Run `gsd review` before review.",
       "",
       "## Changed Files",
       "",
@@ -1684,12 +1690,21 @@ export async function runShipFlow(root) {
     };
   }
 
+  const review = await generateReview(root);
   const report = await generateReport(root);
   return {
     ok: report.ok,
-    message: ["Ship flow ready", formatCheckResults(verification.checks), "Spec validation passed", report.message].join("\n"),
+    message: [
+      "Ship flow ready",
+      formatCheckResults(verification.checks),
+      "Spec validation passed",
+      "Auto review:",
+      `- Review: .gsd/reviews/${review.activeChange.slug}.md`,
+      report.message,
+    ].join("\n"),
     verification,
     ready,
+    review,
     report,
   };
 }
