@@ -1177,14 +1177,19 @@ export async function learnFromChange(root) {
   const activeChange = await requireActiveChange(root);
   const reflection = await generateReflection(root);
   const lessonPath = join(root, ".gsd", "lessons", `${activeChange.slug}.md`);
+  const structuredMemoryPath = join(root, ".gsd", "memory", `${activeChange.slug}.json`);
   const patternsPath = join(root, ".gsd", "patterns", "project.md");
   const memoryPath = join(root, ".agent", "memory.md");
+  const structuredMemory = await buildStructuredMemory(root, activeChange, reflection);
   const patternSection = [
     `## Learned from ${activeChange.title}`,
     "",
     `- Change: ${activeChange.slug}`,
     `- Readiness: ${reflection.ok ? "ready" : "needs attention"}`,
     `- Primary next action: ${reflection.nextActions[0] ?? "Continue normal review."}`,
+    `- Common files: ${structuredMemory.changedFiles.slice(0, 5).join(", ") || "No changed files recorded."}`,
+    `- Checks: ${structuredMemory.checks.map((check) => check.name).join(", ") || "No checks recorded."}`,
+    `- Ship pattern: ${structuredMemory.shipPattern}`,
     "- Human approval required before changing workflow rules.",
     "",
   ].join("\n");
@@ -1192,10 +1197,13 @@ export async function learnFromChange(root) {
     "## ShipSpec Lessons",
     "",
     `- ${activeChange.slug}: ${reflection.nextActions[0] ?? "No next action recorded."}`,
+    `- ${activeChange.slug} files: ${structuredMemory.changedFiles.slice(0, 5).join(", ") || "No changed files recorded."}`,
+    `- ${activeChange.slug} checks: ${structuredMemory.checks.map((check) => check.name).join(", ") || "No checks recorded."}`,
     "",
   ].join("\n");
 
   await mkdir(join(root, ".gsd", "lessons"), { recursive: true });
+  await mkdir(join(root, ".gsd", "memory"), { recursive: true });
   await mkdir(join(root, ".gsd", "patterns"), { recursive: true });
   await mkdir(join(root, ".agent"), { recursive: true });
   await writeFile(
@@ -1217,6 +1225,7 @@ export async function learnFromChange(root) {
       "",
     ].join("\n"),
   );
+  await writeFile(structuredMemoryPath, `${JSON.stringify(structuredMemory, null, 2)}\n`);
   await appendUniqueSection(patternsPath, "# Project Patterns\n\n", `Learned from ${activeChange.title}`, patternSection);
   await appendUniqueSection(memoryPath, "# Project Memory\n\n", activeChange.slug, memorySection);
 
@@ -1224,6 +1233,7 @@ export async function learnFromChange(root) {
     ok: true,
     message: `Lesson written to .gsd/lessons/${activeChange.slug}.md`,
     lessonPath,
+    structuredMemoryPath,
     patternsPath,
     memoryPath,
   };
@@ -1467,6 +1477,7 @@ export async function generateCodexHandoff(root) {
   await initWorkspace(root);
   const activeChange = await requireActiveChange(root);
   const slug = activeChange.slug;
+  const memory = await getMemorySummary(root);
 
   if (!(await exists(join(root, ".gsd", "prompts", `${slug}.md`)))) {
     await generatePlanPrompt(root);
@@ -1489,7 +1500,7 @@ export async function generateCodexHandoff(root) {
     if (await exists(join(root, relativePath))) files.push(relativePath);
   }
 
-  const handoff = buildCodexHandoffMarkdown({ activeChange, files });
+  const handoff = buildCodexHandoffMarkdown({ activeChange, files, memory });
 
   return {
     ok: true,
@@ -1544,10 +1555,14 @@ export async function getMemorySummary(root) {
   const lessons = await readMemoryArtifacts(root, join(".gsd", "lessons"));
   const reflections = await readMemoryArtifacts(root, join(".gsd", "reflections"));
   const loops = await readMemoryArtifacts(root, join(".gsd", "loops"));
+  const structured = await readStructuredMemoryArtifacts(root);
+  const smartMemory = summarizeStructuredMemory(structured);
 
   return {
     projectMemory,
     projectPatterns,
+    structured,
+    smartMemory,
     lessons,
     reflections,
     loops: loops.map((loop) => ({
@@ -2324,7 +2339,8 @@ function formatMissionResult({ mission }) {
   return lines.join("\n");
 }
 
-function buildCodexHandoffMarkdown({ activeChange, files }) {
+function buildCodexHandoffMarkdown({ activeChange, files, memory }) {
+  const memoryLines = formatCodexMemoryLines(memory);
   return [
     "Use $shipspec and implement the active ShipSpec mission.",
     `Mission: ${activeChange.slug}`,
@@ -2332,6 +2348,7 @@ function buildCodexHandoffMarkdown({ activeChange, files }) {
     "Read these files from the repo:",
     ...formatBulletList(files, "No ShipSpec files found."),
     "",
+    ...(memoryLines.length ? ["Project memory:", ...memoryLines, ""] : []),
     "Do not ask me to paste long context. Use repo files as the source of truth.",
     "Stop before coding if the mission/spec is unclear.",
     "",
@@ -2340,6 +2357,16 @@ function buildCodexHandoffMarkdown({ activeChange, files }) {
     "- gsd ship",
     "- gsd share",
   ].join("\n");
+}
+
+function formatCodexMemoryLines(memory) {
+  if (!memory?.smartMemory) return [];
+  const lines = [];
+  if (memory.smartMemory.commonFiles.length) lines.push(`- Common files: ${memory.smartMemory.commonFiles.slice(0, 5).join(", ")}`);
+  if (memory.smartMemory.checks.length) lines.push(`- Checks: ${memory.smartMemory.checks.slice(0, 5).join(", ")}`);
+  if (memory.smartMemory.recentRisks.length) lines.push(`- Recent risks: ${memory.smartMemory.recentRisks.slice(0, 3).join("; ")}`);
+  if (memory.smartMemory.shipPatterns.length) lines.push(`- Ship pattern: ${memory.smartMemory.shipPatterns[0]}`);
+  return lines;
 }
 
 async function getRiskSummary(root, next = null) {
@@ -2636,6 +2663,38 @@ async function getReviewUiState(root, slug) {
   };
 }
 
+async function buildStructuredMemory(root, activeChange, reflection) {
+  const diff = await getDiffSummary(root);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])].sort();
+  const evidencePath = `.agent/evidence/${activeChange.slug}.md`;
+  const reviewPath = `.gsd/reviews/${activeChange.slug}.md`;
+  const reportPath = `.gsd/reports/${activeChange.slug}.md`;
+  const donePath = `.gsd/done/${activeChange.slug}.md`;
+  const evidence = await readTextSnippetIfExists(join(root, evidencePath), 24_000);
+  const checks = extractEvidenceChecks(evidence);
+  const evidenceSummary = extractEvidenceSummaryBullets(evidence);
+  const risks = [
+    ...evidenceSummary.filter((item) => item.startsWith("Risk:")).map((item) => item.replace(/^Risk:\s*/u, "")),
+    ...reflection.gaps,
+  ].filter(Boolean);
+
+  return {
+    slug: activeChange.slug,
+    title: activeChange.title,
+    learnedAt: new Date().toISOString(),
+    changedFiles,
+    checks,
+    risks: [...new Set(risks)],
+    artifacts: {
+      evidence: (await exists(join(root, evidencePath))) ? evidencePath : null,
+      review: (await exists(join(root, reviewPath))) ? reviewPath : null,
+      report: (await exists(join(root, reportPath))) ? reportPath : null,
+      done: (await exists(join(root, donePath))) ? donePath : null,
+    },
+    shipPattern: await buildShipPattern({ reviewPath, reportPath, donePath }, root),
+  };
+}
+
 async function readMemoryArtifacts(root, relativeDir) {
   const dir = join(root, relativeDir);
   try {
@@ -2658,6 +2717,92 @@ async function readMemoryArtifacts(root, relativeDir) {
     if (error.code === "ENOENT") return [];
     throw error;
   }
+}
+
+async function readStructuredMemoryArtifacts(root) {
+  const dir = join(root, ".gsd", "memory");
+  try {
+    const files = (await readdir(dir)).filter((file) => file.endsWith(".json")).sort().reverse().slice(0, 20);
+    const memories = [];
+
+    for (const file of files) {
+      const memory = await readJsonIfExists(join(dir, file));
+      if (memory) memories.push(memory);
+    }
+
+    return memories;
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+}
+
+function summarizeStructuredMemory(memories) {
+  const commonFiles = rankByFrequency(memories.flatMap((memory) => memory.changedFiles ?? [])).slice(0, 8);
+  const checks = rankByFrequency(memories.flatMap((memory) => (memory.checks ?? []).map((check) => check.name))).slice(0, 8);
+  const recentRisks = [
+    ...new Set(memories.flatMap((memory) => memory.risks ?? []).filter(isUsefulMemoryRisk)),
+  ].slice(0, 6);
+  const shipPatterns = [...new Set(memories.map((memory) => memory.shipPattern).filter(Boolean))].slice(0, 3);
+
+  return {
+    commonFiles,
+    checks,
+    recentRisks,
+    shipPatterns,
+    recentChanges: memories.slice(0, 5).map((memory) => ({
+      slug: memory.slug,
+      title: memory.title,
+      artifacts: memory.artifacts ?? {},
+    })),
+  };
+}
+
+function isUsefulMemoryRisk(risk) {
+  return (
+    Boolean(risk) &&
+    !risk.includes("No verification risks") &&
+    !risk.includes("artifact is missing") &&
+    !risk.includes("handoff is missing")
+  );
+}
+
+function rankByFrequency(values) {
+  const counts = new Map();
+  for (const value of values.filter(Boolean)) {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([value]) => value);
+}
+
+function extractEvidenceChecks(evidence) {
+  const checks = [];
+  let current = null;
+
+  for (const line of evidence.split("\n")) {
+    if (line.startsWith("### ")) {
+      current = { name: line.slice(4).trim(), command: "", result: "unknown", required: "unknown" };
+      checks.push(current);
+    } else if (current && line.startsWith("Command: `")) {
+      current.command = line.slice("Command: `".length).replace(/`$/u, "");
+    } else if (current && line.startsWith("Result: ")) {
+      current.result = line.slice("Result: ".length).trim();
+    } else if (current && line.startsWith("Required: ")) {
+      current.required = line.slice("Required: ".length).trim();
+    }
+  }
+
+  return checks;
+}
+
+async function buildShipPattern(paths, root) {
+  const steps = ["verify"];
+  if (await exists(join(root, paths.reviewPath))) steps.push("review");
+  if (await exists(join(root, paths.reportPath))) steps.push("report");
+  if (await exists(join(root, paths.donePath))) steps.push("done");
+  return steps.join(" -> ");
 }
 
 function readMarkdownTitle(markdown) {
@@ -3175,6 +3320,10 @@ function formatMemorySummary(summary) {
     "",
     summary.projectMemory.trim() ? trimForDisplay(summary.projectMemory, 900) : "No project memory recorded.",
     "",
+    "Smart Memory",
+    "",
+    ...formatSmartMemoryRows(summary.smartMemory),
+    "",
     "Project Patterns",
     "",
     summary.projectPatterns.trim() ? trimForDisplay(summary.projectPatterns, 900) : "No project patterns recorded.",
@@ -3191,6 +3340,19 @@ function formatMemorySummary(summary) {
     "",
     ...formatLoopActionRows(summary.loops),
   ].join("\n");
+}
+
+function formatSmartMemoryRows(smartMemory) {
+  if (!smartMemory || smartMemory.recentChanges.length === 0) {
+    return ["- No smart memory recorded."];
+  }
+
+  return [
+    `- Common files: ${smartMemory.commonFiles.length ? smartMemory.commonFiles.join(", ") : "None recorded."}`,
+    `- Checks: ${smartMemory.checks.length ? smartMemory.checks.join(", ") : "None recorded."}`,
+    `- Recent risks: ${smartMemory.recentRisks.length ? smartMemory.recentRisks.join("; ") : "None recorded."}`,
+    `- Ship pattern: ${smartMemory.shipPatterns[0] ?? "None recorded."}`,
+  ];
 }
 
 function formatArtifactRows(artifacts) {

@@ -1,0 +1,48 @@
+{
+  "slug": "add-smarter-project-memory",
+  "title": "Add smarter project memory",
+  "learnedAt": "2026-06-25T07:35:10.638Z",
+  "changedFiles": [
+    "src/gsd.mjs",
+    "test/gsd.test.mjs"
+  ],
+  "checks": [
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "unit",
+      "command": "npm test",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "e2e",
+      "command": "npm run test:e2e",
+      "result": "pass",
+      "required": "no"
+    }
+  ],
+  "risks": [
+    "No verification risks detected from configured checks.",
+    "Request intake artifact is missing.",
+    "Contract artifact is missing.",
+    "Agent room artifact is missing."
+  ],
+  "artifacts": {
+    "evidence": ".agent/evidence/add-smarter-project-memory.md",
+    "review": ".gsd/reviews/add-smarter-project-memory.md",
+    "report": ".gsd/reports/add-smarter-project-memory.md",
+    "done": ".gsd/done/add-smarter-project-memory.md"
+  },
+  "shipPattern": "verify -> review -> report -> done"
+}

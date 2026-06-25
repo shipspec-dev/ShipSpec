@@ -737,6 +737,50 @@ test("learnFromChange stores governed lessons and project patterns", async () =>
   assert.match(memory, /improve-billing-audit/);
 });
 
+test("learnFromChange writes structured smart memory from local ShipSpec artifacts", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Smart Memory Source");
+  await mkdir(join(root, "src"), { recursive: true });
+  await mkdir(join(root, "test"), { recursive: true });
+  await writeFile(join(root, "src", "billing.js"), "export const billing = true;\n");
+  await writeFile(join(root, "test", "billing.test.js"), "export const tested = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify(
+      {
+        checks: [
+          { name: "unit", command: "node -e \"process.exit(0)\"", required: true },
+          { name: "e2e", command: "node -e \"process.exit(0)\"", required: false, fullOnly: true },
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+  await verifyChange(root, { full: true });
+  await generateReview(root);
+  await generateReport(root);
+  await completeChange(root);
+
+  const result = await learnFromChange(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(await exists(join(root, ".gsd", "memory", "smart-memory-source.json")), true);
+  const memory = JSON.parse(await readFile(join(root, ".gsd", "memory", "smart-memory-source.json"), "utf8"));
+  assert.equal(memory.slug, "smart-memory-source");
+  assert.deepEqual(memory.changedFiles, ["src/billing.js", "test/billing.test.js"]);
+  assert.deepEqual(
+    memory.checks.map((check) => check.name),
+    ["unit", "e2e"],
+  );
+  assert.equal(memory.artifacts.review, ".gsd/reviews/smart-memory-source.md");
+  assert.equal(memory.artifacts.report, ".gsd/reports/smart-memory-source.md");
+  assert.equal(memory.artifacts.done, ".gsd/done/smart-memory-source.md");
+  assert.match(memory.shipPattern, /verify -> review -> report/);
+});
+
 test("runCli reflect and learn expose self-improving loop commands", async () => {
   const root = await tempRoot();
   await initWorkspace(root);
@@ -1179,15 +1223,31 @@ test("getMemorySummary reads lessons, patterns, reflections, and loop actions", 
   assert.equal(summary.loops[0].nextActions.some((action) => action.includes("gsd report")), true);
 });
 
-test("runCli memory prints memory summary and supports json output", async () => {
+test("runCli memory prints memory summary, smart memory, and supports json output", async () => {
   const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
   await initWorkspace(root);
   await startChange(root, "Memory Cli");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "memory-cli.js"), "export const remembered = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+  await generateReview(root);
+  await generateReport(root);
   await learnFromChange(root);
 
   const text = await runCli(["memory"], { cwd: root });
   assert.equal(text.exitCode, 0);
   assert.match(text.stdout, /Project Memory/);
+  assert.match(text.stdout, /Smart Memory/);
+  assert.match(text.stdout, /Common files/);
+  assert.match(text.stdout, /src\/memory-cli\.js/);
+  assert.match(text.stdout, /Checks/);
+  assert.match(text.stdout, /unit/);
+  assert.doesNotMatch(text.stdout, /Request intake artifact is missing/);
   assert.match(text.stdout, /Recent Lessons/);
   assert.match(text.stdout, /memory-cli/);
 
@@ -1195,9 +1255,36 @@ test("runCli memory prints memory summary and supports json output", async () =>
   assert.equal(json.exitCode, 0);
   const parsed = JSON.parse(json.stdout);
   assert.equal(parsed.lessons[0].slug, "memory-cli");
+  assert.equal(parsed.smartMemory.commonFiles.includes("src/memory-cli.js"), true);
+  assert.equal(parsed.smartMemory.checks.includes("unit"), true);
 
   const help = await runCli(["help", "advanced"], { cwd: root });
   assert.match(help.stdout, /memory/);
+});
+
+test("generateCodexHandoff includes smart memory for the next feature", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Remembered Source");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "remembered.js"), "export const remembered = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+  await generateReview(root);
+  await generateReport(root);
+  await learnFromChange(root);
+  await runMission(root, "Next Remembered Feature");
+
+  const result = await generateCodexHandoff(root);
+
+  assert.equal(result.ok, true);
+  assert.match(result.handoff, /Project memory/);
+  assert.match(result.handoff, /Common files: src\/remembered\.js/);
+  assert.match(result.handoff, /Checks: unit/);
 });
 
 test("generateReasoning writes adaptive local reasoning from spec, memory, and project signals", async () => {
