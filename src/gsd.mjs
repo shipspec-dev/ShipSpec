@@ -845,6 +845,7 @@ export async function generateUiDashboard(root) {
   const operation = activeChange ? await getOperationUiState(root, activeChange.slug) : null;
   const decisions = activeChange ? await readDecisionEntries(root, activeChange.slug) : [];
   const review = activeChange ? await getReviewUiState(root, activeChange.slug) : null;
+  const memory = await getMemorySummary(root);
   const next = await getNextRecommendation(root);
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
@@ -867,6 +868,7 @@ export async function generateUiDashboard(root) {
       operation,
       decisions,
       review,
+      memory,
       next,
     }),
   );
@@ -4039,6 +4041,38 @@ function buildUiHtml(model) {
     ["Report", model.reportExists, "PASS", "WAIT"],
   ];
   const nextActions = model.loop?.nextActions?.length ? model.loop.nextActions : [model.next?.reason ?? "Run gsd next for guidance."];
+  const readinessSignals = [
+    ["Spec", model.specStatus.proposal && model.specStatus.tasks],
+    ["Validation", model.validation.ok],
+    ["Evidence", model.specStatus.evidence],
+    ["Review", model.review?.present],
+    ["Report", model.reportExists],
+    ["Ready", model.readyValidation.ok],
+  ];
+  const readinessPassed = readinessSignals.filter(([, ok]) => ok).length;
+  const readinessScore = Math.round((readinessPassed / readinessSignals.length) * 100);
+  const readinessReason = model.readyValidation.ok
+    ? "Ready to ship."
+    : model.readyValidation.errors?.[0] ?? model.next?.reason ?? "Run gsd next for guidance.";
+  const commandCenterActions = [
+    ["Start / Continue", model.next?.command ?? "gsd run \"Feature request\"", "Use the next best ShipSpec action."],
+    ["Hand to AI", "gsd codex", "Give Codex repo files instead of a long paste."],
+    ["Ship", "gsd ship", "Verify, review, and write the ship report."],
+  ];
+  const smartMemory = model.memory?.smartMemory ?? {};
+  const memoryRows = [
+    `Common files: ${smartMemory.commonFiles?.slice(0, 4).join(", ") || "None recorded."}`,
+    `Checks: ${smartMemory.checks?.slice(0, 4).join(", ") || "None recorded."}`,
+    `Ship pattern: ${smartMemory.shipPatterns?.[0] ?? "None recorded."}`,
+  ];
+  const evidenceReceiptRows = [
+    ["Change", changeSlug],
+    ["Branch", model.diff.branch],
+    ["Evidence", model.specStatus.evidence ? "present" : "missing"],
+    ["Review", model.review?.present ? "present" : "missing"],
+    ["Report", model.reportExists ? "present" : "missing"],
+    ["Release", model.releaseExists ? "present" : "missing"],
+  ];
   const reasoningItems = [
     `Reasoning: ${model.reasoning?.present ? "present" : "missing"}`,
     ...(model.reasoning?.risks?.length ? model.reasoning.risks : ["Risks: none recorded."]),
@@ -4111,6 +4145,87 @@ function buildUiHtml(model) {
       box-shadow: 8px 8px 0 #05060b;
       padding: 16px;
     }
+    .command-center { margin-bottom: 16px; }
+    .center-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .center-head p { color: var(--muted); font-size: 17px; line-height: 1.25; }
+    .primary-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .action-card {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 148px;
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 12px;
+    }
+    .action-card h3 { margin: 0; font-size: 18px; color: var(--green); }
+    .action-card p { color: var(--muted); font-size: 15px; line-height: 1.2; }
+    .action-card .command-button { align-self: end; }
+    .command-center-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 10px;
+    }
+    .score-panel {
+      background: var(--panel-2);
+      border: 2px solid var(--line);
+      padding: 12px;
+    }
+    .score-grid {
+      display: grid;
+      grid-template-columns: 126px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+    .score-number {
+      display: grid;
+      place-items: center;
+      min-height: 92px;
+      color: var(--green);
+      background: var(--panel-3);
+      border: 2px solid var(--green);
+      font-size: 34px;
+      line-height: 1;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .signal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    .signal {
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 6px;
+      font-size: 13px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .timeline {
+      margin-top: 10px;
+      color: var(--yellow);
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 10px;
+      overflow-wrap: anywhere;
+    }
+    .receipt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .receipt-item {
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 8px;
+      min-height: 52px;
+      overflow-wrap: anywhere;
+    }
+    .receipt-item strong { display: block; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+    .memory-list { display: grid; gap: 8px; margin-bottom: 12px; }
     .action {
       background: var(--panel-2);
       border: 3px solid var(--blue);
@@ -4191,6 +4306,10 @@ function buildUiHtml(model) {
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
       .top-meta { justify-content: flex-start; }
+      .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
+      .primary-actions { grid-template-columns: 1fr; }
+      .score-grid { grid-template-columns: 1fr; }
+      .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .shell { padding: 16px; }
@@ -4210,6 +4329,53 @@ function buildUiHtml(model) {
         <span class="chip">Branch ${escapeHtml(model.diff.branch)}</span>
       </div>
     </header>
+
+    <section class="command-center panel">
+      <div class="center-head">
+        <div>
+          <h2>ShipSpec Command Center</h2>
+          <p>One screen for the next action, AI handoff, ship readiness, memory, and evidence.</p>
+        </div>
+        <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">Readiness Score ${readinessScore}%</span>
+      </div>
+
+      <div class="primary-actions">
+        ${commandCenterActions.map(([label, command, description]) => `<article class="action-card">
+          <h3>${escapeHtml(label)}</h3>
+          <p>${escapeHtml(description)}</p>
+          <button class="command-button" type="button" data-command="${escapeHtml(command)}" title="Copy command">${escapeHtml(command)}</button>
+        </article>`).join("")}
+      </div>
+
+      <div class="command-center-grid">
+        <div class="score-panel">
+          <h2>Ship Readiness</h2>
+          <div class="score-grid">
+            <div class="score-number" aria-label="Readiness Score">${readinessScore}%</div>
+            <div>
+              <h3>Readiness Score</h3>
+              <p class="reason">${escapeHtml(readinessReason)}</p>
+              <div class="signal-grid">
+                ${readinessSignals.map(([name, ok]) => `<div class="signal"><span class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span> ${escapeHtml(name)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
+          <h3>Delivery Timeline</h3>
+          <div class="timeline">request -> handoff -> verify -> review -> report -> learn</div>
+        </div>
+
+        <div class="score-panel">
+          <h2>Evidence Receipt</h2>
+          <div class="receipt-grid">
+            ${evidenceReceiptRows.map(([label, value]) => `<div class="receipt-item"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</div>`).join("")}
+          </div>
+          <h3>Memory Summary</h3>
+          <div class="memory-list">
+            ${memoryRows.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="action">
       <div>
