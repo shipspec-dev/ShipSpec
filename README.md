@@ -56,6 +56,8 @@ gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
 
+`gsd ui` shows the ShipSpec Command Center: Start / Continue, Hand to AI, Ship, readiness score, evidence receipt, delivery timeline, and project memory in one local page.
+
 For small fixes:
 
 ```bash

@@ -46,6 +46,87 @@
       box-shadow: 8px 8px 0 #05060b;
       padding: 16px;
     }
+    .command-center { margin-bottom: 16px; }
+    .center-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .center-head p { color: var(--muted); font-size: 17px; line-height: 1.25; }
+    .primary-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .action-card {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 148px;
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 12px;
+    }
+    .action-card h3 { margin: 0; font-size: 18px; color: var(--green); }
+    .action-card p { color: var(--muted); font-size: 15px; line-height: 1.2; }
+    .action-card .command-button { align-self: end; }
+    .command-center-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 10px;
+    }
+    .score-panel {
+      background: var(--panel-2);
+      border: 2px solid var(--line);
+      padding: 12px;
+    }
+    .score-grid {
+      display: grid;
+      grid-template-columns: 126px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+    .score-number {
+      display: grid;
+      place-items: center;
+      min-height: 92px;
+      color: var(--green);
+      background: var(--panel-3);
+      border: 2px solid var(--green);
+      font-size: 34px;
+      line-height: 1;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .signal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    .signal {
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 6px;
+      font-size: 13px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .timeline {
+      margin-top: 10px;
+      color: var(--yellow);
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 10px;
+      overflow-wrap: anywhere;
+    }
+    .receipt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .receipt-item {
+      background: var(--panel-3);
+      border: 2px solid var(--line);
+      padding: 8px;
+      min-height: 52px;
+      overflow-wrap: anywhere;
+    }
+    .receipt-item strong { display: block; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+    .memory-list { display: grid; gap: 8px; margin-bottom: 12px; }
     .action {
       background: var(--panel-2);
       border: 3px solid var(--blue);
@@ -126,6 +207,10 @@
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
       .top-meta { justify-content: flex-start; }
+      .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
+      .primary-actions { grid-template-columns: 1fr; }
+      .score-grid { grid-template-columns: 1fr; }
+      .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .shell { padding: 16px; }
@@ -137,64 +222,119 @@
     <header>
       <div>
         <h1>ShipSpec Cockpit</h1>
-        <p class="slug">Add no-copy Codex handoff / add-no-copy-codex-handoff</p>
+        <p class="slug">Add Smart UI command center / add-smart-ui-command-center</p>
       </div>
       <div class="top-meta">
         <span class="chip pass">Spec PASS</span>
         <span class="chip pass">Ready PASS</span>
-        <span class="chip">Branch codex/no-copy-codex-handoff</span>
+        <span class="chip">Branch codex/smart-ui-command-center</span>
       </div>
     </header>
+
+    <section class="command-center panel">
+      <div class="center-head">
+        <div>
+          <h2>ShipSpec Command Center</h2>
+          <p>One screen for the next action, AI handoff, ship readiness, memory, and evidence.</p>
+        </div>
+        <span class="chip pass">Readiness Score 100%</span>
+      </div>
+
+      <div class="primary-actions">
+        <article class="action-card">
+          <h3>Start / Continue</h3>
+          <p>Use the next best ShipSpec action.</p>
+          <button class="command-button" type="button" data-command="gsd reason" title="Copy command">gsd reason</button>
+        </article><article class="action-card">
+          <h3>Hand to AI</h3>
+          <p>Give Codex repo files instead of a long paste.</p>
+          <button class="command-button" type="button" data-command="gsd codex" title="Copy command">gsd codex</button>
+        </article><article class="action-card">
+          <h3>Ship</h3>
+          <p>Verify, review, and write the ship report.</p>
+          <button class="command-button" type="button" data-command="gsd ship" title="Copy command">gsd ship</button>
+        </article>
+      </div>
+
+      <div class="command-center-grid">
+        <div class="score-panel">
+          <h2>Ship Readiness</h2>
+          <div class="score-grid">
+            <div class="score-number" aria-label="Readiness Score">100%</div>
+            <div>
+              <h3>Readiness Score</h3>
+              <p class="reason">Ready to ship.</p>
+              <div class="signal-grid">
+                <div class="signal"><span class="pass">PASS</span> Spec</div><div class="signal"><span class="pass">PASS</span> Validation</div><div class="signal"><span class="pass">PASS</span> Evidence</div><div class="signal"><span class="pass">PASS</span> Review</div><div class="signal"><span class="pass">PASS</span> Report</div><div class="signal"><span class="pass">PASS</span> Ready</div>
+              </div>
+            </div>
+          </div>
+          <h3>Delivery Timeline</h3>
+          <div class="timeline">request -> handoff -> verify -> review -> report -> learn</div>
+        </div>
+
+        <div class="score-panel">
+          <h2>Evidence Receipt</h2>
+          <div class="receipt-grid">
+            <div class="receipt-item"><strong>Change</strong>add-smart-ui-command-center</div><div class="receipt-item"><strong>Branch</strong>codex/smart-ui-command-center</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
+          </div>
+          <h3>Memory Summary</h3>
+          <div class="memory-list">
+            <div class="row">Common files: src/gsd.mjs, test/gsd.test.mjs</div><div class="row">Checks: e2e, lint, typecheck, unit</div><div class="row">Ship pattern: verify -&gt; review -&gt; report -&gt; done</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="action">
       <div>
         <div class="action-label">Next Command</div>
-        <div class="action-command">gsd operate</div>
+        <div class="action-command">gsd reason</div>
       </div>
       <div class="command-actions">
-        <div class="reason">Reason: Operation report is missing for the active change.</div>
+        <div class="reason">Reason: Adaptive reasoning is missing for the active change.</div>
         <div class="command-note">Copy command, then run it in your terminal.</div>
         <div class="command-grid">
-          <button class="command-button" type="button" data-command="gsd operate" title="Copy command">gsd operate</button><button class="command-button" type="button" data-command="gsd validate" title="Copy command">gsd validate</button><button class="command-button" type="button" data-command="gsd verify --full" title="Copy command">gsd verify --full</button><button class="command-button" type="button" data-command="gsd report" title="Copy command">gsd report</button><button class="command-button" type="button" data-command="gsd next" title="Copy command">gsd next</button>
+          <button class="command-button" type="button" data-command="gsd reason" title="Copy command">gsd reason</button><button class="command-button" type="button" data-command="gsd validate" title="Copy command">gsd validate</button><button class="command-button" type="button" data-command="gsd verify --full" title="Copy command">gsd verify --full</button><button class="command-button" type="button" data-command="gsd report" title="Copy command">gsd report</button><button class="command-button" type="button" data-command="gsd next" title="Copy command">gsd next</button>
         </div>
         <div class="copy-status" role="status" aria-live="polite"></div>
       </div>
     </section>
 
     <section aria-label="Readiness" class="readiness">
-      <div class="ready-chip"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Reasoning</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Operation</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Decisions</strong><span class="chip warn">0</span></div><div class="ready-chip"><strong>Prompt</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Evidence</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Review</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Report</strong><span class="chip pass">PASS</span></div>
+      <div class="ready-chip"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Reasoning</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Operation</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Decisions</strong><span class="chip warn">0</span></div><div class="ready-chip"><strong>Prompt</strong><span class="chip warn">WAIT</span></div><div class="ready-chip"><strong>Evidence</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Review</strong><span class="chip pass">PASS</span></div><div class="ready-chip"><strong>Report</strong><span class="chip pass">PASS</span></div>
     </section>
 
     <section class="cockpit">
       <div class="panel section">
         <h2>Workflow</h2>
         <div class="rows">
-          <div class="row">Active change: add-no-copy-codex-handoff</div>
+          <div class="row">Active change: add-smart-ui-command-center</div>
           <div class="row">Evidence: present</div>
           <div class="row">Report: present</div>
-          <div class="row">Release: missing</div>
+          <div class="row">Release: present</div>
         </div>
 
         <h3>Pipeline</h3>
         <div class="pipeline">
-          <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Report</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Release</strong><span class="chip warn">WAIT</span></div><div class="stage"><strong>Ready</strong><span class="chip pass">PASS</span></div>
+          <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Report</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Release</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Ready</strong><span class="chip pass">PASS</span></div>
         </div>
 
         <h3>Self-Improving Loop</h3>
         <div class="rows">
           <div class="row">Loop: missing</div>
-          <div class="row">Reflection: present</div>
+          <div class="row">Reflection: missing</div>
           <div class="row">Learn: skipped</div>
         </div>
 
         <h3>Next Actions</h3>
         <div class="rows">
-          <div class="row">Operation report is missing for the active change.</div>
+          <div class="row">Adaptive reasoning is missing for the active change.</div>
         </div>
 
         <h3>ShipSpec Audit</h3>
         <div class="rows">
-          <div class="row">WAIT Request intake</div><div class="row">PASS Spec</div><div class="row">WAIT Contract</div><div class="row">WAIT Agent room</div><div class="row">PASS Evidence</div><div class="row">PASS Report</div><div class="row">WAIT Release</div><div class="row">WAIT Done</div>
+          <div class="row">WAIT Request intake</div><div class="row">PASS Spec</div><div class="row">WAIT Contract</div><div class="row">WAIT Agent room</div><div class="row">PASS Evidence</div><div class="row">PASS Report</div><div class="row">PASS Release</div><div class="row">PASS Done</div>
         </div>
       </div>
 
@@ -207,7 +347,7 @@
 
         <h3>Adaptive Reasoning</h3>
         <div class="rows">
-          <div class="row">Reasoning: present</div><div class="row">No deterministic risks detected from local ShipSpec state.</div><div class="row">gsd validate</div><div class="row">gsd verify --full</div><div class="row">gsd reflect</div><div class="row">gsd loop</div><div class="row">npm run lint</div><div class="row">npm test</div><div class="row">npm run typecheck</div><div class="row">npm run test:e2e</div>
+          <div class="row">Reasoning: missing</div><div class="row">Risks: none recorded.</div><div class="row">Run gsd reason to generate adaptive workflow.</div>
         </div>
 
         <h3>Operator</h3>
@@ -220,12 +360,12 @@
         <h2>Ship Evidence</h2>
         <h3>Review</h3>
         <div class="rows">
-          <div class="row">Review: missing</div><div class="row">Checklist: missing</div><div class="row">No review evidence summary recorded.</div>
+          <div class="row">Review: present</div><div class="row">Checklist: ready</div><div class="row">Verified: lint passed</div><div class="row">Verified: unit passed</div><div class="row">Verified: typecheck passed</div><div class="row">Verified: e2e passed</div>
         </div>
 
         <h3>Changed Files</h3>
         <div class="rows">
-          <div class="row">README.md</div><div class="row">skills/shipspec/SKILL.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
+          <div class="row">README.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
         </div>
 
         <h3>Agent Inbox</h3>
