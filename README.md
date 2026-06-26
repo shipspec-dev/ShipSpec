@@ -26,7 +26,7 @@ gsd codex
 
 Then open Codex and use the output from `gsd codex`.
 
-To open the visual Command Center immediately:
+To open the visual Mission Control dashboard immediately:
 
 ```bash
 gsd run --open "Add user profile page"
@@ -58,12 +58,12 @@ Useful extras:
 
 ```bash
 gsd ui       # refresh the local dashboard and show how to open it
-gsd ui --open # refresh and open the Command Center
+gsd ui --open # refresh and open Mission Control
 gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
 
-`gsd ui` shows the ShipSpec Command Center: Start / Continue, Hand to AI, Ship, readiness score, evidence receipt, delivery timeline, and project memory in one local page. Use `gsd ui --open` when you want ShipSpec to open it for you.
+`gsd ui` shows ShipSpec Mission Control: a readable developer dashboard with the next best step, Codex handoff, checks, ship readiness, evidence, and project memory in one local page. Use `gsd ui --open` when you want ShipSpec to open it for you.
 
 For small fixes:
 
@@ -144,7 +144,7 @@ gsd ui
 | `gsd ship` | Verify and write review report. |
 | `gsd share` | Create AI context pack. |
 | `gsd ui` | Refresh the local dashboard and show open instructions. |
-| `gsd ui --open` | Refresh and open the Command Center. |
+| `gsd ui --open` | Refresh and open Mission Control. |
 
 Use `gsd next` when you want ShipSpec to explain the next best action.
 
@@ -169,12 +169,12 @@ The full command set is still available for teams that want explicit control.
 | `gsd` | Show the ShipSpec Operator with next action and the small command menu. |
 | `gsd run "Feature request"` | Start or continue an AGI-style delivery mission with reasoning, risk, prompt, pack, and UI artifacts. |
 | `gsd init` | Create `.gsd/`, `.agent/`, and `openspec/` folders. |
-| `gsd quickstart [--light] "Feature name"` | Initialize, configure, start a spec, validate it, and generate the Cockpit. Standard mode also writes agent instructions; light mode skips them. |
+| `gsd quickstart [--light] "Feature name"` | Initialize, configure, start a spec, validate it, and generate Mission Control. Standard mode also writes agent instructions; light mode skips them. |
 | `gsd configure` | Detect existing package scripts and write `.gsd/workflow.json`. |
 | `gsd start "Feature name"` | Create an active change with proposal and tasks. |
 | `gsd status` | Show initialization, active change, and evidence status. |
 | `gsd next [--json]` | Recommend the next ShipSpec command from current project state. |
-| `gsd ui` | Generate the static ShipSpec Cockpit dashboard under `.gsd/ui/index.html`. |
+| `gsd ui` | Generate the static ShipSpec Mission Control dashboard under `.gsd/ui/index.html`. |
 
 ### Verification
 
@@ -276,7 +276,7 @@ npm start
 
 The desktop app keeps the CLI as the engine. It lets you choose a project folder, run core commands, read agent inbox messages, and view command output.
 
-## ShipSpec Cockpit
+## ShipSpec Mission Control
 
 Generate a single-page dashboard:
 
@@ -290,7 +290,7 @@ Open:
 .gsd/ui/index.html
 ```
 
-The Cockpit is a static HTML console for the active change. It shows:
+Mission Control is a static HTML dashboard for the active change. It uses professional system typography and shows:
 
 - next recommended command and reason
 - readiness chips for spec, reasoning, operation, decisions, prompt, evidence, review, and report

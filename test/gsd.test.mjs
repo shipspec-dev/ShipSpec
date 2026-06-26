@@ -1344,7 +1344,7 @@ test("runCli reason prints reasoning path and supports json output", async () =>
   assert.match(help.stdout, /reason/);
 });
 
-test("generateUiDashboard writes a single-page pixel dashboard", async () => {
+test("generateUiDashboard writes a professional Mission Control dashboard", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });
   await initWorkspace(root);
@@ -1357,17 +1357,20 @@ test("generateUiDashboard writes a single-page pixel dashboard", async () => {
   await verifyChange(root, { full: false });
   await generateReport(root);
   await generateRelease(root);
-  await postAgentMessage(root, "tester", "Pixel dashboard verification is ready.");
+  await postAgentMessage(root, "tester", "Mission Control verification is ready.");
 
   const result = await generateUiDashboard(root);
 
   assert.equal(result.ok, true);
   assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
   const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
-  assert.match(html, /ShipSpec Cockpit/);
-  assert.match(html, /ShipSpec Command Center/);
-  assert.match(html, /Start \/ Continue/);
-  assert.match(html, /Hand to AI/);
+  assert.match(html, /ShipSpec Mission Control/);
+  assert.match(html, /font-family: ui-sans-serif/);
+  assert.doesNotMatch(html, /Pixelify Sans/);
+  assert.match(html, /Next best step/);
+  assert.match(html, /Give to Codex/);
+  assert.match(html, /Open Prompt/);
+  assert.match(html, /Run Checks/);
   assert.match(html, /Ship/);
   assert.match(html, /Ship Readiness/);
   assert.match(html, /Readiness Score/);
@@ -1390,7 +1393,6 @@ test("generateUiDashboard writes a single-page pixel dashboard", async () => {
   assert.match(html, /Spec/);
   assert.match(html, /Verify/);
   assert.match(html, /Release/);
-  assert.match(html, /Pixelify Sans/);
   assert.match(html, /tester/);
   assert.match(html, /feature\.js/);
 });
@@ -1541,7 +1543,7 @@ test("runCli ui prints generated dashboard path", async () => {
   const result = await runCli(["ui"], { cwd: root });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /ShipSpec Command Center ready/);
+  assert.match(result.stdout, /ShipSpec Mission Control ready/);
   assert.match(result.stdout, /\.gsd\/ui\/index\.html/);
   assert.match(result.stdout, /Open it:/);
   assert.match(result.stdout, /open \.gsd\/ui\/index\.html/);
@@ -1560,7 +1562,7 @@ test("runCli ui --open opens the generated dashboard", async () => {
   });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /ShipSpec Command Center ready/);
+  assert.match(result.stdout, /ShipSpec Mission Control ready/);
   assert.match(result.stdout, /Opened: \.gsd\/ui\/index\.html/);
   assert.deepEqual(opened, [join(root, ".gsd", "ui", "index.html")]);
 });

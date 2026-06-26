@@ -432,7 +432,7 @@ export async function getNextRecommendation(root) {
     return buildNextRecommendation({
       activeChange,
       command: "gsd ui",
-      reason: "Pixel dashboard is missing.",
+      reason: "Mission Control dashboard is missing.",
       otherCommands: ["gsd status", "gsd report", "gsd release"],
     });
   }
@@ -875,7 +875,7 @@ export async function generateUiDashboard(root) {
 
   return {
     ok: true,
-    message: "Pixel dashboard written to .gsd/ui/index.html",
+    message: "ShipSpec Mission Control written to .gsd/ui/index.html",
     uiPath,
   };
 }
@@ -904,7 +904,7 @@ export async function quickstartProject(root, request, options = {}) {
       `Quickstart ready for ${change.change.slug}`,
       `Mode: ${options.light ? "light" : "standard"}`,
       `Spec: openspec/changes/${change.change.slug}`,
-      "Cockpit: .gsd/ui/index.html",
+      "Mission Control: .gsd/ui/index.html",
       "Guide: gsd next",
       `Next: ${next.command}`,
     ].join("\n"),
@@ -2197,7 +2197,7 @@ async function formatOperatorGuide(root) {
     "- gsd next               Show the next best action",
     "- gsd ship               Verify, validate ready, and report",
     "- gsd share              Create a portable AI context pack",
-    "- gsd ui                 Refresh the Cockpit dashboard",
+    "- gsd ui                 Refresh the Mission Control dashboard",
     "",
     "Advanced:",
     "- gsd help advanced      Show every command",
@@ -3867,13 +3867,10 @@ function buildDesktopIndexHtml() {
 }
 
 function buildDesktopStylesCss() {
-  return `@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap');
-
-:root {
+  return `:root {
   --bg: #11131f;
   --panel: #1b2033;
   --panel-2: #232944;
-  --grid: rgba(255,255,255,.06);
   --text: #f8f4d8;
   --muted: #aeb7d8;
   --green: #67f58c;
@@ -3884,39 +3881,36 @@ function buildDesktopStylesCss() {
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: 'Pixelify Sans', ui-monospace, monospace;
-  background:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-    var(--bg);
-  background-size: 18px 18px;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
   color: var(--text);
 }
 .shell { padding: 28px; max-width: 1180px; margin: 0 auto; }
 header { display: flex; justify-content: space-between; align-items: start; gap: 18px; margin-bottom: 20px; }
-h1 { margin: 0; font-size: 54px; color: var(--green); text-shadow: 4px 4px 0 #000; }
+h1 { margin: 0; font-size: 44px; color: var(--text); letter-spacing: 0; }
 h2 { margin: 0 0 14px; color: var(--blue); }
 p { margin: 8px 0 0; color: var(--muted); }
 button {
   font: inherit;
   color: var(--text);
   background: #11172a;
-  border: 3px solid var(--line);
-  box-shadow: 5px 5px 0 #05060b;
+  border: 1px solid var(--line);
+  border-radius: 8px;
   padding: 10px 12px;
   cursor: pointer;
 }
-button:hover { color: var(--green); transform: translate(1px, 1px); box-shadow: 4px 4px 0 #05060b; }
+button:hover { color: var(--green); border-color: var(--blue); }
 .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
 .lower { margin-top: 18px; }
 .panel {
   background: var(--panel);
-  border: 3px solid var(--line);
-  box-shadow: 8px 8px 0 #05060b;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.26);
   padding: 18px;
 }
 .pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.stage { background: var(--panel-2); border: 2px solid var(--line); padding: 14px; min-height: 78px; }
+.stage { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-height: 78px; }
 .stage b { display: block; margin-bottom: 8px; }
 .pass { color: var(--green); }
 .wait { color: var(--yellow); }
@@ -3928,7 +3922,8 @@ pre {
   overflow: auto;
   white-space: pre-wrap;
   background: #11172a;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: 8px;
   padding: 12px;
   color: var(--text);
 }
@@ -4061,9 +4056,11 @@ function buildUiHtml(model) {
   const readinessReason = model.readyValidation.ok
     ? "Ready to ship."
     : model.readyValidation.errors?.[0] ?? model.next?.reason ?? "Run gsd next for guidance.";
+  const promptCommand = model.activeChange ? `open .gsd/prompts/${model.activeChange.slug}.md` : "gsd prompt";
   const commandCenterActions = [
-    ["Start / Continue", model.next?.command ?? "gsd run \"Feature request\"", "Use the next best ShipSpec action."],
-    ["Hand to AI", "gsd codex", "Give Codex repo files instead of a long paste."],
+    ["Give to Codex", "gsd codex", "Send the prepared mission context to Codex."],
+    ["Open Prompt", promptCommand, "Review the implementation brief before coding."],
+    ["Run Checks", "gsd verify --full", "Collect verification evidence for this mission."],
     ["Ship", "gsd ship", "Verify, review, and write the ship report."],
   ];
   const smartMemory = model.memory?.smartMemory ?? {};
@@ -4109,48 +4106,46 @@ function buildUiHtml(model) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ShipSpec Cockpit</title>
+  <title>ShipSpec Mission Control</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap');
     :root {
-      --bg: #10131d;
-      --panel: #181e2f;
-      --panel-2: #202844;
-      --panel-3: #11182a;
-      --grid: rgba(255,255,255,.055);
-      --text: #f8f4d8;
-      --muted: #aeb7d8;
-      --green: #67f58c;
-      --yellow: #ffd166;
-      --red: #ff5d73;
-      --blue: #64d2ff;
-      --line: #3c456c;
+      --bg: #0b1020;
+      --surface: #0f172a;
+      --panel: #111827;
+      --panel-2: #172033;
+      --panel-3: #0b1220;
+      --text: #e5edf7;
+      --muted: #94a3b8;
+      --subtle: #64748b;
+      --green: #3ddc84;
+      --yellow: #f8c14a;
+      --red: #fb7185;
+      --blue: #38bdf8;
+      --line: rgba(148, 163, 184, .22);
+      --shadow: rgba(0, 0, 0, .28);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Pixelify Sans', ui-monospace, monospace;
-      background:
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-        var(--bg);
-      background-size: 18px 18px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, .12), transparent 32rem), var(--bg);
       color: var(--text);
       min-height: 100vh;
     }
-    .shell { max-width: 1320px; margin: 0 auto; padding: 24px; }
-    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 16px; }
+    .shell { max-width: 1240px; margin: 0 auto; padding: 32px 24px; }
+    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 20px; }
     h1, h2, h3, p { margin: 0; }
-    h1 { font-size: clamp(32px, 5vw, 58px); line-height: .95; color: var(--green); text-shadow: 4px 4px 0 #000; }
-    h2 { font-size: 20px; margin-bottom: 12px; color: var(--blue); }
-    h3 { font-size: 16px; margin: 14px 0 8px; color: var(--yellow); }
-    .slug { color: var(--muted); margin-top: 8px; font-size: 18px; overflow-wrap: anywhere; }
+    h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1; letter-spacing: 0; color: var(--text); }
+    h2 { font-size: 20px; margin-bottom: 12px; color: var(--text); }
+    h3 { font-size: 15px; margin: 14px 0 8px; color: var(--text); }
+    .slug { color: var(--muted); margin-top: 10px; font-size: 16px; overflow-wrap: anywhere; }
     .top-meta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
     .panel {
       background: var(--panel);
-      border: 3px solid var(--line);
-      box-shadow: 8px 8px 0 #05060b;
-      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 18px 50px var(--shadow);
+      padding: 18px;
     }
     .command-center { margin-bottom: 16px; }
     .center-head {
@@ -4160,10 +4155,52 @@ function buildUiHtml(model) {
       align-items: start;
       margin-bottom: 14px;
     }
-    .center-head p { color: var(--muted); font-size: 17px; line-height: 1.25; }
+    .center-head p { color: var(--muted); font-size: 15px; line-height: 1.45; }
+    .mission-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(220px, .7fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .next-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, .14), rgba(61, 220, 132, .08));
+      border: 1px solid rgba(56, 189, 248, .34);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .eyebrow {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .next-title { font-size: 24px; line-height: 1.2; margin-bottom: 8px; }
+    .next-command {
+      display: inline-flex;
+      max-width: 100%;
+      margin-top: 14px;
+      color: var(--green);
+      background: rgba(11, 18, 32, .78);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+    .status-card {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
     .primary-actions {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 14px;
     }
@@ -4171,13 +4208,14 @@ function buildUiHtml(model) {
       display: grid;
       gap: 8px;
       align-content: start;
-      min-height: 148px;
+      min-height: 132px;
       background: var(--panel-3);
-      border: 2px solid var(--line);
-      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
     }
-    .action-card h3 { margin: 0; font-size: 18px; color: var(--green); }
-    .action-card p { color: var(--muted); font-size: 15px; line-height: 1.2; }
+    .action-card h3 { margin: 0; font-size: 15px; color: var(--text); }
+    .action-card p { color: var(--muted); font-size: 14px; line-height: 1.4; }
     .action-card .command-button { align-self: end; }
     .command-center-grid {
       display: grid;
@@ -4186,8 +4224,9 @@ function buildUiHtml(model) {
     }
     .score-panel {
       background: var(--panel-2);
-      border: 2px solid var(--line);
-      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
     }
     .score-grid {
       display: grid;
@@ -4201,15 +4240,17 @@ function buildUiHtml(model) {
       min-height: 92px;
       color: var(--green);
       background: var(--panel-3);
-      border: 2px solid var(--green);
+      border: 1px solid rgba(61, 220, 132, .52);
+      border-radius: 8px;
       font-size: 34px;
       line-height: 1;
-      text-shadow: 3px 3px 0 #000;
+      font-weight: 800;
     }
     .signal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
     .signal {
       background: var(--panel-3);
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       padding: 6px;
       font-size: 13px;
       text-align: center;
@@ -4219,24 +4260,27 @@ function buildUiHtml(model) {
       margin-top: 10px;
       color: var(--yellow);
       background: var(--panel-3);
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       padding: 10px;
       overflow-wrap: anywhere;
     }
     .receipt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .receipt-item {
       background: var(--panel-3);
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       padding: 8px;
       min-height: 52px;
       overflow-wrap: anywhere;
     }
-    .receipt-item strong { display: block; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+    .receipt-item strong { display: block; color: var(--blue); font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
     .memory-list { display: grid; gap: 8px; margin-bottom: 12px; }
     .action {
       background: var(--panel-2);
-      border: 3px solid var(--blue);
-      box-shadow: 8px 8px 0 #05060b;
+      border: 1px solid rgba(56, 189, 248, .38);
+      border-radius: 8px;
+      box-shadow: 0 18px 50px var(--shadow);
       padding: 18px;
       margin-bottom: 16px;
       display: grid;
@@ -4244,9 +4288,9 @@ function buildUiHtml(model) {
       gap: 16px;
       align-items: center;
     }
-    .action-label { color: var(--blue); font-size: 17px; margin-bottom: 6px; }
-    .action-command { color: var(--yellow); font-size: clamp(24px, 4vw, 42px); line-height: 1; overflow-wrap: anywhere; }
-    .reason { color: var(--muted); font-size: 18px; line-height: 1.25; }
+    .action-label { color: var(--blue); font-size: 14px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+    .action-command { color: var(--green); font-size: clamp(22px, 4vw, 36px); line-height: 1.1; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .reason { color: var(--muted); font-size: 15px; line-height: 1.45; }
     .command-actions { display: grid; gap: 8px; }
     .command-note { color: var(--muted); font-size: 15px; line-height: 1.2; }
     .command-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -4257,14 +4301,14 @@ function buildUiHtml(model) {
       font: inherit;
       color: var(--yellow);
       background: var(--panel-3);
-      border: 2px solid var(--line);
-      box-shadow: 4px 4px 0 #05060b;
+      border: 1px solid var(--line);
+      border-radius: 6px;
       padding: 8px;
       text-align: left;
       overflow-wrap: anywhere;
     }
-    button.command-button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-    button.command-button:hover { border-color: var(--yellow); }
+    button.command-button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    button.command-button:hover { border-color: var(--blue); color: var(--text); }
     .copy-status { min-height: 18px; color: var(--green); font-size: 14px; }
     .readiness {
       display: grid;
@@ -4275,7 +4319,8 @@ function buildUiHtml(model) {
     .ready-chip {
       min-height: 62px;
       background: var(--panel);
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -4283,8 +4328,8 @@ function buildUiHtml(model) {
       padding: 8px;
       text-align: center;
     }
-    .ready-chip strong { color: var(--muted); font-size: 13px; }
-    .chip { display: inline-block; padding: 4px 7px; border: 2px solid currentColor; font-size: 13px; }
+    .ready-chip strong { color: var(--muted); font-size: 12px; }
+    .chip { display: inline-block; padding: 5px 8px; border: 1px solid currentColor; border-radius: 999px; font-size: 12px; font-weight: 700; }
     .pass { color: var(--green); }
     .warn { color: var(--yellow); }
     .fail { color: var(--red); }
@@ -4298,23 +4343,25 @@ function buildUiHtml(model) {
     .rows, .messages { display: grid; gap: 8px; }
     .row {
       background: var(--panel-3);
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       padding: 9px 10px;
       color: var(--text);
       overflow-wrap: anywhere;
       line-height: 1.2;
     }
-    .cmd { color: var(--yellow); background: var(--panel-3); border: 2px solid var(--line); padding: 9px 10px; overflow-wrap: anywhere; }
+    .cmd { color: var(--yellow); background: var(--panel-3); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; overflow-wrap: anywhere; }
     .messages .row b { color: var(--green); }
     .pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .stage { background: var(--panel-3); border: 2px solid var(--line); padding: 9px; min-height: 64px; display: grid; align-content: center; gap: 6px; text-align: center; }
+    .stage { background: var(--panel-3); border: 1px solid var(--line); border-radius: 6px; padding: 9px; min-height: 64px; display: grid; align-content: center; gap: 6px; text-align: center; }
     .stage strong { font-size: 14px; }
     .footer { margin-top: 16px; color: var(--muted); font-size: 15px; }
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
       .top-meta { justify-content: flex-start; }
+      .mission-hero { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
-      .primary-actions { grid-template-columns: 1fr; }
+      .primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .score-grid { grid-template-columns: 1fr; }
       .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -4327,7 +4374,7 @@ function buildUiHtml(model) {
   <main class="shell">
     <header>
       <div>
-        <h1>ShipSpec Cockpit</h1>
+        <h1>ShipSpec Mission Control</h1>
         <p class="slug">${escapeHtml(changeTitle)} / ${escapeHtml(changeSlug)}</p>
       </div>
       <div class="top-meta">
@@ -4340,10 +4387,24 @@ function buildUiHtml(model) {
     <section class="command-center panel">
       <div class="center-head">
         <div>
-          <h2>ShipSpec Command Center</h2>
-          <p>One screen for the next action, AI handoff, ship readiness, memory, and evidence.</p>
+          <h2>Mission dashboard</h2>
+          <p>A clearer view of the next step, ship readiness, evidence, and project memory.</p>
         </div>
         <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">Readiness Score ${readinessScore}%</span>
+      </div>
+
+      <div class="mission-hero">
+        <div class="next-card">
+          <div class="eyebrow">Next best step</div>
+          <div class="next-title">${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</div>
+          <div class="next-command">${escapeHtml(model.next?.command ?? "gsd next")}</div>
+        </div>
+        <div class="status-card">
+          <div class="eyebrow">Current mission</div>
+          <h2>${escapeHtml(changeTitle)}</h2>
+          <p class="reason">${escapeHtml(changeSlug)}</p>
+          <span class="chip ${model.validation.ok ? "pass" : "warn"}">Spec ${model.validation.ok ? "ready" : "needs work"}</span>
+        </div>
       </div>
 
       <div class="primary-actions">
@@ -4554,7 +4615,7 @@ async function openUiDashboard(root, options = {}) {
 
 function formatUiResult(result, options = {}) {
   const lines = [
-    "ShipSpec Command Center ready",
+    "ShipSpec Mission Control ready",
     "",
     "UI: .gsd/ui/index.html",
     "",
