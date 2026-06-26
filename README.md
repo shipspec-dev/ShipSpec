@@ -63,7 +63,7 @@ gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
 
-`gsd ui` shows ShipSpec Mission Control: a readable developer dashboard with the next best step, Codex handoff, checks, ship readiness, evidence, and project memory in one local page. Use `gsd ui --open` when you want ShipSpec to open it for you.
+`gsd ui` shows ShipSpec Mission Control: a focused local dashboard with the next best step, Codex handoff, checks, and progress first. Evidence, memory, workflow, and audit details stay available in collapsed advanced sections. Use `gsd ui --open` when you want ShipSpec to open it for you.
 
 For small fixes:
 

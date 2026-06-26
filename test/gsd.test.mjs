@@ -1372,7 +1372,17 @@ test("generateUiDashboard writes a professional Mission Control dashboard", asyn
   assert.match(html, /Open Prompt/);
   assert.match(html, /Run Checks/);
   assert.match(html, /Ship/);
-  assert.match(html, /Ship Readiness/);
+  assert.match(html, /Progress/);
+  assert.match(html, /Advanced details/);
+  assert.match(html, /<details class="advanced-section">/);
+  assert.match(html, /<summary>Ship readiness<\/summary>/);
+  assert.match(html, /<summary>Evidence and memory<\/summary>/);
+  assert.match(html, /<summary>Workflow and audit<\/summary>/);
+  assert.match(html, /<summary>AI context and ship evidence<\/summary>/);
+  assert.doesNotMatch(html, /<section class="action">/);
+  assert.doesNotMatch(html, /<section aria-label="Readiness" class="readiness">/);
+  assert.doesNotMatch(html, /<section class="cockpit">/);
+  assert.match(html, /Ship readiness/);
   assert.match(html, /Readiness Score/);
   assert.match(html, /Evidence Receipt/);
   assert.match(html, /Delivery Timeline/);

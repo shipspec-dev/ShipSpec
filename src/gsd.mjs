@@ -4217,6 +4217,26 @@ function buildUiHtml(model) {
     .action-card h3 { margin: 0; font-size: 15px; color: var(--text); }
     .action-card p { color: var(--muted); font-size: 14px; line-height: 1.4; }
     .action-card .command-button { align-self: end; }
+    .progress-panel {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .progress-head h2 { margin: 0; }
+    .progress-head p { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .progress-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
     .command-center-grid {
       display: grid;
       grid-template-columns: 1.05fr .95fr;
@@ -4355,6 +4375,40 @@ function buildUiHtml(model) {
     .pipeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .stage { background: var(--panel-3); border: 1px solid var(--line); border-radius: 6px; padding: 9px; min-height: 64px; display: grid; align-content: center; gap: 6px; text-align: center; }
     .stage strong { font-size: 14px; }
+    .advanced {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .advanced > h2 { margin: 0 0 2px; }
+    .advanced-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 18px 50px var(--shadow);
+      overflow: hidden;
+    }
+    .advanced-section summary {
+      cursor: pointer;
+      padding: 14px 16px;
+      color: var(--text);
+      font-weight: 800;
+      list-style-position: inside;
+    }
+    .advanced-section summary:hover { background: rgba(148, 163, 184, .07); }
+    .advanced-body {
+      display: grid;
+      gap: 14px;
+      padding: 0 16px 16px;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .detail-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .footer { margin-top: 16px; color: var(--muted); font-size: 15px; }
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
@@ -4362,10 +4416,12 @@ function buildUiHtml(model) {
       .mission-hero { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
       .primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .score-grid { grid-template-columns: 1fr; }
       .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-grid, .detail-grid.three { grid-template-columns: 1fr; }
       .shell { padding: 16px; }
     }
   </style>
@@ -4415,9 +4471,26 @@ function buildUiHtml(model) {
         </article>`).join("")}
       </div>
 
-      <div class="command-center-grid">
-        <div class="score-panel">
-          <h2>Ship Readiness</h2>
+      <div class="progress-panel">
+        <div class="progress-head">
+          <div>
+            <h2>Progress</h2>
+            <p>${escapeHtml(readinessReason)}</p>
+          </div>
+          <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">${readinessScore}% ready</span>
+        </div>
+        <div class="progress-grid">
+          ${readinessSignals.map(([name, ok]) => `<div class="signal"><span class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span> ${escapeHtml(name)}</div>`).join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="advanced" aria-label="Advanced details">
+      <h2>Advanced details</h2>
+
+      <details class="advanced-section">
+        <summary>Ship readiness</summary>
+        <div class="advanced-body">
           <div class="score-grid">
             <div class="score-number" aria-label="Readiness Score">${readinessScore}%</div>
             <div>
@@ -4428,116 +4501,148 @@ function buildUiHtml(model) {
               </div>
             </div>
           </div>
-          <h3>Delivery Timeline</h3>
-          <div class="timeline">request -> handoff -> verify -> review -> report -> learn</div>
-        </div>
 
-        <div class="score-panel">
-          <h2>Evidence Receipt</h2>
-          <div class="receipt-grid">
-            ${evidenceReceiptRows.map(([label, value]) => `<div class="receipt-item"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</div>`).join("")}
+          <div>
+            <h3>Next Command</h3>
+            <div class="command-actions">
+              <div class="reason">Reason: ${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</div>
+              <div class="command-note">Copy command, then run it in your terminal.</div>
+              <div class="command-grid">
+                ${commandButtons.map((command) => `<button class="command-button" type="button" data-command="${escapeHtml(command)}" title="Copy command">${escapeHtml(command)}</button>`).join("")}
+              </div>
+              <div class="copy-status" role="status" aria-live="polite"></div>
+            </div>
           </div>
-          <h3>Memory Summary</h3>
-          <div class="memory-list">
-            ${memoryRows.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+
+          <div>
+            <h3>Delivery Timeline</h3>
+            <div class="timeline">request -> handoff -> verify -> review -> report -> learn</div>
           </div>
         </div>
-      </div>
-    </section>
+      </details>
 
-    <section class="action">
-      <div>
-        <div class="action-label">Next Command</div>
-        <div class="action-command">${escapeHtml(model.next?.command ?? "gsd next")}</div>
-      </div>
-      <div class="command-actions">
-        <div class="reason">Reason: ${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</div>
-        <div class="command-note">Copy command, then run it in your terminal.</div>
-        <div class="command-grid">
-          ${commandButtons.map((command) => `<button class="command-button" type="button" data-command="${escapeHtml(command)}" title="Copy command">${escapeHtml(command)}</button>`).join("")}
+      <details class="advanced-section">
+        <summary>Evidence and memory</summary>
+        <div class="advanced-body">
+          <div class="detail-grid">
+            <div>
+              <h3>Evidence Receipt</h3>
+              <div class="receipt-grid">
+                ${evidenceReceiptRows.map(([label, value]) => `<div class="receipt-item"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>Memory Summary</h3>
+              <div class="memory-list">
+                ${memoryRows.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div>
+              <h3>${changedFilesTitle}</h3>
+              <div class="rows">
+                ${(changedFiles.length ? changedFiles : [changedFilesEmptyText]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>Agent Inbox</h3>
+              <div class="messages">
+                ${(model.messages.length ? model.messages.slice(0, 6) : [{ role: "system", text: "No agent messages yet." }]).map((message) => `<div class="row"><b>${escapeHtml(message.role)}</b>: ${escapeHtml(message.text)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="copy-status" role="status" aria-live="polite"></div>
-      </div>
-    </section>
+      </details>
 
-    <section aria-label="Readiness" class="readiness">
-      ${readiness.map(([name, ok, passText, waitText]) => `<div class="ready-chip"><strong>${escapeHtml(name)}</strong><span class="chip ${ok ? "pass" : "warn"}">${escapeHtml(ok ? passText : waitText)}</span></div>`).join("")}
-    </section>
+      <details class="advanced-section">
+        <summary>Workflow and audit</summary>
+        <div class="advanced-body">
+          <div class="detail-grid">
+            <div>
+              <h3>Workflow</h3>
+              <div class="rows">
+                <div class="row">Active change: ${escapeHtml(changeSlug)}</div>
+                <div class="row">Evidence: ${model.specStatus.evidence ? "present" : "missing"}</div>
+                <div class="row">Report: ${model.reportExists ? "present" : "missing"}</div>
+                <div class="row">Release: ${model.releaseExists ? "present" : "missing"}</div>
+              </div>
+            </div>
+            <div>
+              <h3>Self-Improving Loop</h3>
+              <div class="rows">
+                <div class="row">Loop: ${model.loop?.loop ? "present" : "missing"}</div>
+                <div class="row">Reflection: ${model.loop?.reflection ? "present" : "missing"}</div>
+                <div class="row">Learn: ${model.loop?.learned ? "learned" : "skipped"}</div>
+              </div>
+            </div>
+          </div>
 
-    <section class="cockpit">
-      <div class="panel section">
-        <h2>Workflow</h2>
-        <div class="rows">
-          <div class="row">Active change: ${escapeHtml(changeSlug)}</div>
-          <div class="row">Evidence: ${model.specStatus.evidence ? "present" : "missing"}</div>
-          <div class="row">Report: ${model.reportExists ? "present" : "missing"}</div>
-          <div class="row">Release: ${model.releaseExists ? "present" : "missing"}</div>
+          <h3>Pipeline</h3>
+          <div class="pipeline">
+            ${stages.map(([name, ok]) => `<div class="stage"><strong>${escapeHtml(name)}</strong><span class="chip ${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span></div>`).join("")}
+          </div>
+
+          <div class="detail-grid">
+            <div>
+              <h3>Next Actions</h3>
+              <div class="rows">
+                ${nextActions.map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>ShipSpec Audit</h3>
+              <div class="rows">
+                ${model.audit.checks.map((check) => `<div class="row">${check.ok ? "PASS" : "WAIT"} ${escapeHtml(check.name)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
         </div>
+      </details>
 
-        <h3>Pipeline</h3>
-        <div class="pipeline">
-          ${stages.map(([name, ok]) => `<div class="stage"><strong>${escapeHtml(name)}</strong><span class="chip ${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span></div>`).join("")}
-        </div>
+      <details class="advanced-section">
+        <summary>AI context and ship evidence</summary>
+        <div class="advanced-body">
+          <h2>Human + AI Context</h2>
+          <div class="detail-grid three">
+            <div>
+              <h3>Human Decisions</h3>
+              <div class="rows">
+                ${(model.decisions?.length ? model.decisions : ["No recorded human decisions."]).map((decision) => `<div class="row">${escapeHtml(decision)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>Adaptive Reasoning</h3>
+              <div class="rows">
+                ${reasoningItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>Operator</h3>
+              <div class="rows">
+                ${operatorItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
 
-        <h3>Self-Improving Loop</h3>
-        <div class="rows">
-          <div class="row">Loop: ${model.loop?.loop ? "present" : "missing"}</div>
-          <div class="row">Reflection: ${model.loop?.reflection ? "present" : "missing"}</div>
-          <div class="row">Learn: ${model.loop?.learned ? "learned" : "skipped"}</div>
+          <div class="detail-grid">
+            <div>
+              <h3>Ship Evidence</h3>
+              <div class="rows">
+                ${reviewItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+              </div>
+            </div>
+            <div>
+              <h3>ShipSpec Files</h3>
+              <div class="rows">
+                <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
+                <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <h3>Next Actions</h3>
-        <div class="rows">
-          ${nextActions.map((action) => `<div class="row">${escapeHtml(action)}</div>`).join("")}
-        </div>
-
-        <h3>ShipSpec Audit</h3>
-        <div class="rows">
-          ${model.audit.checks.map((check) => `<div class="row">${check.ok ? "PASS" : "WAIT"} ${escapeHtml(check.name)}</div>`).join("")}
-        </div>
-      </div>
-
-      <div class="panel section">
-        <h2>Human + AI Context</h2>
-        <h3>Human Decisions</h3>
-        <div class="rows">
-          ${(model.decisions?.length ? model.decisions : ["No recorded human decisions."]).map((decision) => `<div class="row">${escapeHtml(decision)}</div>`).join("")}
-        </div>
-
-        <h3>Adaptive Reasoning</h3>
-        <div class="rows">
-          ${reasoningItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
-        </div>
-
-        <h3>Operator</h3>
-        <div class="rows">
-          ${operatorItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
-        </div>
-      </div>
-
-      <div class="panel section">
-        <h2>Ship Evidence</h2>
-        <h3>Review</h3>
-        <div class="rows">
-          ${reviewItems.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
-        </div>
-
-        <h3>${changedFilesTitle}</h3>
-        <div class="rows">
-          ${(changedFiles.length ? changedFiles : [changedFilesEmptyText]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
-        </div>
-
-        <h3>Agent Inbox</h3>
-        <div class="messages">
-          ${(model.messages.length ? model.messages.slice(0, 6) : [{ role: "system", text: "No agent messages yet." }]).map((message) => `<div class="row"><b>${escapeHtml(message.role)}</b>: ${escapeHtml(message.text)}</div>`).join("")}
-        </div>
-
-        <h3>ShipSpec Files</h3>
-        <div class="rows">
-          <div class="row">Contract: ${model.audit.checks.find((check) => check.name === "Contract")?.ok ? "present" : "missing"}</div>
-          <div class="row">Agent room: ${model.audit.checks.find((check) => check.name === "Agent room")?.ok ? "present" : "missing"}</div>
-        </div>
-      </div>
+      </details>
     </section>
 
     <p class="footer">Generated by ShipSpec. Static single-page dashboard. Refresh with <span class="cmd">gsd ui</span>.</p>
