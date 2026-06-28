@@ -923,6 +923,72 @@ test("runCli operate exposes safe operator command with json output", async () =
   assert.match(help.stdout, /operate/);
 });
 
+test("runCli autopilot asks for a mission when none is active", async () => {
+  const root = await tempRoot();
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.stdout, /Autopilot status: no mission/);
+  assert.match(result.stdout, /gsd run "Feature"/);
+});
+
+test("runCli autopilot guides a prepared mission to Codex handoff", async () => {
+  const root = await tempRoot();
+  await runMission(root, "Add Login Page");
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Autopilot status: implementation needed/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /After implementation: gsd autopilot/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
+  assert.equal(await exists(join(root, ".gsd", "autopilot", "add-login-page.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
+
+  const report = await readFile(join(root, ".gsd", "autopilot", "add-login-page.md"), "utf8");
+  assert.match(report, /Status: implementation-needed/);
+  assert.match(report, /No code edits were made/);
+  assert.match(report, /No deployment attempted/);
+});
+
+test("runCli autopilot guides changed code to ship verification", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await runMission(root, "Add Login Page");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "login-page.js"), "export const login = true;\n");
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Autopilot status: verification needed/);
+  assert.match(result.stdout, /Next: gsd ship/);
+  assert.match(result.stdout, /Changed files:/);
+  assert.match(result.stdout, /src\/login-page\.js/);
+});
+
+test("runCli autopilot reports review-ready missions", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Review Ready Mission");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+  await generateReport(root);
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Autopilot status: review ready/);
+  assert.match(result.stdout, /Next: open \.gsd\/reports\/review-ready-mission\.md/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
+  assert.equal(await exists(join(root, ".gsd", "autopilot", "review-ready-mission.md")), true);
+});
+
 test("recordDecision stores human decisions for the active change", async () => {
   const root = await tempRoot();
   await initWorkspace(root);

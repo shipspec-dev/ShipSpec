@@ -1447,6 +1447,79 @@ export async function runOperation(root, request = "", options = {}) {
   };
 }
 
+export async function runAutopilot(root) {
+  await initWorkspace(root);
+  const status = await getStatus(root);
+
+  if (!status.activeChange) {
+    return {
+      ok: false,
+      status: "no-mission",
+      command: 'gsd run "Feature"',
+      reason: "No active ShipSpec mission exists.",
+      changedFiles: [],
+      ui: null,
+      reportPath: null,
+      message: formatAutopilotResult({
+        status: "no-mission",
+        command: 'gsd run "Feature"',
+        reason: "No active ShipSpec mission exists.",
+        changedFiles: [],
+      }),
+    };
+  }
+
+  const activeChange = status.activeChange;
+  const diff = await getDiffSummary(root);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles])];
+  const evidenceExists = await exists(join(root, ".agent", "evidence", `${activeChange.slug}.md`));
+  const reportExists = await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`));
+  const specValidation = await validateChange(root, { ready: false });
+  const readyValidation = await validateChange(root, { ready: true });
+  let autopilotStatus = "implementation-needed";
+  let command = "gsd codex";
+  let reason = "Mission is prepared; hand it to AI for implementation.";
+
+  if (!specValidation.ok) {
+    autopilotStatus = "spec-needed";
+    command = "gsd validate";
+    reason = specValidation.errors[0] ?? "Spec needs attention.";
+  } else if (changedFiles.length > 0 && !evidenceExists) {
+    autopilotStatus = "verification-needed";
+    command = "gsd ship";
+    reason = "Project files changed and verification evidence is missing.";
+  } else if (evidenceExists && reportExists && readyValidation.ok) {
+    autopilotStatus = "review-ready";
+    command = `open .gsd/reports/${activeChange.slug}.md`;
+    reason = "Verification evidence and review report are ready.";
+  } else if (evidenceExists && !reportExists) {
+    autopilotStatus = "report-needed";
+    command = "gsd ship";
+    reason = "Verification evidence exists; run ship to refresh review and report artifacts.";
+  }
+
+  const ui = await generateUiDashboard(root);
+  const reportPath = join(root, ".gsd", "autopilot", `${activeChange.slug}.md`);
+  const result = {
+    ok: true,
+    activeChange,
+    status: autopilotStatus,
+    command,
+    reason,
+    changedFiles,
+    ui,
+    reportPath,
+  };
+
+  await mkdir(join(root, ".gsd", "autopilot"), { recursive: true });
+  await writeFile(reportPath, buildAutopilotMarkdown(result));
+
+  return {
+    ...result,
+    message: formatAutopilotResult(result),
+  };
+}
+
 export async function generatePlanPrompt(root) {
   await initWorkspace(root);
   const activeChange = await requireActiveChange(root);
@@ -1919,6 +1992,11 @@ export async function runCli(argv, options = {}) {
       return cliResult(result.ok ? 0 : 1, `${result.message}${openMessage}\n`);
     }
 
+    if (command === "autopilot") {
+      const result = await runAutopilot(cwd);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
     if (command === "start") {
       const title = rest.join(" ").trim();
       if (!title) return cliResult(1, "Usage: gsd start <change title>\n");
@@ -2375,6 +2453,51 @@ function formatMissionResult({ mission }) {
   lines.push("Codex: gsd codex");
 
   return lines.join("\n");
+}
+
+function formatAutopilotResult(result) {
+  const statusLabel = result.status.replace(/-/g, " ");
+  const lines = [
+    `Autopilot status: ${statusLabel}`,
+    `Next: ${result.command}`,
+    `Why: ${result.reason}`,
+  ];
+
+  if (result.status === "implementation-needed") lines.push("After implementation: gsd autopilot");
+  if (result.status === "verification-needed") lines.push("After verification: gsd autopilot");
+  if (result.changedFiles?.length) {
+    lines.push("Changed files:", ...result.changedFiles.slice(0, 8).map((file) => `- ${file}`));
+  }
+  if (result.status !== "no-mission") lines.push("UI: gsd ui --open");
+
+  return lines.join("\n");
+}
+
+function buildAutopilotMarkdown(result) {
+  return [
+    `# Autopilot: ${result.activeChange.title}`,
+    "",
+    `Status: ${result.status}`,
+    `Next: ${result.command}`,
+    `Reason: ${result.reason}`,
+    `Generated: ${new Date().toISOString()}`,
+    "",
+    "## Changed Files",
+    "",
+    ...formatChangedFiles(result.changedFiles),
+    "",
+    "## Safety",
+    "",
+    "- No code edits were made by autopilot.",
+    "- No deployment attempted.",
+    "- No network calls were made.",
+    "- No destructive commands were run.",
+    "",
+    "## UI",
+    "",
+    result.ui?.ok ? "- Mission Control refreshed at .gsd/ui/index.html" : "- Mission Control was not refreshed.",
+    "",
+  ].join("\n");
 }
 
 function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles }) {
@@ -4885,6 +5008,7 @@ function beginnerUsage() {
     "Main:",
     "  gsd",
     "  gsd run <request>",
+    "  gsd autopilot",
     "  gsd codex",
     '  gsd "Feature request"',
     "  gsd fix <small fix>",
@@ -4912,6 +5036,7 @@ function usage() {
     "Daily path:",
     "  init",
     "  run [--open] [request]",
+    "  autopilot",
     '  "feature request"',
     "  quickstart [--light] <feature>",
     "  configure",

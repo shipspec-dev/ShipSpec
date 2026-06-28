@@ -21,10 +21,11 @@ From any project folder:
 
 ```bash
 gsd run "Add user profile page"
+gsd autopilot
 gsd codex
 ```
 
-Then open Codex and use the output from `gsd codex`.
+Then follow the next command from `gsd autopilot`. When it says `gsd codex`, open Codex and use that output.
 
 To open the visual Mission Control dashboard immediately:
 
@@ -48,10 +49,12 @@ That is the main flow.
 ```bash
 cd /path/to/project
 gsd run "Your feature"
+gsd autopilot
 gsd codex
 
 # AI or human implements
 
+gsd autopilot
 gsd ship
 gsd share
 ```
@@ -61,6 +64,7 @@ Useful extras:
 ```bash
 gsd ui       # refresh the local dashboard and show how to open it
 gsd ui --open # refresh and open Mission Control
+gsd autopilot # ask ShipSpec for the next safe mission step
 gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
@@ -132,6 +136,7 @@ Most people only need these:
 ```bash
 gsd
 gsd run "Feature request"
+gsd autopilot
 gsd codex
 gsd ship
 gsd share
@@ -142,6 +147,7 @@ gsd ui
 | --- | --- |
 | `gsd` | Show next action. |
 | `gsd run "Feature"` | Start or continue work. |
+| `gsd autopilot` | Guide the active mission to Codex, verification, or review. |
 | `gsd codex` | Hand work to Codex without long paste. |
 | `gsd ship` | Verify and write review report. |
 | `gsd share` | Create AI context pack. |
@@ -170,6 +176,7 @@ The full command set is still available for teams that want explicit control.
 | --- | --- |
 | `gsd` | Show the ShipSpec Operator with next action and the small command menu. |
 | `gsd run "Feature request"` | Start or continue an AGI-style delivery mission with reasoning, risk, prompt, pack, and UI artifacts. |
+| `gsd autopilot` | Inspect the active mission and recommend the next safe step without editing code. |
 | `gsd init` | Create `.gsd/`, `.agent/`, and `openspec/` folders. |
 | `gsd quickstart [--light] "Feature name"` | Initialize, configure, start a spec, validate it, and generate Mission Control. Standard mode also writes agent instructions; light mode skips them. |
 | `gsd configure` | Detect existing package scripts and write `.gsd/workflow.json`. |
