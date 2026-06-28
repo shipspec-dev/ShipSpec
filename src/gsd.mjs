@@ -565,6 +565,7 @@ export async function generateContextPack(root) {
   const next = await getNextRecommendation(root);
   const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
   const risk = buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next });
+  const likelyFiles = await inferLikelyFiles(root, activeChange, { diff, changedFiles });
   const packPath = join(root, ".gsd", "packs", `${activeChange.slug}.md`);
   const pack = buildContextPackMarkdown({
     activeChange,
@@ -577,6 +578,7 @@ export async function generateContextPack(root) {
     decisions,
     next,
     risk,
+    likelyFiles,
   });
 
   await mkdir(join(root, ".gsd", "packs"), { recursive: true });
@@ -587,6 +589,7 @@ export async function generateContextPack(root) {
     activeChange,
     pack,
     packPath,
+    likelyFiles,
     message: `Context pack written to .gsd/packs/${activeChange.slug}.md`,
   };
 }
@@ -847,6 +850,7 @@ export async function generateUiDashboard(root) {
   const review = activeChange ? await getReviewUiState(root, activeChange.slug) : null;
   const memory = await getMemorySummary(root);
   const next = await getNextRecommendation(root);
+  const likelyFiles = activeChange ? await inferLikelyFiles(root, activeChange, { diff }) : [];
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
   await mkdir(join(root, ".gsd", "ui"), { recursive: true });
@@ -870,6 +874,7 @@ export async function generateUiDashboard(root) {
       review,
       memory,
       next,
+      likelyFiles,
     }),
   );
 
@@ -1333,6 +1338,7 @@ export async function runMission(root, request = "", options = {}) {
   const ui = await generateUiDashboard(root);
   const baseNext = await getNextRecommendation(root);
   const risk = await getRiskSummary(root, baseNext);
+  const likelyFiles = await inferLikelyFiles(root, activeChange);
   const phase = classifyMissionPhase({ specValidation, readyValidation, risk, hasRequest: Boolean(title) });
   const next = buildMissionNextAction({ phase, activeChange, baseNext, prompt, pack, report, reflection });
 
@@ -1344,6 +1350,7 @@ export async function runMission(root, request = "", options = {}) {
     next,
     specValidation,
     readyValidation,
+    likelyFiles,
     artifacts: {
       mission: `.gsd/missions/${activeChange.slug}.md`,
       missionJson: `.gsd/missions/${activeChange.slug}.json`,
@@ -1502,12 +1509,14 @@ export async function generateCodexHandoff(root) {
     if (await exists(join(root, relativePath))) files.push(relativePath);
   }
 
-  const handoff = buildCodexHandoffMarkdown({ activeChange, files, memory });
+  const likelyFiles = await inferLikelyFiles(root, activeChange);
+  const handoff = buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles });
 
   return {
     ok: true,
     activeChange,
     files,
+    likelyFiles,
     handoff,
     message: handoff,
   };
@@ -2213,13 +2222,14 @@ function classifyMissionPhase({ specValidation, readyValidation, risk, hasReques
   return "implementation-ready";
 }
 
-function buildMissionState({ activeChange, phase, request, risk, next, specValidation, readyValidation, artifacts }) {
+function buildMissionState({ activeChange, phase, request, risk, next, specValidation, readyValidation, likelyFiles, artifacts }) {
   return {
     title: activeChange.title,
     slug: activeChange.slug,
     request,
     phase,
     risk,
+    likelyFiles,
     nextAction: {
       command: next.command,
       reason: next.reason,
@@ -2307,6 +2317,10 @@ function buildMissionMarkdown(mission) {
     "",
     ...formatBulletList(mission.risk.reasons, "No risk reasons."),
     "",
+    "## Likely Files",
+    "",
+    ...formatBulletList(mission.likelyFiles, "No likely files inferred."),
+    "",
     "## Artifacts",
     "",
     ...formatArtifactList(mission.artifacts),
@@ -2329,6 +2343,21 @@ function formatArtifactList(artifacts) {
 }
 
 function formatMissionResult({ mission }) {
+  if (mission.phase === "planning-ready") {
+    return [
+      `Mission ready: ${mission.slug}`,
+      "Next: gsd codex",
+      "UI: gsd ui --open",
+      "Codex: gsd codex",
+      `Risk: ${mission.risk.level}`,
+      "Likely files:",
+      ...formatBulletList(mission.likelyFiles?.slice(0, 5) ?? [], "No likely files inferred yet."),
+      `Mission file: ${mission.artifacts.mission}`,
+      mission.artifacts.prompt ? `Prompt: ${mission.artifacts.prompt}` : null,
+      mission.artifacts.pack ? `Pack: ${mission.artifacts.pack}` : null,
+    ].filter(Boolean).join("\n");
+  }
+
   const lines = [
     `Mission: ${mission.slug}`,
     `Phase: ${mission.phase}`,
@@ -2348,7 +2377,7 @@ function formatMissionResult({ mission }) {
   return lines.join("\n");
 }
 
-function buildCodexHandoffMarkdown({ activeChange, files, memory }) {
+function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles }) {
   const memoryLines = formatCodexMemoryLines(memory);
   return [
     "Use $shipspec and implement the active ShipSpec mission.",
@@ -2357,6 +2386,7 @@ function buildCodexHandoffMarkdown({ activeChange, files, memory }) {
     "Read these files from the repo:",
     ...formatBulletList(files, "No ShipSpec files found."),
     "",
+    ...(likelyFiles.length ? ["Likely project files:", ...formatBulletList(likelyFiles.slice(0, 8), "No likely project files inferred."), ""] : []),
     ...(memoryLines.length ? ["Project memory:", ...memoryLines, ""] : []),
     "Do not ask me to paste long context. Use repo files as the source of truth.",
     "Stop before coding if the mission/spec is unclear.",
@@ -2615,6 +2645,97 @@ async function readTextIfExists(path) {
 async function readTextSnippetIfExists(path, maxBytes = 24_000) {
   const content = await readTextIfExists(path);
   return content.slice(0, maxBytes);
+}
+
+async function inferLikelyFiles(root, activeChange, options = {}) {
+  if (!activeChange) return [];
+
+  const diff = options.diff ?? (await getDiffSummary(root));
+  const changedFiles = options.changedFiles ?? [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const memory = options.memory ?? (await getMemorySummary(root));
+  const projectFiles = await listProjectFiles(root);
+  const tokens = buildIntentTokens(`${activeChange.title} ${activeChange.slug}`);
+  const scores = new Map();
+
+  const addScore = (file, score) => {
+    if (!isLikelyFileCandidate(file)) return;
+    scores.set(file, (scores.get(file) ?? 0) + score);
+  };
+
+  for (const file of changedFiles) addScore(file, 120);
+  for (const file of diff.committedFiles ?? []) addScore(file, 80);
+  for (const file of memory.smartMemory?.commonFiles ?? []) addScore(file, 55);
+
+  for (const file of projectFiles) {
+    const score = scorePathForIntent(file, tokens, activeChange.slug);
+    if (score > 0) addScore(file, score);
+  }
+
+  return [...scores.entries()]
+    .sort(([fileA, scoreA], [fileB, scoreB]) => scoreB - scoreA || fileA.localeCompare(fileB))
+    .map(([file]) => file)
+    .slice(0, 8);
+}
+
+async function listProjectFiles(root, prefix = "", depth = 0) {
+  if (depth > 5) return [];
+
+  let entries = [];
+  try {
+    entries = await readdir(join(root, prefix), { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const files = [];
+  for (const entry of entries) {
+    const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (shouldSkipProjectPath(relativePath, entry.isDirectory())) continue;
+
+    if (entry.isDirectory()) {
+      files.push(...(await listProjectFiles(root, relativePath, depth + 1)));
+      continue;
+    }
+
+    if (isLikelyFileCandidate(relativePath)) files.push(relativePath);
+  }
+
+  return files.slice(0, 500);
+}
+
+function buildIntentTokens(value) {
+  const stopWords = new Set(["add", "new", "the", "a", "an", "and", "or", "to", "for", "with", "page", "feature", "mission", "v1"]);
+  return [...new Set(value.toLowerCase().split(/[^a-z0-9]+/u).filter((token) => token.length > 2 && !stopWords.has(token)))];
+}
+
+function scorePathForIntent(file, tokens, slug) {
+  const normalized = file.toLowerCase();
+  const compact = normalized.replace(/[^a-z0-9]+/gu, "-");
+  let score = 0;
+
+  if (slug && compact.includes(slug)) score += 90;
+  for (const token of tokens) {
+    if (normalized.includes(token)) score += 25;
+    if (basename(normalized).includes(token)) score += 15;
+  }
+  if (/^(src|app|pages|components|lib|test|tests)\//u.test(normalized)) score += 6;
+  if (/(^|\/)(index|main|app|server|route|page|component)\.[cm]?[jt]sx?$/u.test(normalized)) score += 4;
+
+  return score;
+}
+
+function shouldSkipProjectPath(relativePath, isDirectory) {
+  const parts = relativePath.split("/");
+  if (parts.some((part) => [".git", ".gsd", ".agent", "openspec", "node_modules", "dist", "build", "coverage", ".next", ".turbo"].includes(part))) {
+    return true;
+  }
+  if (isDirectory) return false;
+  return /\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tgz|lock)$/iu.test(relativePath);
+}
+
+function isLikelyFileCandidate(file) {
+  if (!file || shouldSkipProjectPath(file, false)) return false;
+  return !/(^|\/)(package-lock\.json|npm-shrinkwrap\.json)$/u.test(file);
 }
 
 async function getLoopUiState(root, slug) {
@@ -3603,6 +3724,7 @@ function buildContextPackMarkdown({
   decisions,
   next,
   risk,
+  likelyFiles,
 }) {
   const proposalPath = `openspec/changes/${activeChange.slug}/proposal.md`;
   const tasksPath = `openspec/changes/${activeChange.slug}/tasks.md`;
@@ -3636,6 +3758,10 @@ function buildContextPackMarkdown({
     "## Changed Files",
     "",
     ...formatChangedFiles(changedFiles),
+    "",
+    "## Likely Files",
+    "",
+    ...formatBulletList(likelyFiles, "No likely files inferred."),
     "",
     "## Evidence Summary",
     "",
@@ -4460,6 +4586,10 @@ function buildUiHtml(model) {
           <h2>${escapeHtml(changeTitle)}</h2>
           <p class="reason">${escapeHtml(changeSlug)}</p>
           <span class="chip ${model.validation.ok ? "pass" : "warn"}">Spec ${model.validation.ok ? "ready" : "needs work"}</span>
+          <h3>Likely Files</h3>
+          <div class="rows">
+            ${(model.likelyFiles?.length ? model.likelyFiles.slice(0, 4) : ["No likely files inferred yet."]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+          </div>
         </div>
       </div>
 

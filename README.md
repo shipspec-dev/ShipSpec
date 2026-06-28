@@ -41,6 +41,8 @@ gsd share
 
 That is the main flow.
 
+`gsd run` is Mission Autopilot. It prepares the mission, prompt, context pack, reasoning, likely files, risk level, and dashboard in one step, then prints the next short action.
+
 ## Daily Flow
 
 ```bash

@@ -189,16 +189,21 @@ test("runCli quickstart --light avoids agent ceremony", async () => {
 
 test("runMission prepares an AGI-style mission for a new request", async () => {
   const root = await tempRoot();
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "checkout-discount.js"), "export const discount = true;\n");
 
   const result = await runMission(root, "Add Checkout Discount");
 
   assert.equal(result.ok, true);
   assert.equal(result.activeChange.slug, "add-checkout-discount");
   assert.equal(result.phase, "planning-ready");
-  assert.match(result.message, /Mission: add-checkout-discount/);
-  assert.match(result.message, /Phase: planning-ready/);
-  assert.match(result.message, /Next: open \.gsd\/prompts\/add-checkout-discount\.md/);
+  assert.match(result.message, /Mission ready: add-checkout-discount/);
+  assert.match(result.message, /Next: gsd codex/);
+  assert.match(result.message, /UI: gsd ui --open/);
   assert.match(result.message, /Codex: gsd codex/);
+  assert.match(result.message, /Risk: medium/);
+  assert.match(result.message, /Likely files:/);
+  assert.match(result.message, /src\/checkout-discount\.js/);
   assert.equal(result.next.command, "open .gsd/prompts/add-checkout-discount.md");
   assert.match(result.next.reason, /AI coding pass/);
   assert.equal(await exists(join(root, ".gsd", "missions", "add-checkout-discount.json")), true);
@@ -212,8 +217,13 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   assert.equal(mission.slug, "add-checkout-discount");
   assert.equal(mission.phase, "planning-ready");
   assert.equal(mission.nextAction.command, "open .gsd/prompts/add-checkout-discount.md");
+  assert.deepEqual(mission.likelyFiles.slice(0, 1), ["src/checkout-discount.js"]);
   assert.equal(mission.safety.externalActions, false);
   assert.equal(mission.artifacts.prompt, ".gsd/prompts/add-checkout-discount.md");
+
+  const missionMarkdown = await readFile(join(root, ".gsd", "missions", "add-checkout-discount.md"), "utf8");
+  assert.match(missionMarkdown, /## Likely Files/);
+  assert.match(missionMarkdown, /src\/checkout-discount\.js/);
 });
 
 test("runMission continues an active change and prepares review when evidence passes", async () => {
@@ -421,8 +431,9 @@ test("runCli supports the AGI-style run command", async () => {
   const result = await runCli(["run", "Add", "Mission", "Mode"], { cwd: root });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /Mission: add-mission-mode/);
-  assert.match(result.stdout, /Phase: planning-ready/);
+  assert.match(result.stdout, /Mission ready: add-mission-mode/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
 
   const help = await runCli(["--help"], { cwd: root });
   assert.equal(help.exitCode, 0);
@@ -1099,6 +1110,8 @@ test("runCli prompt prints Plan mode prompt and supports json output", async () 
 
 test("generateCodexHandoff prints a compact no-copy handoff from mission files", async () => {
   const root = await tempRoot();
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "pixel-card-dashboard.js"), "export const dashboard = true;\n");
   await runMission(root, "Pixel Card Dashboard");
 
   const result = await generateCodexHandoff(root);
@@ -1113,6 +1126,8 @@ test("generateCodexHandoff prints a compact no-copy handoff from mission files",
   assert.match(result.handoff, /\.gsd\/packs\/pixel-card-dashboard\.md/);
   assert.match(result.handoff, /openspec\/changes\/pixel-card-dashboard\/proposal\.md/);
   assert.match(result.handoff, /openspec\/changes\/pixel-card-dashboard\/tasks\.md/);
+  assert.match(result.handoff, /Likely project files:/);
+  assert.match(result.handoff, /src\/pixel-card-dashboard\.js/);
   assert.match(result.handoff, /Do not ask me to paste long context/);
   assert.match(result.handoff, /Use repo files as the source of truth/);
 });
@@ -1158,6 +1173,8 @@ test("generateContextPack writes a portable AI handoff pack", async () => {
   assert.match(result.pack, /## Spec Files/);
   assert.match(result.pack, /openspec\/changes\/pack-review-context\/proposal\.md/);
   assert.match(result.pack, /## Changed Files/);
+  assert.match(result.pack, /feature\.js/);
+  assert.match(result.pack, /## Likely Files/);
   assert.match(result.pack, /feature\.js/);
   assert.match(result.pack, /## Evidence Summary/);
   assert.match(result.pack, /unit passed/);
@@ -1373,6 +1390,8 @@ test("generateUiDashboard writes a professional Mission Control dashboard", asyn
   assert.match(html, /Run Checks/);
   assert.match(html, /Ship/);
   assert.match(html, /Progress/);
+  assert.match(html, /Likely Files/);
+  assert.match(html, /feature\.js/);
   assert.match(html, /Advanced details/);
   assert.match(html, /<details class="advanced-section">/);
   assert.match(html, /<summary>Ship readiness<\/summary>/);
@@ -1587,8 +1606,9 @@ test("runCli run --open starts a mission and opens the dashboard", async () => {
   });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /Mission: add-login-page/);
-  assert.match(result.stdout, /Open dashboard: gsd ui --open/);
+  assert.match(result.stdout, /Mission ready: add-login-page/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
   assert.deepEqual(opened, [join(root, ".gsd", "ui", "index.html")]);
 });
 
