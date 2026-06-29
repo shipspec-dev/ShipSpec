@@ -4416,6 +4416,12 @@ function formatReleaseMessages(messages) {
   return messages.slice(0, 10).map((message) => `- ${message.created} ${message.role}: ${message.text}`);
 }
 
+function compactFileLabel(file) {
+  const normalized = String(file).replaceAll("\\", "/");
+  const parts = normalized.split("/").filter(Boolean);
+  return parts.at(-1) ?? normalized;
+}
+
 function buildUiHtml(model) {
   const changeTitle = model.activeChange?.title ?? "No active change";
   const changeSlug = model.activeChange?.slug ?? "none";
@@ -4503,6 +4509,10 @@ function buildUiHtml(model) {
   ].filter((command, index, commands) => commands.indexOf(command) === index);
   const likelyFiles = model.likelyFiles ?? [];
   const likelyPreview = likelyFiles.length ? likelyFiles.slice(0, 3) : ["No likely files inferred yet."];
+  const likelyPreviewRows = likelyPreview.map((file) => ({
+    label: likelyFiles.length ? compactFileLabel(file) : file,
+    fullPath: likelyFiles.length ? file : "",
+  }));
   const likelyOverflow = Math.max(0, likelyFiles.length - likelyPreview.length);
   const fullLikelyFiles = likelyFiles.length ? likelyFiles : ["No likely files inferred yet."];
   const compactReadinessSignals = [
@@ -4542,10 +4552,10 @@ function buildUiHtml(model) {
       color: var(--text);
       min-height: 100vh;
     }
-    .shell { max-width: 1240px; margin: 0 auto; padding: 32px 24px; }
-    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 20px; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 28px 24px; }
+    header { display: flex; justify-content: space-between; gap: 18px; align-items: start; margin-bottom: 18px; }
     h1, h2, h3, p { margin: 0; }
-    h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1; letter-spacing: 0; color: var(--text); }
+    h1 { font-size: clamp(30px, 4vw, 48px); line-height: 1; letter-spacing: 0; color: var(--text); }
     h2 { font-size: 20px; margin-bottom: 12px; color: var(--text); }
     h3 { font-size: 15px; margin: 14px 0 8px; color: var(--text); }
     .slug { color: var(--muted); margin-top: 10px; font-size: 16px; overflow-wrap: anywhere; }
@@ -4555,7 +4565,7 @@ function buildUiHtml(model) {
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: 0 18px 50px var(--shadow);
-      padding: 18px;
+      padding: 16px;
     }
     .command-center { margin-bottom: 16px; }
     .center-head {
@@ -4574,9 +4584,9 @@ function buildUiHtml(model) {
     }
     .cockpit-shell {
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(250px, .72fr) minmax(220px, .55fr);
-      gap: 14px;
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, .72fr) minmax(190px, .48fr);
+      gap: 12px;
+      align-items: start;
       margin-bottom: 14px;
     }
     .next-card {
@@ -4588,9 +4598,7 @@ function buildUiHtml(model) {
     .next-card.compact {
       display: grid;
       align-content: start;
-      gap: 12px;
-      min-height: 0;
-      max-height: 420px;
+      gap: 10px;
     }
     .eyebrow {
       color: var(--blue);
@@ -4600,11 +4608,11 @@ function buildUiHtml(model) {
       text-transform: uppercase;
       margin-bottom: 10px;
     }
-    .next-title { font-size: 22px; line-height: 1.25; margin-bottom: 0; max-width: 720px; }
+    .next-title { font-size: 20px; line-height: 1.25; margin-bottom: 0; max-width: 720px; }
     .next-command {
       display: inline-flex;
       max-width: 100%;
-      margin-top: 14px;
+      margin-top: 2px;
       color: var(--green);
       background: rgba(11, 18, 32, .78);
       border: 1px solid var(--line);
@@ -4612,6 +4620,7 @@ function buildUiHtml(model) {
       padding: 10px 12px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       overflow-wrap: anywhere;
+      align-self: start;
     }
     .status-card {
       display: grid;
@@ -4624,7 +4633,7 @@ function buildUiHtml(model) {
     }
     .likely-preview {
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
     .likely-note {
       color: var(--muted);
@@ -4647,6 +4656,11 @@ function buildUiHtml(model) {
     }
     .file-list-drawer .rows {
       padding: 0 10px 10px;
+    }
+    .file-row {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .primary-actions {
       display: grid;
@@ -4984,7 +4998,7 @@ function buildUiHtml(model) {
           <span class="chip ${model.validation.ok ? "pass" : "warn"}">Spec ${model.validation.ok ? "ready" : "needs work"}</span>
           <h3>Likely Files</h3>
           <div class="likely-preview">
-            ${likelyPreview.map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+            ${likelyPreviewRows.map((file) => `<div class="row file-row"${file.fullPath ? ` title="${escapeHtml(file.fullPath)}"` : ""}>${escapeHtml(file.label)}</div>`).join("")}
           </div>
           ${likelyOverflow > 0 ? `<p class="likely-note">${likelyFiles.length} likely files. Open full list below.</p>` : ""}
           <details class="file-list-drawer">
@@ -5015,26 +5029,27 @@ function buildUiHtml(model) {
         </div>
       </details>
 
-      <div class="progress-panel">
-        <div class="progress-head">
-          <div>
-            <h2>Progress</h2>
-            <p>${escapeHtml(readinessReason)}</p>
-          </div>
-          <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">${readinessScore}% ready</span>
-        </div>
-        <div class="progress-grid">
-          ${readinessSignals.map(([name, ok]) => `<div class="signal"><span class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span> ${escapeHtml(name)}</div>`).join("")}
-        </div>
-      </div>
     </section>
 
     <section class="advanced" aria-label="Advanced details">
       <h2>Advanced details</h2>
 
       <details class="advanced-section">
-        <summary>Ship readiness</summary>
+        <summary>Progress and readiness</summary>
         <div class="advanced-body">
+          <div class="progress-panel">
+            <div class="progress-head">
+              <div>
+                <h2>Progress</h2>
+                <p>${escapeHtml(readinessReason)}</p>
+              </div>
+              <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">${readinessScore}% ready</span>
+            </div>
+            <div class="progress-grid">
+              ${readinessSignals.map(([name, ok]) => `<div class="signal"><span class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span> ${escapeHtml(name)}</div>`).join("")}
+            </div>
+          </div>
+
           <div class="score-grid">
             <div class="score-number" aria-label="Readiness Score">${readinessScore}%</div>
             <div>
