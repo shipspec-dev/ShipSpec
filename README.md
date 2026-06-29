@@ -84,7 +84,7 @@ gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
 
-`gsd ui` shows ShipSpec Mission Control: a compact local dashboard with one next command, current mission status, three readiness signals, and a short likely-file preview first. Workflow commands, full file lists, evidence, memory, and audit details stay collapsed until you open them. Use `gsd ui --open` when you want ShipSpec to open it for you.
+`gsd ui` shows ShipSpec Mission Control: a compact local dashboard with one next command, current mission status, readiness, and short likely-file names first. Workflow commands, full file paths, progress, evidence, memory, and audit details stay collapsed until you open them. Use `gsd ui --open` when you want ShipSpec to open it for you.
 
 For small fixes:
 
@@ -319,11 +319,11 @@ Open:
 Mission Control is a static HTML dashboard for the active change. It uses professional system typography and keeps the first screen compact:
 
 - next recommended command and reason
-- current mission and likely files
-- three readiness signals
+- current mission and short likely-file names
+- readiness score and three core signals
 - optional workflow commands collapsed by default
-- full likely-file list behind a drawer
-- collapsed evidence, memory, workflow, audit, and AI context details
+- full likely-file paths behind a drawer
+- collapsed progress, evidence, memory, workflow, audit, and AI context details
 
 Command buttons in the static dashboard are safe by design. They copy commands such as `gsd validate`, `gsd verify --full`, `gsd report`, and `gsd next` to your clipboard; they do not execute shell commands from the browser.
 

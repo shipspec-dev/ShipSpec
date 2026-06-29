@@ -1549,14 +1549,14 @@ test("generateUiDashboard writes a professional Mission Control dashboard", asyn
   assert.match(html, /Advanced details/);
   assert.doesNotMatch(html, /class="action-card"/);
   assert.match(html, /<details class="advanced-section">/);
-  assert.match(html, /<summary>Ship readiness<\/summary>/);
+  assert.match(html, /<summary>Progress and readiness<\/summary>/);
   assert.match(html, /<summary>Evidence and memory<\/summary>/);
   assert.match(html, /<summary>Workflow and audit<\/summary>/);
   assert.match(html, /<summary>AI context and ship evidence<\/summary>/);
   assert.doesNotMatch(html, /<section class="action">/);
   assert.doesNotMatch(html, /<section aria-label="Readiness" class="readiness">/);
   assert.doesNotMatch(html, /<section class="cockpit">/);
-  assert.match(html, /Ship readiness/);
+  assert.match(html, /Progress and readiness/);
   assert.match(html, /Readiness Score/);
   assert.match(html, /Evidence Receipt/);
   assert.match(html, /Delivery Timeline/);
@@ -1604,8 +1604,25 @@ test("generateUiDashboard keeps the first screen compact", async () => {
   assert.match(html, /Show workflow commands/);
   assert.match(html, /Full file list/);
   assert.match(html, /4 likely files/);
-  assert.match(html, /max-height: 420px/);
+  assert.doesNotMatch(html, /max-height: 420px/);
+  assert.doesNotMatch(html, /min-height: 240px/);
   assert.doesNotMatch(html, /min-height: 132px/);
+});
+
+test("generateUiDashboard keeps progress out of the first viewport", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Compact Progress");
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  const beforeAdvanced = html.split('<section class="advanced" aria-label="Advanced details">')[0];
+  assert.doesNotMatch(beforeAdvanced, /class="progress-panel"/);
+  assert.doesNotMatch(beforeAdvanced, />Progress</);
+  assert.match(html, /<summary>Progress and readiness<\/summary>/);
+  assert.match(html, /class="progress-panel"/);
 });
 
 test("generateUiDashboard moves full likely files into advanced details", async () => {
@@ -1623,13 +1640,39 @@ test("generateUiDashboard moves full likely files into advanced details", async 
 
   const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
   const beforeFullList = html.split('<details class="file-list-drawer">')[0];
-  const previewMatches = beforeFullList.match(/compact-login-[a-z]+\.js/g) ?? [];
+  const previewMatches = beforeFullList.match(/class="row file-row"/g) ?? [];
   assert.equal(previewMatches.length, 3);
   assert.match(html, /<summary>Full file list<\/summary>/);
   assert.match(html, /compact-login-extra\.js/);
   assert.match(html, /compact-login-page\.js/);
   assert.match(html, /compact-login-form\.js/);
   assert.match(html, /compact-login-model\.js/);
+});
+
+test("generateUiDashboard uses short likely-file labels above the fold", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Compact Login Files");
+  await mkdir(join(root, "AlertService", "AlertService", "Schedulers"), { recursive: true });
+  await mkdir(join(root, "AlertService", "AlertService", "Controllers"), { recursive: true });
+  await writeFile(
+    join(root, "AlertService", "AlertService", "Schedulers", "SendAlertScheduler.cs"),
+    "namespace AlertService;\n",
+  );
+  await writeFile(
+    join(root, "AlertService", "AlertService", "Controllers", "RegisterController.cs"),
+    "namespace AlertService;\n",
+  );
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  const beforeFullList = html.split('<details class="file-list-drawer">')[0];
+  assert.match(beforeFullList, /<div class="row file-row" title="AlertService\/AlertService\/Schedulers\/SendAlertScheduler\.cs">SendAlertScheduler\.cs<\/div>/);
+  assert.match(beforeFullList, /<div class="row file-row" title="AlertService\/AlertService\/Controllers\/RegisterController\.cs">RegisterController\.cs<\/div>/);
+  assert.doesNotMatch(beforeFullList, />AlertService\/AlertService\/Schedulers\/SendAlertScheduler\.cs</);
+  assert.match(html, />AlertService\/AlertService\/Schedulers\/SendAlertScheduler\.cs<\/div>/);
 });
 
 test("generateUiDashboard shows committed files when working tree is clean", async () => {

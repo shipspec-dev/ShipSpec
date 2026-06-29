@@ -1,0 +1,55 @@
+{
+  "title": "Polish Mission Control first screen",
+  "slug": "polish-mission-control-first-screen",
+  "request": "Polish Mission Control first screen",
+  "phase": "planning-ready",
+  "risk": {
+    "level": "medium",
+    "reasons": [
+      "Verification evidence missing",
+      "ready validation failing",
+      "next action pending: gsd operate"
+    ]
+  },
+  "likelyFiles": [
+    "src/gsd.mjs",
+    "test/gsd.test.mjs",
+    "README.md",
+    "src/adapters/index.ts",
+    "src/adapters/github.ts",
+    "src/adapters/openspec.ts",
+    "src/adapters/project-scripts.ts",
+    "src/adapters/superpowers.ts"
+  ],
+  "nextAction": {
+    "command": "open .gsd/prompts/polish-mission-control-first-screen.md",
+    "reason": "Mission prompt and context pack are ready for an AI coding pass.",
+    "otherCommands": [
+      "open .gsd/packs/polish-mission-control-first-screen.md",
+      "gsd ui"
+    ]
+  },
+  "validation": {
+    "spec": "pass",
+    "ready": "not-run",
+    "errors": []
+  },
+  "artifacts": {
+    "mission": ".gsd/missions/polish-mission-control-first-screen.md",
+    "missionJson": ".gsd/missions/polish-mission-control-first-screen.json",
+    "reasoning": ".gsd/reasoning/polish-mission-control-first-screen.md",
+    "prompt": ".gsd/prompts/polish-mission-control-first-screen.md",
+    "pack": ".gsd/packs/polish-mission-control-first-screen.md",
+    "report": null,
+    "reflection": null,
+    "ui": ".gsd/ui/index.html"
+  },
+  "safety": {
+    "localOnly": true,
+    "externalActions": false,
+    "destructiveActions": false,
+    "deployment": false,
+    "maxLoops": 1
+  },
+  "generatedAt": "2026-06-29T10:57:32.760Z"
+}
