@@ -4,5 +4,6 @@
 - [x] Write implementation plan
 - [x] Add regression test for setup-file routing
 - [x] Filter generated setup files in autopilot
+- [x] Filter generated setup files from likely-file suggestions
 - [x] Preserve real changed-file verification routing
 - [x] Verify evidence

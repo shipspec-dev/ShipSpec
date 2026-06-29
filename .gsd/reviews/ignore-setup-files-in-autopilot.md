@@ -1,7 +1,7 @@
 # Review: Ignore Setup Files In Autopilot
 
 Change: ignore-setup-files-in-autopilot
-Generated: 2026-06-29T09:32:02.577Z
+Generated: 2026-06-29T09:47:52.857Z
 
 ## Human Decisions To Verify
 
@@ -11,7 +11,6 @@ Generated: 2026-06-29T09:32:02.577Z
 
 - src/gsd.mjs
 - test/gsd.test.mjs
-- README.md
 
 ## Verification Evidence
 
