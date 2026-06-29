@@ -17,6 +17,7 @@ Keep autopilot focused on real implementation changes after ShipSpec creates set
 ## Scope
 
 - Filter known generated setup files out of autopilot's implementation-change decision.
+- Filter known generated setup files out of mission likely-file suggestions.
 - Preserve verification routing when real project files change.
 - Add a regression test for the fresh Git repository flow.
 
@@ -30,6 +31,7 @@ Keep autopilot focused on real implementation changes after ShipSpec creates set
 
 - [ ] After `gsd "Feature"` in a fresh Git repo, `gsd autopilot` recommends `gsd codex`.
 - [ ] Generated setup files do not appear as changed implementation files in autopilot output.
+- [ ] Generated setup files do not appear as likely project files in mission output.
 - [ ] Real project file changes still recommend `gsd ship`.
 - [ ] Verification evidence is recorded before the change is marked done.
 

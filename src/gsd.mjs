@@ -2936,6 +2936,7 @@ function shouldSkipProjectPath(relativePath, isDirectory) {
 
 function isLikelyFileCandidate(file) {
   if (!file || shouldSkipProjectPath(file, false)) return false;
+  if (!isAutopilotImplementationFile(file)) return false;
   return !/(^|\/)(package-lock\.json|npm-shrinkwrap\.json)$/u.test(file);
 }
 

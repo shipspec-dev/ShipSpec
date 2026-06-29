@@ -226,6 +226,20 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   assert.match(missionMarkdown, /src\/checkout-discount\.js/);
 });
 
+test("runMission does not suggest generated setup files as likely files", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+
+  const result = await runMission(root, "Add Login Page");
+
+  assert.equal(result.ok, true);
+  assert.doesNotMatch(result.message, /AGENTS\.md/);
+  assert.doesNotMatch(result.message, /\.cursor\/rules\/gsd\.mdc/);
+  const mission = JSON.parse(await readFile(join(root, ".gsd", "missions", "add-login-page.json"), "utf8"));
+  assert.equal(mission.likelyFiles.includes("AGENTS.md"), false);
+  assert.equal(mission.likelyFiles.includes(".cursor/rules/gsd.mdc"), false);
+});
+
 test("runMission continues an active change and prepares review when evidence passes", async () => {
   const root = await tempRoot();
   await initWorkspace(root);
