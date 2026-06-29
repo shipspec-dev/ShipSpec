@@ -27,6 +27,12 @@ gsd codex
 
 Then follow the next command from `gsd`. When it says `gsd codex`, open Codex and use that output.
 
+If something feels off, run the health check:
+
+```bash
+gsd doctor
+```
+
 To open the visual Mission Control dashboard immediately:
 
 ```bash
@@ -43,6 +49,14 @@ gsd share
 That is the main flow.
 
 `gsd "Feature"` is Mission Autopilot. It prepares the mission, prompt, context pack, reasoning, likely files, risk level, and dashboard in one step. Plain `gsd` then guides the next safe step.
+
+ShipSpec now behaves like a small AI delivery control layer:
+
+- `gsd doctor` checks repo health, scripts, workflow, Git, and ShipSpec skill setup.
+- `gsd` routes you to the next safe action from local state.
+- `gsd codex` includes likely files and learned project memory.
+- `gsd ship` verifies, validates, writes review guidance, and creates the report.
+- `gsd ui` opens a calm mission view first, with detailed evidence collapsed.
 
 ## Daily Flow
 
@@ -65,6 +79,7 @@ Useful extras:
 gsd ui       # refresh the local dashboard and show how to open it
 gsd ui --open # refresh and open Mission Control
 gsd autopilot # same smart guidance as plain gsd
+gsd doctor   # diagnose setup, tests, skill install, and workflow health
 gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
@@ -94,7 +109,7 @@ gsd share
 ShipSpec's basic idea:
 
 ```text
-request -> AI context -> implementation -> verification -> review notes
+request -> doctor -> AI context + memory -> implementation -> verification -> risk review -> report
 ```
 
 ## Install
@@ -138,6 +153,7 @@ gsd
 gsd "Feature"
 gsd codex
 gsd ship
+gsd doctor
 gsd share
 gsd ui
 ```
@@ -149,7 +165,8 @@ gsd ui
 | `gsd run "Feature"` | Explicit form of `gsd "Feature"`. |
 | `gsd autopilot` | Explicit form of plain `gsd`. |
 | `gsd codex` | Hand work to Codex without long paste. |
-| `gsd ship` | Verify and write review report. |
+| `gsd ship` | Verify, validate, write review guidance, and write report. |
+| `gsd doctor` | Diagnose setup, workflow, skill, and test readiness. |
 | `gsd share` | Create AI context pack. |
 | `gsd ui` | Refresh the local dashboard and show open instructions. |
 | `gsd ui --open` | Refresh and open Mission Control. |
@@ -235,7 +252,7 @@ The full command set is still available for teams that want explicit control.
 
 | Command | Purpose |
 | --- | --- |
-| `gsd doctor` | Check whether the repo has basics needed for reliable delivery. |
+| `gsd doctor` | Check repo health with pass/warn/fail diagnostics and next fixes. |
 | `gsd detect` | Detect runtime, package manager, framework, tests, and E2E tooling. |
 | `gsd agents` | Write agent role instructions and message-board folders. |
 | `gsd message <role> <message>` | Post a handoff note for a role. |
@@ -299,12 +316,13 @@ Open:
 .gsd/ui/index.html
 ```
 
-Mission Control is a static HTML dashboard for the active change. It uses professional system typography and shows:
+Mission Control is a static HTML dashboard for the active change. It uses professional system typography and keeps the first screen calm:
 
 - next recommended command and reason
-- readiness chips for spec, reasoning, operation, decisions, prompt, evidence, review, and report
-- workflow status, self-improving loop state, next actions, and audit trail
-- human decisions, adaptive reasoning, operator safety notes, review evidence, changed files, and agent inbox
+- current mission and likely files
+- compact progress
+- optional workflow commands
+- collapsed evidence, memory, workflow, audit, and AI context details
 
 Command buttons in the static dashboard are safe by design. They copy commands such as `gsd validate`, `gsd verify --full`, `gsd report`, and `gsd next` to your clipboard; they do not execute shell commands from the browser.
 

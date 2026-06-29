@@ -101,6 +101,40 @@
       gap: 10px;
       margin-bottom: 14px;
     }
+    .command-drawer {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .command-drawer summary {
+      cursor: pointer;
+      padding: 13px 14px;
+      color: var(--blue);
+      font-weight: 800;
+      list-style-position: inside;
+    }
+    .command-drawer summary:hover { background: rgba(148, 163, 184, .07); }
+    .workflow-actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 14px 14px;
+    }
+    .workflow-command {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 118px;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .workflow-command h3 { margin: 0; font-size: 15px; color: var(--text); }
+    .workflow-command p { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .workflow-command .command-button { align-self: end; }
     .action-card {
       display: grid;
       gap: 8px;
@@ -312,7 +346,7 @@
       .top-meta { justify-content: flex-start; }
       .mission-hero { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
-      .primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .primary-actions, .workflow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .score-grid { grid-template-columns: 1fr; }
       .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -328,12 +362,12 @@
     <header>
       <div>
         <h1>ShipSpec Mission Control</h1>
-        <p class="slug">Smart Default CLI v1 / smart-default-cli-v1</p>
+        <p class="slug">Next Gen Control Layer / next-gen-control-layer</p>
       </div>
       <div class="top-meta">
         <span class="chip pass">Spec PASS</span>
         <span class="chip pass">Ready PASS</span>
-        <span class="chip">Branch codex/smart-default-cli</span>
+        <span class="chip">Branch codex/nextgen-control-layer</span>
       </div>
     </header>
 
@@ -341,7 +375,7 @@
       <div class="center-head">
         <div>
           <h2>Mission dashboard</h2>
-          <p>A clearer view of the next step, ship readiness, evidence, and project memory.</p>
+          <p>Calm mode: one next step first, deeper workflow details only when you open them.</p>
         </div>
         <span class="chip pass">Readiness Score 100%</span>
       </div>
@@ -354,35 +388,38 @@
         </div>
         <div class="status-card">
           <div class="eyebrow">Current mission</div>
-          <h2>Smart Default CLI v1</h2>
-          <p class="reason">smart-default-cli-v1</p>
+          <h2>Next Gen Control Layer</h2>
+          <p class="reason">next-gen-control-layer</p>
           <span class="chip pass">Spec ready</span>
           <h3>Likely Files</h3>
           <div class="rows">
-            <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div><div class="row">src/adapters/index.ts</div>
+            <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div><div class="row">AGENTS.md</div>
           </div>
         </div>
       </div>
 
-      <div class="primary-actions">
-        <article class="action-card">
-          <h3>Give to Codex</h3>
-          <p>Send the prepared mission context to Codex.</p>
-          <button class="command-button" type="button" data-command="gsd codex" title="Copy command">gsd codex</button>
-        </article><article class="action-card">
-          <h3>Open Prompt</h3>
-          <p>Review the implementation brief before coding.</p>
-          <button class="command-button" type="button" data-command="open .gsd/prompts/smart-default-cli-v1.md" title="Copy command">open .gsd/prompts/smart-default-cli-v1.md</button>
-        </article><article class="action-card">
-          <h3>Run Checks</h3>
-          <p>Collect verification evidence for this mission.</p>
-          <button class="command-button" type="button" data-command="gsd verify --full" title="Copy command">gsd verify --full</button>
-        </article><article class="action-card">
-          <h3>Ship</h3>
-          <p>Verify, review, and write the ship report.</p>
-          <button class="command-button" type="button" data-command="gsd ship" title="Copy command">gsd ship</button>
-        </article>
-      </div>
+      <details class="command-drawer">
+        <summary>Show workflow commands</summary>
+        <div class="workflow-actions">
+          <article class="workflow-command">
+            <h3>Give to Codex</h3>
+            <p>Send the prepared mission context to Codex.</p>
+            <button class="command-button" type="button" data-command="gsd codex" title="Copy command">gsd codex</button>
+          </article><article class="workflow-command">
+            <h3>Open Prompt</h3>
+            <p>Review the implementation brief before coding.</p>
+            <button class="command-button" type="button" data-command="open .gsd/prompts/next-gen-control-layer.md" title="Copy command">open .gsd/prompts/next-gen-control-layer.md</button>
+          </article><article class="workflow-command">
+            <h3>Run Checks</h3>
+            <p>Collect verification evidence for this mission.</p>
+            <button class="command-button" type="button" data-command="gsd verify --full" title="Copy command">gsd verify --full</button>
+          </article><article class="workflow-command">
+            <h3>Ship</h3>
+            <p>Verify, review, and write the ship report.</p>
+            <button class="command-button" type="button" data-command="gsd ship" title="Copy command">gsd ship</button>
+          </article>
+        </div>
+      </details>
 
       <div class="progress-panel">
         <div class="progress-head">
@@ -441,7 +478,7 @@
             <div>
               <h3>Evidence Receipt</h3>
               <div class="receipt-grid">
-                <div class="receipt-item"><strong>Change</strong>smart-default-cli-v1</div><div class="receipt-item"><strong>Branch</strong>codex/smart-default-cli</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
+                <div class="receipt-item"><strong>Change</strong>next-gen-control-layer</div><div class="receipt-item"><strong>Branch</strong>codex/nextgen-control-layer</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
               </div>
             </div>
             <div>
@@ -476,7 +513,7 @@
             <div>
               <h3>Workflow</h3>
               <div class="rows">
-                <div class="row">Active change: smart-default-cli-v1</div>
+                <div class="row">Active change: next-gen-control-layer</div>
                 <div class="row">Evidence: present</div>
                 <div class="row">Report: present</div>
                 <div class="row">Release: present</div>

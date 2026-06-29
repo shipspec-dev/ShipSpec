@@ -345,6 +345,28 @@ test("runCli ship runs ready verification, validation, and report", async () => 
   assert.match(report, /\.gsd\/reviews\/ship-flow\.md/);
 });
 
+test("runCli ship writes pre-ship risk review for sensitive changes", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Token Rotation");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "auth-token.js"), "export const token = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+
+  const result = await runCli(["ship"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Pre-ship review/);
+  const review = await readFile(join(root, ".gsd", "reviews", "token-rotation.md"), "utf8");
+  assert.match(review, /## Risk Review/);
+  assert.match(review, /Sensitive files changed: src\/auth-token\.js/);
+  assert.match(review, /Confirm auth, token, payment, or data access behavior manually/);
+});
+
 test("runCli supports help and version for an installable CLI", async () => {
   const root = await tempRoot();
 
@@ -950,6 +972,7 @@ test("runCli autopilot guides a prepared mission to Codex handoff", async () => 
   assert.equal(result.exitCode, 0);
   assert.match(result.stdout, /Autopilot status: implementation needed/);
   assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /Health: warnings found; run gsd doctor/);
   assert.match(result.stdout, /After implementation: gsd autopilot/);
   assert.match(result.stdout, /UI: gsd ui --open/);
   assert.equal(await exists(join(root, ".gsd", "autopilot", "add-login-page.md")), true);
@@ -959,6 +982,33 @@ test("runCli autopilot guides a prepared mission to Codex handoff", async () => 
   assert.match(report, /Status: implementation-needed/);
   assert.match(report, /No code edits were made/);
   assert.match(report, /No deployment attempted/);
+});
+
+test("runCli autopilot includes smart memory when routing to AI", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Remember Auth Flow");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "auth-flow.js"), "export const auth = true;\n");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+  await generateReview(root);
+  await generateReport(root);
+  await learnFromChange(root);
+  await runMission(root, "Add Auth Banner");
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Memory: common files include src\/auth-flow\.js/);
+
+  const report = await readFile(join(root, ".gsd", "autopilot", "add-auth-banner.md"), "utf8");
+  assert.match(report, /## Memory Signals/);
+  assert.match(report, /src\/auth-flow\.js/);
 });
 
 test("runCli autopilot guides changed code to ship verification", async () => {
@@ -1466,7 +1516,10 @@ test("generateUiDashboard writes a professional Mission Control dashboard", asyn
   assert.match(html, /Progress/);
   assert.match(html, /Likely Files/);
   assert.match(html, /feature\.js/);
+  assert.match(html, /Calm mode/);
+  assert.match(html, /Show workflow commands/);
   assert.match(html, /Advanced details/);
+  assert.doesNotMatch(html, /class="action-card"/);
   assert.match(html, /<details class="advanced-section">/);
   assert.match(html, /<summary>Ship readiness<\/summary>/);
   assert.match(html, /<summary>Evidence and memory<\/summary>/);
@@ -1760,10 +1813,26 @@ test("doctorWorkspace reports repo readiness checks", async () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.checks.find((check) => check.name === "ShipSpec workspace").ok, true);
+  assert.equal(result.checks.find((check) => check.name === "ShipSpec workspace").severity, "pass");
   assert.equal(result.checks.find((check) => check.name === "Git repository").ok, true);
   assert.equal(result.checks.find((check) => check.name === "Package manifest").ok, true);
   assert.equal(result.checks.find((check) => check.name === "Test script").ok, true);
   assert.equal(result.checks.find((check) => check.name === "E2E script").ok, true);
+  assert.equal(result.nextFixes.length, 0);
+});
+
+test("runCli doctor prints operator-grade diagnostics and fixes", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+
+  const result = await runCli(["doctor"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /ShipSpec Doctor/);
+  assert.match(result.stdout, /WARN Package manifest/);
+  assert.match(result.stdout, /Next fixes:/);
+  assert.match(result.stdout, /Create package.json or run inside your project root/);
+  assert.match(result.stdout, /Run `gsd configure` after adding scripts/);
 });
 
 test("detectProject identifies npm, Next, Vitest, and Playwright from package metadata", async () => {
