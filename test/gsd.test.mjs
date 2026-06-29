@@ -249,33 +249,40 @@ test("runMission continues an active change and prepares review when evidence pa
   assert.equal(await exists(join(root, ".gsd", "packs", "ready-mission.md")), true);
 });
 
-test("runCli with no args shows the operator guide instead of raw help", async () => {
+test("runCli with no args asks for a mission when none exists", async () => {
   const root = await tempRoot();
-  await initWorkspace(root);
-  await startChange(root, "Operator Guide");
 
   const result = await runCli([], { cwd: root });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /ShipSpec Operator/);
-  assert.match(result.stdout, /Next:/);
-  assert.match(result.stdout, /Risk: medium/);
-  assert.match(result.stdout, /evidence missing/);
-  assert.match(result.stdout, /Main commands:/);
-  assert.match(result.stdout, /gsd "Feature request"/);
-  assert.match(result.stdout, /gsd share/);
-  assert.match(result.stdout, /Advanced:/);
+  assert.match(result.stdout, /Autopilot status: no mission/);
+  assert.match(result.stdout, /gsd run "Feature"/);
+  assert.match(result.stdout, /Try: gsd "Feature"/);
 });
 
-test("runCli routes plain text to quickstart", async () => {
+test("runCli with no args runs autopilot for an active mission", async () => {
+  const root = await tempRoot();
+  await runMission(root, "Operator Guide");
+
+  const result = await runCli([], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Autopilot status: implementation needed/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
+});
+
+test("runCli routes plain text to Mission Autopilot", async () => {
   const root = await tempRoot();
 
   const result = await runCli(["Add", "Billing", "Export"], { cwd: root });
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /Quickstart ready/);
-  assert.match(result.stdout, /add-billing-export/);
+  assert.match(result.stdout, /Mission ready: add-billing-export/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.match(result.stdout, /UI: gsd ui --open/);
   assert.equal(await exists(join(root, "openspec", "changes", "add-billing-export", "proposal.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "missions", "add-billing-export.md")), true);
 });
 
 test("runCli share aliases pack", async () => {
@@ -345,7 +352,7 @@ test("runCli supports help and version for an installable CLI", async () => {
   assert.equal(help.exitCode, 0);
   assert.match(help.stdout, /ShipSpec/);
   assert.match(help.stdout, /Main:/);
-  assert.match(help.stdout, /gsd "Feature request"/);
+  assert.match(help.stdout, /gsd "Feature"/);
   assert.match(help.stdout, /gsd ship/);
   assert.match(help.stdout, /gsd help advanced/);
   assert.doesNotMatch(help.stdout, /quickstart \[--light\] <feature>/);
@@ -437,7 +444,8 @@ test("runCli supports the AGI-style run command", async () => {
 
   const help = await runCli(["--help"], { cwd: root });
   assert.equal(help.exitCode, 0);
-  assert.match(help.stdout, /gsd run/);
+  assert.match(help.stdout, /gsd "Feature"/);
+  assert.match(help.stdout, /gsd$/m);
 
   const advanced = await runCli(["help", "advanced"], { cwd: root });
   assert.equal(advanced.exitCode, 0);

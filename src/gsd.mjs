@@ -1942,7 +1942,9 @@ export async function runCli(argv, options = {}) {
 
   try {
     if (!command) {
-      return cliResult(0, `${await formatOperatorGuide(cwd)}\n`);
+      const result = await runAutopilot(cwd);
+      const startHint = result.status === "no-mission" ? '\nTry: gsd "Feature"\n' : "\n";
+      return cliResult(0, `${result.message}${startHint}`);
     }
 
     if (command === "--help" || command === "-h") {
@@ -2248,14 +2250,14 @@ export async function runCli(argv, options = {}) {
     }
 
     if (isPlainTextIntent(command, rest)) {
-      const result = await quickstartProject(cwd, [command, ...rest].join(" "), { light: false });
+      const result = await runMission(cwd, [command, ...rest].join(" "));
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
     return cliResult(1, usage());
   } catch (error) {
     if (isPlainTextIntent(command, rest)) {
-      const result = await quickstartProject(cwd, [command, ...rest].join(" "), { light: false });
+      const result = await runMission(cwd, [command, ...rest].join(" "));
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
     return cliResult(1, `${error.message}\n`);
@@ -5007,10 +5009,10 @@ function beginnerUsage() {
     "",
     "Main:",
     "  gsd",
-    "  gsd run <request>",
+    '  gsd "Feature"',
     "  gsd autopilot",
     "  gsd codex",
-    '  gsd "Feature request"',
+    "  gsd run <request>",
     "  gsd fix <small fix>",
     "  gsd ship",
     "  gsd share",

@@ -20,12 +20,12 @@ gsd
 From any project folder:
 
 ```bash
-gsd run "Add user profile page"
-gsd autopilot
+gsd "Add user profile page"
+gsd
 gsd codex
 ```
 
-Then follow the next command from `gsd autopilot`. When it says `gsd codex`, open Codex and use that output.
+Then follow the next command from `gsd`. When it says `gsd codex`, open Codex and use that output.
 
 To open the visual Mission Control dashboard immediately:
 
@@ -42,19 +42,19 @@ gsd share
 
 That is the main flow.
 
-`gsd run` is Mission Autopilot. It prepares the mission, prompt, context pack, reasoning, likely files, risk level, and dashboard in one step, then prints the next short action.
+`gsd "Feature"` is Mission Autopilot. It prepares the mission, prompt, context pack, reasoning, likely files, risk level, and dashboard in one step. Plain `gsd` then guides the next safe step.
 
 ## Daily Flow
 
 ```bash
 cd /path/to/project
-gsd run "Your feature"
-gsd autopilot
+gsd "Your feature"
+gsd
 gsd codex
 
 # AI or human implements
 
-gsd autopilot
+gsd
 gsd ship
 gsd share
 ```
@@ -64,7 +64,7 @@ Useful extras:
 ```bash
 gsd ui       # refresh the local dashboard and show how to open it
 gsd ui --open # refresh and open Mission Control
-gsd autopilot # ask ShipSpec for the next safe mission step
+gsd autopilot # same smart guidance as plain gsd
 gsd next     # see next suggested action
 gsd clean    # preview demo/test files that can be removed
 ```
@@ -135,8 +135,7 @@ Most people only need these:
 
 ```bash
 gsd
-gsd run "Feature request"
-gsd autopilot
+gsd "Feature"
 gsd codex
 gsd ship
 gsd share
@@ -145,9 +144,10 @@ gsd ui
 
 | Command | Purpose |
 | --- | --- |
-| `gsd` | Show next action. |
-| `gsd run "Feature"` | Start or continue work. |
-| `gsd autopilot` | Guide the active mission to Codex, verification, or review. |
+| `gsd` | Guide the active mission to Codex, verification, or review. |
+| `gsd "Feature"` | Start or continue work. |
+| `gsd run "Feature"` | Explicit form of `gsd "Feature"`. |
+| `gsd autopilot` | Explicit form of plain `gsd`. |
 | `gsd codex` | Hand work to Codex without long paste. |
 | `gsd ship` | Verify and write review report. |
 | `gsd share` | Create AI context pack. |
