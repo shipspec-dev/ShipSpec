@@ -984,6 +984,20 @@ test("runCli autopilot guides a prepared mission to Codex handoff", async () => 
   assert.match(report, /No deployment attempted/);
 });
 
+test("runCli autopilot ignores generated setup files before implementation", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await runMission(root, "Add Login Page");
+
+  const result = await runCli(["autopilot"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /Autopilot status: implementation needed/);
+  assert.match(result.stdout, /Next: gsd codex/);
+  assert.doesNotMatch(result.stdout, /Autopilot status: verification needed/);
+  assert.doesNotMatch(result.stdout, /AGENTS\.md/);
+});
+
 test("runCli autopilot includes smart memory when routing to AI", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });

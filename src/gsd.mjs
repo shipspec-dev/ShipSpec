@@ -1504,7 +1504,7 @@ export async function runAutopilot(root) {
 
   const activeChange = status.activeChange;
   const diff = await getDiffSummary(root);
-  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles])];
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles])].filter(isAutopilotImplementationFile);
   const evidenceExists = await exists(join(root, ".agent", "evidence", `${activeChange.slug}.md`));
   const reportExists = await exists(join(root, ".gsd", "reports", `${activeChange.slug}.md`));
   const specValidation = await validateChange(root, { ready: false });
@@ -3400,6 +3400,11 @@ function normalizeGitStatusPath(value, prefix = "") {
 
 function isInternalDeliveryFile(file) {
   return file.startsWith(".agent/") || file.startsWith(".gsd/") || file.startsWith("openspec/");
+}
+
+function isAutopilotImplementationFile(file) {
+  const generatedSetupFiles = new Set(["AGENTS.md", "CLAUDE.md", "GEMINI.md", ".cursor/rules/gsd.mdc"]);
+  return !generatedSetupFiles.has(file);
 }
 
 async function writeEvidence(root, activeChange, results, full, skippedChecks = []) {
