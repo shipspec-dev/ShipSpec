@@ -78,6 +78,8 @@ Useful extras:
 ```bash
 gsd ui       # refresh the local dashboard and show how to open it
 gsd ui --open # refresh and open Mission Control
+gsd app      # generate the richer local app shell
+gsd app --open # generate and open the richer app shell
 gsd autopilot # same smart guidance as plain gsd
 gsd doctor   # diagnose setup, tests, skill install, and workflow health
 gsd next     # see next suggested action
@@ -85,6 +87,8 @@ gsd clean    # preview demo/test files that can be removed
 ```
 
 `gsd ui` shows ShipSpec Mission Control: a compact local dashboard with one next command, current mission status, readiness, and short likely-file names first. Workflow commands, full file paths, progress, evidence, memory, and audit details stay collapsed until you open them. Use `gsd ui --open` when you want ShipSpec to open it for you.
+
+`gsd app` generates a richer local app shell at `.gsd/app/index.html`. Use it when you want sidebar navigation, tabs, file search, agent inbox, memory, evidence, readiness, and copyable commands in one app-like screen.
 
 For small fixes:
 
@@ -170,6 +174,8 @@ gsd ui
 | `gsd share` | Create AI context pack. |
 | `gsd ui` | Refresh the local dashboard and show open instructions. |
 | `gsd ui --open` | Refresh and open Mission Control. |
+| `gsd app` | Generate the richer local app shell. |
+| `gsd app --open` | Generate and open the richer app shell. |
 
 Use `gsd next` when you want ShipSpec to explain the next best action.
 
@@ -332,6 +338,14 @@ Regenerate it after workflow state changes:
 ```bash
 gsd ui
 ```
+
+For a richer local app shell:
+
+```bash
+gsd app --open
+```
+
+`gsd app` keeps `gsd ui` as the fast static fallback, but adds sidebar navigation, Mission/Files/Evidence/Agents/Memory tabs, likely-file search, readiness checklist, agent inbox, memory summary, and copyable commands. It is generated locally and does not call a remote service.
 
 ## Important Remarks
 

@@ -1,0 +1,55 @@
+{
+  "title": "Add React Mission Control app",
+  "slug": "add-react-mission-control-app",
+  "request": "Add React Mission Control app",
+  "phase": "planning-ready",
+  "risk": {
+    "level": "medium",
+    "reasons": [
+      "Verification evidence missing",
+      "ready validation failing",
+      "next action pending: gsd operate"
+    ]
+  },
+  "likelyFiles": [
+    "src/gsd.mjs",
+    "test/gsd.test.mjs",
+    "README.md",
+    "apps/desktop/renderer/app.js",
+    "apps/desktop/main.js",
+    "apps/desktop/package.json",
+    "apps/desktop/preload.js",
+    "apps/desktop/renderer/index.html"
+  ],
+  "nextAction": {
+    "command": "open .gsd/prompts/add-react-mission-control-app.md",
+    "reason": "Mission prompt and context pack are ready for an AI coding pass.",
+    "otherCommands": [
+      "open .gsd/packs/add-react-mission-control-app.md",
+      "gsd ui"
+    ]
+  },
+  "validation": {
+    "spec": "pass",
+    "ready": "not-run",
+    "errors": []
+  },
+  "artifacts": {
+    "mission": ".gsd/missions/add-react-mission-control-app.md",
+    "missionJson": ".gsd/missions/add-react-mission-control-app.json",
+    "reasoning": ".gsd/reasoning/add-react-mission-control-app.md",
+    "prompt": ".gsd/prompts/add-react-mission-control-app.md",
+    "pack": ".gsd/packs/add-react-mission-control-app.md",
+    "report": null,
+    "reflection": null,
+    "ui": ".gsd/ui/index.html"
+  },
+  "safety": {
+    "localOnly": true,
+    "externalActions": false,
+    "destructiveActions": false,
+    "deployment": false,
+    "maxLoops": 1
+  },
+  "generatedAt": "2026-06-29T15:11:56.419Z"
+}

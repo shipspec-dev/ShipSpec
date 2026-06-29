@@ -13,6 +13,7 @@ import {
   doctorWorkspace,
   generateExamples,
   generateDesktopApp,
+  generateAppDashboard,
   generateUiDashboard,
   generateAgentInstructions,
   generateCiWorkflow,
@@ -1843,6 +1844,58 @@ test("runCli ui --open opens the generated dashboard", async () => {
   assert.match(result.stdout, /ShipSpec Mission Control ready/);
   assert.match(result.stdout, /Opened: \.gsd\/ui\/index\.html/);
   assert.deepEqual(opened, [join(root, ".gsd", "ui", "index.html")]);
+});
+
+test("generateAppDashboard writes a richer Mission Control app shell", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "React Mission Control");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "mission-control.js"), "export const mission = true;\n");
+  await postAgentMessage(root, "planner", "Spec is ready for builder.");
+  await postAgentMessage(root, "tester", "Run full verification before ship.");
+
+  const result = await generateAppDashboard(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.appPath, join(root, ".gsd", "app", "index.html"));
+  const html = await readFile(join(root, ".gsd", "app", "index.html"), "utf8");
+  assert.match(html, /ShipSpec App ready/);
+  assert.match(html, /data-app="shipspec-react-mission-control"/);
+  assert.match(html, /Mission/);
+  assert.match(html, /Files/);
+  assert.match(html, /Evidence/);
+  assert.match(html, /Agents/);
+  assert.match(html, /Memory/);
+  assert.match(html, /Next action/);
+  assert.match(html, /data-command="gsd codex"/);
+  assert.match(html, /type="search"/);
+  assert.match(html, /mission-control\.js/);
+  assert.match(html, /Spec is ready for builder/);
+  assert.match(html, /Readiness/);
+  assert.match(html, /navigator\.clipboard\.writeText/);
+});
+
+test("runCli app prints generated app path and supports open", async () => {
+  const root = await tempRoot();
+  const opened = [];
+  await initWorkspace(root);
+  await startChange(root, "Open React App");
+
+  const result = await runCli(["app", "--open"], {
+    cwd: root,
+    opener: async (path) => opened.push(path),
+  });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /ShipSpec App ready/);
+  assert.match(result.stdout, /\.gsd\/app\/index\.html/);
+  assert.match(result.stdout, /Opened: \.gsd\/app\/index\.html/);
+  assert.deepEqual(opened, [join(root, ".gsd", "app", "index.html")]);
+
+  const help = await runCli(["--help"], { cwd: root });
+  assert.match(help.stdout, /gsd app/);
 });
 
 test("runCli run --open starts a mission and opens the dashboard", async () => {

@@ -855,7 +855,7 @@ export async function generateDesktopApp(root) {
   };
 }
 
-export async function generateUiDashboard(root) {
+async function buildDashboardModel(root) {
   await initWorkspace(root);
   const status = await getStatus(root);
   const specStatus = await getSpecStatus(root);
@@ -876,37 +876,54 @@ export async function generateUiDashboard(root) {
   const memory = await getMemorySummary(root);
   const next = await getNextRecommendation(root);
   const likelyFiles = activeChange ? await inferLikelyFiles(root, activeChange, { diff }) : [];
+
+  return {
+    activeChange,
+    specStatus,
+    validation,
+    readyValidation,
+    diff,
+    messages,
+    audit,
+    reportExists,
+    releaseExists,
+    promptExists,
+    loop,
+    reasoning,
+    operation,
+    decisions,
+    review,
+    memory,
+    next,
+    likelyFiles,
+  };
+}
+
+export async function generateUiDashboard(root) {
+  const model = await buildDashboardModel(root);
   const uiPath = join(root, ".gsd", "ui", "index.html");
 
   await mkdir(join(root, ".gsd", "ui"), { recursive: true });
-  await writeFile(
-    uiPath,
-    buildUiHtml({
-      activeChange,
-      specStatus,
-      validation,
-      readyValidation,
-      diff,
-      messages,
-      audit,
-      reportExists,
-      releaseExists,
-      promptExists,
-      loop,
-      reasoning,
-      operation,
-      decisions,
-      review,
-      memory,
-      next,
-      likelyFiles,
-    }),
-  );
+  await writeFile(uiPath, buildUiHtml(model));
 
   return {
     ok: true,
     message: "ShipSpec Mission Control written to .gsd/ui/index.html",
     uiPath,
+  };
+}
+
+export async function generateAppDashboard(root) {
+  const model = await buildDashboardModel(root);
+  const appPath = join(root, ".gsd", "app", "index.html");
+
+  await mkdir(join(root, ".gsd", "app"), { recursive: true });
+  await writeFile(appPath, buildAppHtml(model));
+
+  return {
+    ok: true,
+    message: "ShipSpec App written to .gsd/app/index.html",
+    appPath,
   };
 }
 
@@ -2273,6 +2290,13 @@ export async function runCli(argv, options = {}) {
       const result = await generateUiDashboard(cwd);
       if (result.ok && open) await openUiDashboard(cwd, options);
       return cliResult(result.ok ? 0 : 1, `${formatUiResult(result, { opened: result.ok && open })}\n`);
+    }
+
+    if (command === "app") {
+      const open = rest.includes("--open");
+      const result = await generateAppDashboard(cwd);
+      if (result.ok && open) await openAppDashboard(cwd, options);
+      return cliResult(result.ok ? 0 : 1, `${formatAppResult(result, { opened: result.ok && open })}\n`);
     }
 
     if (command === "verify") {
@@ -4422,6 +4446,383 @@ function compactFileLabel(file) {
   return parts.at(-1) ?? normalized;
 }
 
+function buildAppHtml(model) {
+  const changeTitle = model.activeChange?.title ?? "No active mission";
+  const changeSlug = model.activeChange?.slug ?? "none";
+  const files = model.likelyFiles?.length ? model.likelyFiles : ["No likely files inferred yet."];
+  const commands = [
+    model.next?.command ?? "gsd next",
+    "gsd codex",
+    "gsd verify --full",
+    "gsd ship",
+    "gsd ui",
+  ].filter((command, index, commands) => commands.indexOf(command) === index);
+  const readinessSignals = [
+    ["Spec", model.specStatus.proposal && model.specStatus.tasks],
+    ["Validation", model.validation.ok],
+    ["Evidence", model.specStatus.evidence],
+    ["Review", model.review?.present],
+    ["Report", model.reportExists],
+    ["Ready", model.readyValidation.ok],
+  ];
+  const readinessPassed = readinessSignals.filter(([, ok]) => ok).length;
+  const readinessScore = Math.round((readinessPassed / readinessSignals.length) * 100);
+  const readinessReason = model.readyValidation.ok
+    ? "Ready to ship."
+    : model.readyValidation.errors?.[0] ?? model.next?.reason ?? "Run gsd next for guidance.";
+  const evidenceRows = [
+    ["Change", changeSlug],
+    ["Branch", model.diff.branch],
+    ["Evidence", model.specStatus.evidence ? "present" : "missing"],
+    ["Review", model.review?.present ? "present" : "missing"],
+    ["Report", model.reportExists ? "present" : "missing"],
+    ["Release", model.releaseExists ? "present" : "missing"],
+  ];
+  const memory = model.memory?.smartMemory ?? {};
+  const memoryRows = [
+    `Common files: ${memory.commonFiles?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Checks: ${memory.checks?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Ship pattern: ${memory.shipPatterns?.[0] ?? "None recorded."}`,
+  ];
+  const messages = model.messages.length ? model.messages.slice(0, 8) : [{ role: "system", text: "No agent messages yet." }];
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShipSpec App</title>
+  <style>
+    :root {
+      --bg: #080d19;
+      --shell: #0d1424;
+      --panel: #121b2e;
+      --panel-2: #0b1220;
+      --line: rgba(148, 163, 184, .2);
+      --text: #e8eef8;
+      --muted: #9aa8bd;
+      --subtle: #64748b;
+      --blue: #38bdf8;
+      --green: #36d981;
+      --yellow: #f6c453;
+      --red: #fb7185;
+      --shadow: rgba(0, 0, 0, .32);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: linear-gradient(135deg, #07111f 0%, #0a1020 45%, #080b16 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) 300px;
+      gap: 16px;
+      padding: 18px;
+    }
+    .sidebar, .main, .inspector {
+      background: rgba(18, 27, 46, .82);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 22px 60px var(--shadow);
+    }
+    .sidebar { padding: 16px; display: grid; align-content: start; gap: 16px; }
+    .brand h1 { margin: 0; font-size: 22px; line-height: 1.05; }
+    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .nav { display: grid; gap: 8px; }
+    .tab-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 11px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .tab-button[aria-selected="true"] {
+      color: var(--text);
+      border-color: rgba(56, 189, 248, .38);
+      background: rgba(56, 189, 248, .1);
+    }
+    .main { padding: 18px; overflow: hidden; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+    .title h2 { margin: 0; font-size: 28px; line-height: 1.1; }
+    .title p { margin: 6px 0 0; color: var(--muted); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .pass { color: var(--green); }
+    .warn { color: var(--yellow); }
+    .fail { color: var(--red); }
+    .next-action {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid rgba(56, 189, 248, .32);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, .13), rgba(54, 217, 129, .07));
+      margin-bottom: 16px;
+    }
+    .label { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .next-action h3 { margin: 6px 0 0; font-size: 18px; }
+    .command {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--green);
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(11, 18, 32, .62);
+      padding: 14px;
+    }
+    .section h3 { margin: 0 0 10px; font-size: 16px; }
+    .rows { display: grid; gap: 8px; }
+    .row {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      padding: 9px 10px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .file-tools { display: flex; gap: 10px; margin-bottom: 10px; }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 12px;
+    }
+    .file-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .file-name { font-weight: 800; }
+    .file-path { color: var(--muted); font-size: 13px; }
+    .inspector { padding: 16px; display: grid; align-content: start; gap: 14px; }
+    .score {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--green);
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .score span { color: var(--muted); font-size: 13px; }
+    .signal {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      padding: 9px 10px;
+    }
+    .copy-status { min-height: 18px; color: var(--green); font-size: 13px; }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .grid, .next-action { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" data-app="shipspec-react-mission-control">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ShipSpec App ready</h1>
+        <p>React-ready Mission Control shell generated from local ShipSpec state.</p>
+      </div>
+      <nav class="nav" aria-label="Mission Control sections">
+        ${["Mission", "Files", "Evidence", "Agents", "Memory"].map((name, index) => `<button class="tab-button" type="button" data-tab="${escapeHtml(name.toLowerCase())}" aria-selected="${index === 0 ? "true" : "false"}"><span>${escapeHtml(name)}</span><span>${index === 0 ? "on" : ""}</span></button>`).join("")}
+      </nav>
+      <div class="section">
+        <div class="label">Commands</div>
+        <div class="rows">
+          ${commands.map((command) => `<button class="command" type="button" data-command="${escapeHtml(command)}">${escapeHtml(command)}</button>`).join("")}
+        </div>
+        <div class="copy-status" role="status" aria-live="polite"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h2>${escapeHtml(changeTitle)}</h2>
+          <p>${escapeHtml(changeSlug)} / ${escapeHtml(model.diff.branch)}</p>
+        </div>
+        <span class="pill ${model.readyValidation.ok ? "pass" : "warn"}">Ready ${model.readyValidation.ok ? "PASS" : "WAIT"}</span>
+      </div>
+
+      <section class="next-action" aria-label="Next action">
+        <div>
+          <div class="label">Next action</div>
+          <h3>${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</h3>
+        </div>
+        <button class="command" type="button" data-command="${escapeHtml(model.next?.command ?? "gsd next")}">${escapeHtml(model.next?.command ?? "gsd next")}</button>
+      </section>
+
+      <section class="tab-panel active" data-panel="mission">
+        <div class="grid">
+          <div class="section">
+            <h3>Mission</h3>
+            <div class="rows">
+              <div class="row">Change: ${escapeHtml(changeSlug)}</div>
+              <div class="row">Spec: ${model.specStatus.proposal && model.specStatus.tasks ? "ready" : "needs work"}</div>
+              <div class="row">Prompt: ${model.promptExists ? "present" : "missing"}</div>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Blockers</h3>
+            <div class="rows">
+              <div class="row">${escapeHtml(readinessReason)}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="files">
+        <div class="section">
+          <h3>Files</h3>
+          <div class="file-tools">
+            <input class="search" type="search" placeholder="Search likely files" aria-label="Search likely files">
+          </div>
+          <div class="rows file-list">
+            ${files.map((file) => `<div class="row file-row" data-file="${escapeHtml(file.toLowerCase())}"><span class="file-name">${escapeHtml(compactFileLabel(file))}</span><span class="file-path">${escapeHtml(file)}</span></div>`).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="evidence">
+        <div class="grid">
+          ${evidenceRows.map(([label, value]) => `<div class="section"><div class="label">${escapeHtml(label)}</div><h3>${escapeHtml(value)}</h3></div>`).join("")}
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="agents">
+        <div class="section">
+          <h3>Agent inbox</h3>
+          <div class="rows">
+            ${messages.map((message) => `<div class="row"><strong>${escapeHtml(message.role)}</strong>: ${escapeHtml(message.text)}</div>`).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="memory">
+        <div class="section">
+          <h3>Memory</h3>
+          <div class="rows">
+            ${memoryRows.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="inspector">
+      <div class="section">
+        <div class="label">Readiness</div>
+        <div class="score">${readinessScore}% <span>ready</span></div>
+        <p>${escapeHtml(readinessReason)}</p>
+      </div>
+      <div class="section">
+        <h3>Checklist</h3>
+        <div class="rows">
+          ${readinessSignals.map(([name, ok]) => `<div class="signal"><span>${escapeHtml(name)}</span><strong class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</strong></div>`).join("")}
+        </div>
+      </div>
+    </aside>
+  </div>
+  <script>
+    const tabs = [...document.querySelectorAll("[data-tab]")];
+    const panels = [...document.querySelectorAll("[data-panel]")];
+    const search = document.querySelector(".search");
+    const fileRows = [...document.querySelectorAll("[data-file]")];
+    const copyStatus = document.querySelector(".copy-status");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const name = tab.dataset.tab;
+        tabs.forEach((item) => item.setAttribute("aria-selected", String(item === tab)));
+        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === name));
+      });
+    });
+
+    search?.addEventListener("input", () => {
+      const term = search.value.trim().toLowerCase();
+      fileRows.forEach((row) => {
+        row.hidden = term.length > 0 && !row.dataset.file.includes(term);
+      });
+    });
+
+    async function copyCommand(command) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(command);
+        return;
+      }
+
+      const field = document.createElement("textarea");
+      field.value = command;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.left = "-9999px";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+
+    document.querySelectorAll("[data-command]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const command = button.dataset.command;
+        try {
+          await copyCommand(command);
+          copyStatus.textContent = \`Copied: \${command}\`;
+        } catch {
+          copyStatus.textContent = "Copy failed. Select the command text instead.";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+`;
+}
+
 function buildUiHtml(model) {
   const changeTitle = model.activeChange?.title ?? "No active change";
   const changeSlug = model.activeChange?.slug ?? "none";
@@ -5277,6 +5678,12 @@ async function openUiDashboard(root, options = {}) {
   return uiPath;
 }
 
+async function openAppDashboard(root, options = {}) {
+  const appPath = join(root, ".gsd", "app", "index.html");
+  await openPath(appPath, options);
+  return appPath;
+}
+
 function formatUiResult(result, options = {}) {
   const lines = [
     "ShipSpec Mission Control ready",
@@ -5291,6 +5698,24 @@ function formatUiResult(result, options = {}) {
   ];
 
   if (options.opened) lines.push("", "Opened: .gsd/ui/index.html");
+  if (!result.ok) lines.unshift(result.message);
+  return lines.join("\n");
+}
+
+function formatAppResult(result, options = {}) {
+  const lines = [
+    "ShipSpec App ready",
+    "",
+    "App: .gsd/app/index.html",
+    "",
+    "Open it:",
+    "  open .gsd/app/index.html",
+    "",
+    "Or run:",
+    "  gsd app --open",
+  ];
+
+  if (options.opened) lines.push("", "Opened: .gsd/app/index.html");
   if (!result.ok) lines.unshift(result.message);
   return lines.join("\n");
 }
@@ -5324,6 +5749,8 @@ function beginnerUsage() {
     "  gsd ask",
     "  gsd ui",
     "  gsd ui --open",
+    "  gsd app",
+    "  gsd app --open",
     "",
     "Common:",
     "  gsd next",
@@ -5350,6 +5777,7 @@ function usage() {
     "  start <change title>",
     "  next [--json]",
     "  ui [--open]",
+    "  app [--open]",
     "",
     "Verification:",
     "  spec",

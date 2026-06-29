@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShipSpec App</title>
+  <style>
+    :root {
+      --bg: #080d19;
+      --shell: #0d1424;
+      --panel: #121b2e;
+      --panel-2: #0b1220;
+      --line: rgba(148, 163, 184, .2);
+      --text: #e8eef8;
+      --muted: #9aa8bd;
+      --subtle: #64748b;
+      --blue: #38bdf8;
+      --green: #36d981;
+      --yellow: #f6c453;
+      --red: #fb7185;
+      --shadow: rgba(0, 0, 0, .32);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: linear-gradient(135deg, #07111f 0%, #0a1020 45%, #080b16 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) 300px;
+      gap: 16px;
+      padding: 18px;
+    }
+    .sidebar, .main, .inspector {
+      background: rgba(18, 27, 46, .82);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 22px 60px var(--shadow);
+    }
+    .sidebar { padding: 16px; display: grid; align-content: start; gap: 16px; }
+    .brand h1 { margin: 0; font-size: 22px; line-height: 1.05; }
+    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .nav { display: grid; gap: 8px; }
+    .tab-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 11px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .tab-button[aria-selected="true"] {
+      color: var(--text);
+      border-color: rgba(56, 189, 248, .38);
+      background: rgba(56, 189, 248, .1);
+    }
+    .main { padding: 18px; overflow: hidden; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+    .title h2 { margin: 0; font-size: 28px; line-height: 1.1; }
+    .title p { margin: 6px 0 0; color: var(--muted); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .pass { color: var(--green); }
+    .warn { color: var(--yellow); }
+    .fail { color: var(--red); }
+    .next-action {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid rgba(56, 189, 248, .32);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, .13), rgba(54, 217, 129, .07));
+      margin-bottom: 16px;
+    }
+    .label { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .next-action h3 { margin: 6px 0 0; font-size: 18px; }
+    .command {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--green);
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(11, 18, 32, .62);
+      padding: 14px;
+    }
+    .section h3 { margin: 0 0 10px; font-size: 16px; }
+    .rows { display: grid; gap: 8px; }
+    .row {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      padding: 9px 10px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .file-tools { display: flex; gap: 10px; margin-bottom: 10px; }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 12px;
+    }
+    .file-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .file-name { font-weight: 800; }
+    .file-path { color: var(--muted); font-size: 13px; }
+    .inspector { padding: 16px; display: grid; align-content: start; gap: 14px; }
+    .score {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--green);
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .score span { color: var(--muted); font-size: 13px; }
+    .signal {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      padding: 9px 10px;
+    }
+    .copy-status { min-height: 18px; color: var(--green); font-size: 13px; }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .grid, .next-action { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" data-app="shipspec-react-mission-control">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ShipSpec App ready</h1>
+        <p>React-ready Mission Control shell generated from local ShipSpec state.</p>
+      </div>
+      <nav class="nav" aria-label="Mission Control sections">
+        <button class="tab-button" type="button" data-tab="mission" aria-selected="true"><span>Mission</span><span>on</span></button><button class="tab-button" type="button" data-tab="files" aria-selected="false"><span>Files</span><span></span></button><button class="tab-button" type="button" data-tab="evidence" aria-selected="false"><span>Evidence</span><span></span></button><button class="tab-button" type="button" data-tab="agents" aria-selected="false"><span>Agents</span><span></span></button><button class="tab-button" type="button" data-tab="memory" aria-selected="false"><span>Memory</span><span></span></button>
+      </nav>
+      <div class="section">
+        <div class="label">Commands</div>
+        <div class="rows">
+          <button class="command" type="button" data-command="gsd operate">gsd operate</button><button class="command" type="button" data-command="gsd codex">gsd codex</button><button class="command" type="button" data-command="gsd verify --full">gsd verify --full</button><button class="command" type="button" data-command="gsd ship">gsd ship</button><button class="command" type="button" data-command="gsd ui">gsd ui</button>
+        </div>
+        <div class="copy-status" role="status" aria-live="polite"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h2>Add React Mission Control app</h2>
+          <p>add-react-mission-control-app / codex/react-mission-control-app</p>
+        </div>
+        <span class="pill pass">Ready PASS</span>
+      </div>
+
+      <section class="next-action" aria-label="Next action">
+        <div>
+          <div class="label">Next action</div>
+          <h3>Operation report is missing for the active change.</h3>
+        </div>
+        <button class="command" type="button" data-command="gsd operate">gsd operate</button>
+      </section>
+
+      <section class="tab-panel active" data-panel="mission">
+        <div class="grid">
+          <div class="section">
+            <h3>Mission</h3>
+            <div class="rows">
+              <div class="row">Change: add-react-mission-control-app</div>
+              <div class="row">Spec: ready</div>
+              <div class="row">Prompt: present</div>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Blockers</h3>
+            <div class="rows">
+              <div class="row">Ready to ship.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="files">
+        <div class="section">
+          <h3>Files</h3>
+          <div class="file-tools">
+            <input class="search" type="search" placeholder="Search likely files" aria-label="Search likely files">
+          </div>
+          <div class="rows file-list">
+            <div class="row file-row" data-file="src/gsd.mjs"><span class="file-name">gsd.mjs</span><span class="file-path">src/gsd.mjs</span></div><div class="row file-row" data-file="test/gsd.test.mjs"><span class="file-name">gsd.test.mjs</span><span class="file-path">test/gsd.test.mjs</span></div><div class="row file-row" data-file="readme.md"><span class="file-name">README.md</span><span class="file-path">README.md</span></div><div class="row file-row" data-file="apps/desktop/renderer/app.js"><span class="file-name">app.js</span><span class="file-path">apps/desktop/renderer/app.js</span></div><div class="row file-row" data-file="apps/desktop/main.js"><span class="file-name">main.js</span><span class="file-path">apps/desktop/main.js</span></div><div class="row file-row" data-file="apps/desktop/package.json"><span class="file-name">package.json</span><span class="file-path">apps/desktop/package.json</span></div><div class="row file-row" data-file="apps/desktop/preload.js"><span class="file-name">preload.js</span><span class="file-path">apps/desktop/preload.js</span></div><div class="row file-row" data-file="apps/desktop/renderer/index.html"><span class="file-name">index.html</span><span class="file-path">apps/desktop/renderer/index.html</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="evidence">
+        <div class="grid">
+          <div class="section"><div class="label">Change</div><h3>add-react-mission-control-app</h3></div><div class="section"><div class="label">Branch</div><h3>codex/react-mission-control-app</h3></div><div class="section"><div class="label">Evidence</div><h3>present</h3></div><div class="section"><div class="label">Review</div><h3>present</h3></div><div class="section"><div class="label">Report</div><h3>present</h3></div><div class="section"><div class="label">Release</div><h3>present</h3></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="agents">
+        <div class="section">
+          <h3>Agent inbox</h3>
+          <div class="rows">
+            <div class="row"><strong>planner</strong>: Spec is ready for builder</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="memory">
+        <div class="section">
+          <h3>Memory</h3>
+          <div class="rows">
+            <div class="row">Common files: src/gsd.mjs, test/gsd.test.mjs</div><div class="row">Checks: e2e, lint, typecheck, unit</div><div class="row">Ship pattern: verify -&gt; review -&gt; report -&gt; done</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="inspector">
+      <div class="section">
+        <div class="label">Readiness</div>
+        <div class="score">100% <span>ready</span></div>
+        <p>Ready to ship.</p>
+      </div>
+      <div class="section">
+        <h3>Checklist</h3>
+        <div class="rows">
+          <div class="signal"><span>Spec</span><strong class="pass">PASS</strong></div><div class="signal"><span>Validation</span><strong class="pass">PASS</strong></div><div class="signal"><span>Evidence</span><strong class="pass">PASS</strong></div><div class="signal"><span>Review</span><strong class="pass">PASS</strong></div><div class="signal"><span>Report</span><strong class="pass">PASS</strong></div><div class="signal"><span>Ready</span><strong class="pass">PASS</strong></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <script>
+    const tabs = [...document.querySelectorAll("[data-tab]")];
+    const panels = [...document.querySelectorAll("[data-panel]")];
+    const search = document.querySelector(".search");
+    const fileRows = [...document.querySelectorAll("[data-file]")];
+    const copyStatus = document.querySelector(".copy-status");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const name = tab.dataset.tab;
+        tabs.forEach((item) => item.setAttribute("aria-selected", String(item === tab)));
+        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === name));
+      });
+    });
+
+    search?.addEventListener("input", () => {
+      const term = search.value.trim().toLowerCase();
+      fileRows.forEach((row) => {
+        row.hidden = term.length > 0 && !row.dataset.file.includes(term);
+      });
+    });
+
+    async function copyCommand(command) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(command);
+        return;
+      }
+
+      const field = document.createElement("textarea");
+      field.value = command;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.left = "-9999px";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+
+    document.querySelectorAll("[data-command]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const command = button.dataset.command;
+        try {
+          await copyCommand(command);
+          copyStatus.textContent = `Copied: ${command}`;
+        } catch {
+          copyStatus.textContent = "Copy failed. Select the command text instead.";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
