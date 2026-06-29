@@ -59,11 +59,25 @@
       gap: 14px;
       margin-bottom: 14px;
     }
+    .cockpit-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(250px, .72fr) minmax(220px, .55fr);
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
     .next-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, .14), rgba(61, 220, 132, .08));
       border: 1px solid rgba(56, 189, 248, .34);
       border-radius: 8px;
       padding: 18px;
+    }
+    .next-card.compact {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      min-height: 0;
+      max-height: 420px;
     }
     .eyebrow {
       color: var(--blue);
@@ -73,7 +87,7 @@
       text-transform: uppercase;
       margin-bottom: 10px;
     }
-    .next-title { font-size: 24px; line-height: 1.2; margin-bottom: 8px; }
+    .next-title { font-size: 22px; line-height: 1.25; margin-bottom: 0; max-width: 720px; }
     .next-command {
       display: inline-flex;
       max-width: 100%;
@@ -94,6 +108,32 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 18px;
+    }
+    .likely-preview {
+      display: grid;
+      gap: 8px;
+    }
+    .likely-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .file-list-drawer {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(11, 18, 32, .48);
+      overflow: hidden;
+    }
+    .file-list-drawer summary {
+      cursor: pointer;
+      padding: 8px 10px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      list-style-position: inside;
+    }
+    .file-list-drawer .rows {
+      padding: 0 10px 10px;
     }
     .primary-actions {
       display: grid;
@@ -126,7 +166,7 @@
       display: grid;
       gap: 8px;
       align-content: start;
-      min-height: 118px;
+      min-height: 96px;
       background: var(--panel-3);
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -139,7 +179,6 @@
       display: grid;
       gap: 8px;
       align-content: start;
-      min-height: 132px;
       background: var(--panel-3);
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -153,6 +192,45 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 14px;
+    }
+    .readiness-strip {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .readiness-score {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--green);
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .readiness-score span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .readiness-mini {
+      display: grid;
+      gap: 8px;
+    }
+    .mini-signal {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 14px;
     }
     .progress-head {
       display: flex;
@@ -344,7 +422,7 @@
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
       .top-meta { justify-content: flex-start; }
-      .mission-hero { grid-template-columns: 1fr; }
+      .mission-hero, .cockpit-shell { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
       .primary-actions, .workflow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -362,12 +440,12 @@
     <header>
       <div>
         <h1>ShipSpec Mission Control</h1>
-        <p class="slug">Ignore Setup Files In Autopilot / ignore-setup-files-in-autopilot</p>
+        <p class="slug">Make Mission Control Compact / make-mission-control-compact</p>
       </div>
       <div class="top-meta">
         <span class="chip pass">Spec PASS</span>
         <span class="chip pass">Ready PASS</span>
-        <span class="chip">Branch codex/autopilot-ignore-setup-files</span>
+        <span class="chip">Branch codex/compact-mission-control</span>
       </div>
     </header>
 
@@ -380,20 +458,35 @@
         <span class="chip pass">Readiness Score 100%</span>
       </div>
 
-      <div class="mission-hero">
-        <div class="next-card">
+      <div class="cockpit-shell">
+        <div class="next-card compact">
           <div class="eyebrow">Next best step</div>
           <div class="next-title">Adaptive reasoning is missing for the active change.</div>
           <div class="next-command">gsd reason</div>
         </div>
         <div class="status-card">
           <div class="eyebrow">Current mission</div>
-          <h2>Ignore Setup Files In Autopilot</h2>
-          <p class="reason">ignore-setup-files-in-autopilot</p>
+          <h2>Make Mission Control Compact</h2>
+          <p class="reason">make-mission-control-compact</p>
           <span class="chip pass">Spec ready</span>
           <h3>Likely Files</h3>
-          <div class="rows">
-            <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">.gitignore</div><div class="row">src/adapters/index.ts</div>
+          <div class="likely-preview">
+            <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div>
+          </div>
+          <p class="likely-note">8 likely files. Open full list below.</p>
+          <details class="file-list-drawer">
+            <summary>Full file list</summary>
+            <div class="rows">
+              <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div><div class="row">src/adapters/index.ts</div><div class="row">src/adapters/github.ts</div><div class="row">src/adapters/openspec.ts</div><div class="row">src/adapters/project-scripts.ts</div><div class="row">src/adapters/superpowers.ts</div>
+            </div>
+          </details>
+        </div>
+        <div class="readiness-strip">
+          <div class="eyebrow">Readiness</div>
+          <div class="readiness-score">100% <span>ready</span></div>
+          <p class="reason">Ready to ship.</p>
+          <div class="readiness-mini">
+            <div class="mini-signal"><span>Spec</span><span class="pass">PASS</span></div><div class="mini-signal"><span>Evidence</span><span class="pass">PASS</span></div><div class="mini-signal"><span>Report</span><span class="pass">PASS</span></div>
           </div>
         </div>
       </div>
@@ -408,7 +501,7 @@
           </article><article class="workflow-command">
             <h3>Open Prompt</h3>
             <p>Review the implementation brief before coding.</p>
-            <button class="command-button" type="button" data-command="open .gsd/prompts/ignore-setup-files-in-autopilot.md" title="Copy command">open .gsd/prompts/ignore-setup-files-in-autopilot.md</button>
+            <button class="command-button" type="button" data-command="open .gsd/prompts/make-mission-control-compact.md" title="Copy command">open .gsd/prompts/make-mission-control-compact.md</button>
           </article><article class="workflow-command">
             <h3>Run Checks</h3>
             <p>Collect verification evidence for this mission.</p>
@@ -478,7 +571,7 @@
             <div>
               <h3>Evidence Receipt</h3>
               <div class="receipt-grid">
-                <div class="receipt-item"><strong>Change</strong>ignore-setup-files-in-autopilot</div><div class="receipt-item"><strong>Branch</strong>codex/autopilot-ignore-setup-files</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
+                <div class="receipt-item"><strong>Change</strong>make-mission-control-compact</div><div class="receipt-item"><strong>Branch</strong>codex/compact-mission-control</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
               </div>
             </div>
             <div>
@@ -493,7 +586,7 @@
             <div>
               <h3>Changed Files</h3>
               <div class="rows">
-                <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
+                <div class="row">README.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
               </div>
             </div>
             <div>
@@ -513,7 +606,7 @@
             <div>
               <h3>Workflow</h3>
               <div class="rows">
-                <div class="row">Active change: ignore-setup-files-in-autopilot</div>
+                <div class="row">Active change: make-mission-control-compact</div>
                 <div class="row">Evidence: present</div>
                 <div class="row">Report: present</div>
                 <div class="row">Release: present</div>

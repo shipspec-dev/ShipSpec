@@ -1581,6 +1581,57 @@ test("generateUiDashboard writes a professional Mission Control dashboard", asyn
   assert.match(html, /feature\.js/);
 });
 
+test("generateUiDashboard keeps the first screen compact", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Compact Mission Control");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "compact-page.js"), "export const compact = true;\n");
+  await writeFile(join(root, "src", "compact-form.js"), "export const form = true;\n");
+  await writeFile(join(root, "src", "compact-state.js"), "export const state = true;\n");
+  await writeFile(join(root, "src", "compact-extra.js"), "export const extra = true;\n");
+
+  const result = await generateUiDashboard(root);
+
+  assert.equal(result.ok, true);
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  assert.match(html, /class="cockpit-shell"/);
+  assert.match(html, /class="next-card compact"/);
+  assert.match(html, /class="readiness-strip"/);
+  assert.match(html, /<details class="command-drawer">/);
+  assert.doesNotMatch(html, /<details class="command-drawer" open>/);
+  assert.match(html, /Show workflow commands/);
+  assert.match(html, /Full file list/);
+  assert.match(html, /4 likely files/);
+  assert.match(html, /max-height: 420px/);
+  assert.doesNotMatch(html, /min-height: 132px/);
+});
+
+test("generateUiDashboard moves full likely files into advanced details", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Compact Login Files");
+  await mkdir(join(root, "app"), { recursive: true });
+  await writeFile(join(root, "app", "compact-login-page.js"), "export const page = true;\n");
+  await writeFile(join(root, "app", "compact-login-form.js"), "export const form = true;\n");
+  await writeFile(join(root, "app", "compact-login-model.js"), "export const model = true;\n");
+  await writeFile(join(root, "app", "compact-login-extra.js"), "export const extra = true;\n");
+
+  await generateUiDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "ui", "index.html"), "utf8");
+  const beforeFullList = html.split('<details class="file-list-drawer">')[0];
+  const previewMatches = beforeFullList.match(/compact-login-[a-z]+\.js/g) ?? [];
+  assert.equal(previewMatches.length, 3);
+  assert.match(html, /<summary>Full file list<\/summary>/);
+  assert.match(html, /compact-login-extra\.js/);
+  assert.match(html, /compact-login-page\.js/);
+  assert.match(html, /compact-login-form\.js/);
+  assert.match(html, /compact-login-model\.js/);
+});
+
 test("generateUiDashboard shows committed files when working tree is clean", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });

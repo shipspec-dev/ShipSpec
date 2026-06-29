@@ -4501,6 +4501,15 @@ function buildUiHtml(model) {
     "gsd report",
     "gsd next",
   ].filter((command, index, commands) => commands.indexOf(command) === index);
+  const likelyFiles = model.likelyFiles ?? [];
+  const likelyPreview = likelyFiles.length ? likelyFiles.slice(0, 3) : ["No likely files inferred yet."];
+  const likelyOverflow = Math.max(0, likelyFiles.length - likelyPreview.length);
+  const fullLikelyFiles = likelyFiles.length ? likelyFiles : ["No likely files inferred yet."];
+  const compactReadinessSignals = [
+    ["Spec", model.specStatus.proposal && model.specStatus.tasks],
+    ["Evidence", model.specStatus.evidence],
+    ["Report", model.reportExists],
+  ];
 
   return `<!doctype html>
 <html lang="en">
@@ -4563,11 +4572,25 @@ function buildUiHtml(model) {
       gap: 14px;
       margin-bottom: 14px;
     }
+    .cockpit-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(250px, .72fr) minmax(220px, .55fr);
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
     .next-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, .14), rgba(61, 220, 132, .08));
       border: 1px solid rgba(56, 189, 248, .34);
       border-radius: 8px;
       padding: 18px;
+    }
+    .next-card.compact {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      min-height: 0;
+      max-height: 420px;
     }
     .eyebrow {
       color: var(--blue);
@@ -4577,7 +4600,7 @@ function buildUiHtml(model) {
       text-transform: uppercase;
       margin-bottom: 10px;
     }
-    .next-title { font-size: 24px; line-height: 1.2; margin-bottom: 8px; }
+    .next-title { font-size: 22px; line-height: 1.25; margin-bottom: 0; max-width: 720px; }
     .next-command {
       display: inline-flex;
       max-width: 100%;
@@ -4598,6 +4621,32 @@ function buildUiHtml(model) {
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 18px;
+    }
+    .likely-preview {
+      display: grid;
+      gap: 8px;
+    }
+    .likely-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .file-list-drawer {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(11, 18, 32, .48);
+      overflow: hidden;
+    }
+    .file-list-drawer summary {
+      cursor: pointer;
+      padding: 8px 10px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      list-style-position: inside;
+    }
+    .file-list-drawer .rows {
+      padding: 0 10px 10px;
     }
     .primary-actions {
       display: grid;
@@ -4630,7 +4679,7 @@ function buildUiHtml(model) {
       display: grid;
       gap: 8px;
       align-content: start;
-      min-height: 118px;
+      min-height: 96px;
       background: var(--panel-3);
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -4643,7 +4692,6 @@ function buildUiHtml(model) {
       display: grid;
       gap: 8px;
       align-content: start;
-      min-height: 132px;
       background: var(--panel-3);
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -4657,6 +4705,45 @@ function buildUiHtml(model) {
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 14px;
+    }
+    .readiness-strip {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .readiness-score {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--green);
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .readiness-score span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .readiness-mini {
+      display: grid;
+      gap: 8px;
+    }
+    .mini-signal {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 14px;
     }
     .progress-head {
       display: flex;
@@ -4848,7 +4935,7 @@ function buildUiHtml(model) {
     @media (max-width: 980px) {
       header, .action, .cockpit { grid-template-columns: 1fr; display: grid; }
       .top-meta { justify-content: flex-start; }
-      .mission-hero { grid-template-columns: 1fr; }
+      .mission-hero, .cockpit-shell { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
       .primary-actions, .workflow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -4884,8 +4971,8 @@ function buildUiHtml(model) {
         <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">Readiness Score ${readinessScore}%</span>
       </div>
 
-      <div class="mission-hero">
-        <div class="next-card">
+      <div class="cockpit-shell">
+        <div class="next-card compact">
           <div class="eyebrow">Next best step</div>
           <div class="next-title">${escapeHtml(model.next?.reason ?? "Run gsd next for guidance.")}</div>
           <div class="next-command">${escapeHtml(model.next?.command ?? "gsd next")}</div>
@@ -4896,8 +4983,23 @@ function buildUiHtml(model) {
           <p class="reason">${escapeHtml(changeSlug)}</p>
           <span class="chip ${model.validation.ok ? "pass" : "warn"}">Spec ${model.validation.ok ? "ready" : "needs work"}</span>
           <h3>Likely Files</h3>
-          <div class="rows">
-            ${(model.likelyFiles?.length ? model.likelyFiles.slice(0, 4) : ["No likely files inferred yet."]).map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+          <div class="likely-preview">
+            ${likelyPreview.map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+          </div>
+          ${likelyOverflow > 0 ? `<p class="likely-note">${likelyFiles.length} likely files. Open full list below.</p>` : ""}
+          <details class="file-list-drawer">
+            <summary>Full file list</summary>
+            <div class="rows">
+              ${fullLikelyFiles.map((file) => `<div class="row">${escapeHtml(file)}</div>`).join("")}
+            </div>
+          </details>
+        </div>
+        <div class="readiness-strip">
+          <div class="eyebrow">Readiness</div>
+          <div class="readiness-score">${readinessScore}% <span>ready</span></div>
+          <p class="reason">${escapeHtml(readinessReason)}</p>
+          <div class="readiness-mini">
+            ${compactReadinessSignals.map(([name, ok]) => `<div class="mini-signal"><span>${escapeHtml(name)}</span><span class="${ok ? "pass" : "warn"}">${ok ? "PASS" : "WAIT"}</span></div>`).join("")}
           </div>
         </div>
       </div>
