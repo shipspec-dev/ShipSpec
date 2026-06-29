@@ -88,7 +88,7 @@ gsd clean    # preview demo/test files that can be removed
 
 `gsd ui` shows ShipSpec Mission Control: a compact local dashboard with one next command, current mission status, readiness, and short likely-file names first. Workflow commands, full file paths, progress, evidence, memory, and audit details stay collapsed until you open them. Use `gsd ui --open` when you want ShipSpec to open it for you.
 
-`gsd app` generates a richer local app shell at `.gsd/app/index.html`. Use it when you want sidebar navigation, tabs, file search, agent inbox, memory, evidence, readiness, and copyable commands in one app-like screen.
+`gsd app` generates a richer local app shell at `.gsd/app/index.html`. Use it when you want a denser mission home with top commands, next actions, likely files, agent activity, file search, evidence, memory, readiness, and copyable commands in one app-like screen.
 
 For small fixes:
 
@@ -345,7 +345,7 @@ For a richer local app shell:
 gsd app --open
 ```
 
-`gsd app` keeps `gsd ui` as the fast static fallback, but adds sidebar navigation, Mission/Files/Evidence/Agents/Memory tabs, likely-file search, readiness checklist, agent inbox, memory summary, and copyable commands. It is generated locally and does not call a remote service.
+`gsd app` keeps `gsd ui` as the fast static fallback, but adds a denser app-like home screen: top command bar, navigation rail, Mission/Files/Evidence/Agents/Memory tabs, likely-file search, next actions, recent agent activity, readiness checklist, memory summary, and copyable commands. It is generated locally and does not call a remote service.
 
 ## Important Remarks
 

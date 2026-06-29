@@ -358,6 +358,8 @@ test("runCli ship runs ready verification, validation, and report", async () => 
 
   const report = await readFile(join(root, ".gsd", "reports", "ship-flow.md"), "utf8");
   assert.match(report, /\.gsd\/reviews\/ship-flow\.md/);
+  const review = await readFile(join(root, ".gsd", "reviews", "ship-flow.md"), "utf8");
+  assert.doesNotMatch(review, /Verification evidence contains skipped, missing, or failed checks/);
 });
 
 test("runCli ship writes pre-ship risk review for sensitive changes", async () => {
@@ -1875,6 +1877,37 @@ test("generateAppDashboard writes a richer Mission Control app shell", async () 
   assert.match(html, /Spec is ready for builder/);
   assert.match(html, /Readiness/);
   assert.match(html, /navigator\.clipboard\.writeText/);
+});
+
+test("generateAppDashboard makes the mission home a dense dashboard", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "App Home Polish");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "app-home.js"), "export const home = true;\n");
+  await writeFile(join(root, "src", "app-files.js"), "export const files = true;\n");
+  await postAgentMessage(root, "planner", "Scope is ready.");
+  await postAgentMessage(root, "builder", "Start with the app shell.");
+
+  await generateAppDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "app", "index.html"), "utf8");
+  assert.match(html, /class="sidebar rail"/);
+  assert.match(html, /grid-template-columns: 168px minmax\(0, 1fr\) 260px/);
+  assert.match(html, /class="command-strip"/);
+  assert.match(html, /data-command="gsd operate"/);
+  assert.match(html, /data-command="gsd codex"/);
+  assert.match(html, /data-command="gsd verify --full"/);
+  assert.match(html, /data-command="gsd ship"/);
+  assert.match(html, /class="home-grid"/);
+  assert.match(html, /class="[^"]*next-actions[^"]*"/);
+  assert.match(html, /class="[^"]*home-files[^"]*"/);
+  assert.match(html, /class="[^"]*activity-feed[^"]*"/);
+  assert.match(html, /app-home\.js/);
+  assert.match(html, /Scope is ready/);
+  assert.match(html, /class="inspector compact"/);
+  assert.doesNotMatch(html, /<div class="section">\s*<div class="label">Commands<\/div>/);
 });
 
 test("runCli app prints generated app path and supports open", async () => {

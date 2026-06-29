@@ -4083,7 +4083,7 @@ function buildPreShipRiskReview({ changedFiles, evidenceSummary, decisions }) {
     manualChecks.push("Confirm the visible user flow still renders correctly.");
   }
   if (evidenceSummary.length === 0) warnings.push("No verification evidence summary found.");
-  if (evidenceSummary.some((entry) => /skipped|missing|failed/i.test(entry))) {
+  if (evidenceSummary.some((entry) => evidenceEntryHasProblem(entry))) {
     warnings.push("Verification evidence contains skipped, missing, or failed checks.");
   }
   if (decisions.length === 0) manualChecks.push("Confirm there are no missing human product decisions.");
@@ -4093,6 +4093,14 @@ function buildPreShipRiskReview({ changedFiles, evidenceSummary, decisions }) {
     warnings,
     manualChecks,
   };
+}
+
+function evidenceEntryHasProblem(entry) {
+  const normalized = String(entry).toLowerCase();
+  if (/skipped:\s*none/.test(normalized)) return false;
+  if (/risk:\s*no verification risks/.test(normalized)) return false;
+  if (/verified:.*\bpassed\b/.test(normalized)) return false;
+  return /\b(skipped|missing|failed|fail|risk)\b/.test(normalized);
 }
 
 function buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary, riskReview }) {
@@ -4450,13 +4458,12 @@ function buildAppHtml(model) {
   const changeTitle = model.activeChange?.title ?? "No active mission";
   const changeSlug = model.activeChange?.slug ?? "none";
   const files = model.likelyFiles?.length ? model.likelyFiles : ["No likely files inferred yet."];
-  const commands = [
-    model.next?.command ?? "gsd next",
+  const primaryCommands = [
+    "gsd operate",
     "gsd codex",
     "gsd verify --full",
     "gsd ship",
-    "gsd ui",
-  ].filter((command, index, commands) => commands.indexOf(command) === index);
+  ];
   const readinessSignals = [
     ["Spec", model.specStatus.proposal && model.specStatus.tasks],
     ["Validation", model.validation.ok],
@@ -4485,6 +4492,13 @@ function buildAppHtml(model) {
     `Ship pattern: ${memory.shipPatterns?.[0] ?? "None recorded."}`,
   ];
   const messages = model.messages.length ? model.messages.slice(0, 8) : [{ role: "system", text: "No agent messages yet." }];
+  const visibleFiles = files.slice(0, 5);
+  const nextActions = [
+    [model.next?.command ?? "gsd next", model.next?.reason ?? "Run gsd next for guidance."],
+    ["gsd codex", "Give Codex the prepared mission context."],
+    ["gsd verify --full", "Collect full verification evidence."],
+    ["gsd ship", "Review, report, and prepare the handoff."],
+  ].filter(([command], index, actions) => actions.findIndex(([other]) => other === command) === index);
 
   return `<!doctype html>
 <html lang="en">
@@ -4520,9 +4534,9 @@ function buildAppHtml(model) {
     .app {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 220px minmax(0, 1fr) 300px;
-      gap: 16px;
-      padding: 18px;
+      grid-template-columns: 168px minmax(0, 1fr) 260px;
+      gap: 14px;
+      padding: 16px;
     }
     .sidebar, .main, .inspector {
       background: rgba(18, 27, 46, .82);
@@ -4530,9 +4544,10 @@ function buildAppHtml(model) {
       border-radius: 8px;
       box-shadow: 0 22px 60px var(--shadow);
     }
-    .sidebar { padding: 16px; display: grid; align-content: start; gap: 16px; }
-    .brand h1 { margin: 0; font-size: 22px; line-height: 1.05; }
-    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .sidebar { padding: 14px; display: grid; align-content: start; gap: 14px; }
+    .sidebar.rail { position: sticky; top: 16px; min-height: calc(100vh - 32px); }
+    .brand h1 { margin: 0; font-size: 18px; line-height: 1.05; }
+    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
     .nav { display: grid; gap: 8px; }
     .tab-button {
       display: flex;
@@ -4543,16 +4558,17 @@ function buildAppHtml(model) {
       border-radius: 8px;
       background: transparent;
       color: var(--muted);
-      padding: 10px 11px;
+      padding: 9px 10px;
       cursor: pointer;
       text-align: left;
+      font-size: 13px;
     }
     .tab-button[aria-selected="true"] {
       color: var(--text);
       border-color: rgba(56, 189, 248, .38);
       background: rgba(56, 189, 248, .1);
     }
-    .main { padding: 18px; overflow: hidden; }
+    .main { padding: 16px; overflow: hidden; }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -4562,6 +4578,12 @@ function buildAppHtml(model) {
     }
     .title h2 { margin: 0; font-size: 28px; line-height: 1.1; }
     .title p { margin: 6px 0 0; color: var(--muted); }
+    .command-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
     .pill {
       display: inline-flex;
       align-items: center;
@@ -4597,6 +4619,41 @@ function buildAppHtml(model) {
       padding: 10px 12px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       cursor: pointer;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+    .command.primary {
+      min-height: 46px;
+      color: var(--yellow);
+      font-weight: 800;
+    }
+    .home-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+      gap: 12px;
+    }
+    .next-actions { display: grid; gap: 8px; }
+    .next-actions-card {
+      grid-row: span 2;
+      background: linear-gradient(135deg, rgba(56, 189, 248, .12), rgba(11, 18, 32, .72));
+    }
+    .action-row {
+      display: grid;
+      grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+    .action-row .command { color: var(--green); }
+    .note { margin: 4px 0 0; color: var(--muted); line-height: 1.35; }
+    .activity-feed .row strong { color: var(--green); }
+    .home-files .file-path { display: none; }
+    .home-files .file-row { display: block; }
+    .home-files .row { padding: 10px 11px; }
+    .copy-status {
+      min-height: 18px;
+      color: var(--green);
+      font-size: 13px;
+      margin-bottom: 10px;
     }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
@@ -4635,6 +4692,9 @@ function buildAppHtml(model) {
     .file-name { font-weight: 800; }
     .file-path { color: var(--muted); font-size: 13px; }
     .inspector { padding: 16px; display: grid; align-content: start; gap: 14px; }
+    .inspector.compact { padding: 14px; gap: 12px; }
+    .inspector.compact .section { padding: 12px; }
+    .inspector.compact .signal { padding: 8px 9px; font-size: 13px; }
     .score {
       display: flex;
       align-items: baseline;
@@ -4654,30 +4714,23 @@ function buildAppHtml(model) {
       background: var(--panel-2);
       padding: 9px 10px;
     }
-    .copy-status { min-height: 18px; color: var(--green); font-size: 13px; }
     @media (max-width: 980px) {
       .app { grid-template-columns: 1fr; }
-      .grid, .next-action { grid-template-columns: 1fr; }
+      .grid, .next-action, .home-grid, .command-strip { grid-template-columns: 1fr; }
+      .sidebar.rail { position: static; min-height: auto; }
     }
   </style>
 </head>
 <body>
   <div class="app" data-app="shipspec-react-mission-control">
-    <aside class="sidebar">
+    <aside class="sidebar rail">
       <div class="brand">
         <h1>ShipSpec App ready</h1>
-        <p>React-ready Mission Control shell generated from local ShipSpec state.</p>
+        <p>Mission Control from local ShipSpec state.</p>
       </div>
       <nav class="nav" aria-label="Mission Control sections">
         ${["Mission", "Files", "Evidence", "Agents", "Memory"].map((name, index) => `<button class="tab-button" type="button" data-tab="${escapeHtml(name.toLowerCase())}" aria-selected="${index === 0 ? "true" : "false"}"><span>${escapeHtml(name)}</span><span>${index === 0 ? "on" : ""}</span></button>`).join("")}
       </nav>
-      <div class="section">
-        <div class="label">Commands</div>
-        <div class="rows">
-          ${commands.map((command) => `<button class="command" type="button" data-command="${escapeHtml(command)}">${escapeHtml(command)}</button>`).join("")}
-        </div>
-        <div class="copy-status" role="status" aria-live="polite"></div>
-      </div>
     </aside>
 
     <main class="main">
@@ -4689,6 +4742,11 @@ function buildAppHtml(model) {
         <span class="pill ${model.readyValidation.ok ? "pass" : "warn"}">Ready ${model.readyValidation.ok ? "PASS" : "WAIT"}</span>
       </div>
 
+      <div class="copy-status" role="status" aria-live="polite"></div>
+      <section class="command-strip" aria-label="Primary commands">
+        ${primaryCommands.map((command) => `<button class="command primary" type="button" data-command="${escapeHtml(command)}">${escapeHtml(command)}</button>`).join("")}
+      </section>
+
       <section class="next-action" aria-label="Next action">
         <div>
           <div class="label">Next action</div>
@@ -4698,7 +4756,15 @@ function buildAppHtml(model) {
       </section>
 
       <section class="tab-panel active" data-panel="mission">
-        <div class="grid">
+        <div class="home-grid">
+          <div class="section next-actions-card">
+            <div class="next-actions">
+              <h3>Next actions</h3>
+              <div class="rows">
+                ${nextActions.map(([command, reason]) => `<div class="row action-row"><button class="command" type="button" data-command="${escapeHtml(command)}">${escapeHtml(command)}</button><span>${escapeHtml(reason)}</span></div>`).join("")}
+              </div>
+            </div>
+          </div>
           <div class="section">
             <h3>Mission</h3>
             <div class="rows">
@@ -4708,10 +4774,24 @@ function buildAppHtml(model) {
             </div>
           </div>
           <div class="section">
-            <h3>Blockers</h3>
-            <div class="rows">
-              <div class="row">${escapeHtml(readinessReason)}</div>
+            <div class="home-files">
+              <h3>Likely files</h3>
+              <div class="rows">
+                ${visibleFiles.map((file) => `<div class="row file-row" data-file="${escapeHtml(file.toLowerCase())}"><span class="file-name">${escapeHtml(compactFileLabel(file))}</span><span class="file-path">${escapeHtml(file)}</span></div>`).join("")}
+              </div>
             </div>
+          </div>
+          <div class="section">
+            <div class="activity-feed">
+              <h3>Activity</h3>
+              <div class="rows">
+                ${messages.slice(0, 4).map((message) => `<div class="row"><strong>${escapeHtml(message.role)}</strong>: ${escapeHtml(message.text)}</div>`).join("")}
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Blocker</h3>
+            <p class="note">${escapeHtml(readinessReason)}</p>
           </div>
         </div>
       </section>
@@ -4753,7 +4833,7 @@ function buildAppHtml(model) {
       </section>
     </main>
 
-    <aside class="inspector">
+    <aside class="inspector compact">
       <div class="section">
         <div class="label">Readiness</div>
         <div class="score">${readinessScore}% <span>ready</span></div>

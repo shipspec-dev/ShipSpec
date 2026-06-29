@@ -1,0 +1,55 @@
+{
+  "title": "Polish app dashboard home screen",
+  "slug": "polish-app-dashboard-home-screen",
+  "request": "Polish app dashboard home screen",
+  "phase": "planning-ready",
+  "risk": {
+    "level": "medium",
+    "reasons": [
+      "Verification evidence missing",
+      "ready validation failing",
+      "next action pending: gsd operate"
+    ]
+  },
+  "likelyFiles": [
+    "src/gsd.mjs",
+    "test/gsd.test.mjs",
+    "README.md",
+    "apps/desktop/renderer/app.js",
+    "docs/superpowers/plans/2026-06-26-professional-dashboard-ui.md",
+    "apps/desktop/main.js",
+    "apps/desktop/package.json",
+    "apps/desktop/preload.js"
+  ],
+  "nextAction": {
+    "command": "open .gsd/prompts/polish-app-dashboard-home-screen.md",
+    "reason": "Mission prompt and context pack are ready for an AI coding pass.",
+    "otherCommands": [
+      "open .gsd/packs/polish-app-dashboard-home-screen.md",
+      "gsd ui"
+    ]
+  },
+  "validation": {
+    "spec": "pass",
+    "ready": "not-run",
+    "errors": []
+  },
+  "artifacts": {
+    "mission": ".gsd/missions/polish-app-dashboard-home-screen.md",
+    "missionJson": ".gsd/missions/polish-app-dashboard-home-screen.json",
+    "reasoning": ".gsd/reasoning/polish-app-dashboard-home-screen.md",
+    "prompt": ".gsd/prompts/polish-app-dashboard-home-screen.md",
+    "pack": ".gsd/packs/polish-app-dashboard-home-screen.md",
+    "report": null,
+    "reflection": null,
+    "ui": ".gsd/ui/index.html"
+  },
+  "safety": {
+    "localOnly": true,
+    "externalActions": false,
+    "destructiveActions": false,
+    "deployment": false,
+    "maxLoops": 1
+  },
+  "generatedAt": "2026-06-29T15:55:55.849Z"
+}
