@@ -130,47 +130,70 @@ export async function getStatus(root) {
 export async function doctorWorkspace(root) {
   const packageJson = await readJsonIfExists(join(root, "package.json"));
   const workflow = await readJsonIfExists(join(root, ".gsd", "workflow.json"));
+  const workflowChecks = Array.isArray(workflow?.checks) ? workflow.checks : [];
   const checks = [
-    {
-    name: "ShipSpec workspace",
+    buildDoctorCheck({
+      name: "ShipSpec workspace",
       ok: await exists(join(root, ".gsd", "workflow.json")),
       detail: ".gsd/workflow.json",
-    },
-    {
+      action: "Run `gsd init`.",
+      command: "gsd init",
+      fail: true,
+    }),
+    buildDoctorCheck({
       name: "OpenSpec folders",
       ok: (await exists(join(root, "openspec", "changes"))) && (await exists(join(root, "openspec", "specs"))),
       detail: "openspec/changes and openspec/specs",
-    },
-    {
+      action: "Run `gsd init` to create spec folders.",
+      command: "gsd init",
+      fail: true,
+    }),
+    buildDoctorCheck({
       name: "Git repository",
       ok: await isGitRepository(root),
       detail: "git rev-parse --is-inside-work-tree",
-    },
-    {
+      action: "Initialize git or run ShipSpec inside a repository.",
+      command: "git init",
+    }),
+    buildDoctorCheck({
       name: "Package manifest",
       ok: Boolean(packageJson),
       detail: "package.json",
-    },
-    {
+      action: "Create package.json or run inside your project root.",
+    }),
+    buildDoctorCheck({
       name: "Test script",
       ok: Boolean(packageJson?.scripts?.test),
       detail: "package.json scripts.test",
-    },
-    {
+      action: "Run `gsd configure` after adding scripts.",
+    }),
+    buildDoctorCheck({
       name: "E2E script",
       ok: hasE2eScript(packageJson),
       detail: "package.json script containing e2e",
-    },
-    {
+      action: "Add an E2E script when user flows need browser coverage.",
+    }),
+    buildDoctorCheck({
       name: "Workflow checks",
-      ok: Array.isArray(workflow?.checks) && workflow.checks.length > 0,
+      ok: workflowChecks.length > 0,
       detail: ".gsd/workflow.json checks",
-    },
+      action: "Run `gsd configure` after adding scripts.",
+      command: "gsd configure",
+    }),
+    buildDoctorCheck({
+      name: "ShipSpec skill",
+      ok: await exists(getShipSpecSkillPath()),
+      detail: getShipSpecSkillPath(),
+      action: "Reinstall the package or run from a complete ShipSpec checkout.",
+      fail: true,
+    }),
   ];
+  const nextFixes = checks.filter((check) => check.severity !== "pass").map((check) => check.action).filter(Boolean);
 
   return {
-    ok: checks.every((check) => check.ok),
+    ok: !checks.some((check) => check.severity === "fail"),
     checks,
+    nextFixes: [...new Set(nextFixes)],
   };
 }
 
@@ -538,10 +561,11 @@ export async function generateReview(root) {
   const decisions = await readDecisionEntries(root, activeChange.slug);
   const evidenceSummary = await readEvidenceSummary(root, activeChange.slug);
   const changedFiles = [...new Set([...summary.stagedFiles, ...summary.unstagedFiles, ...(summary.committedFiles ?? [])])];
+  const riskReview = buildPreShipRiskReview({ changedFiles, evidenceSummary, decisions });
   const reviewPath = join(root, ".gsd", "reviews", `${activeChange.slug}.md`);
 
   await mkdir(join(root, ".gsd", "reviews"), { recursive: true });
-  await writeFile(reviewPath, buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary }));
+  await writeFile(reviewPath, buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary, riskReview }));
 
   return {
     ok: true,
@@ -549,6 +573,7 @@ export async function generateReview(root) {
     decisions,
     changedFiles,
     evidenceSummary,
+    riskReview,
     reviewPath,
     message: `Review written to .gsd/reviews/${activeChange.slug}.md`,
   };
@@ -1450,6 +1475,10 @@ export async function runOperation(root, request = "", options = {}) {
 export async function runAutopilot(root) {
   await initWorkspace(root);
   const status = await getStatus(root);
+  const doctor = await doctorWorkspace(root);
+  const memory = await getMemorySummary(root);
+  const health = summarizeDoctorForAutopilot(doctor);
+  const memorySignal = buildAutopilotMemorySignal(memory);
 
   if (!status.activeChange) {
     return {
@@ -1458,6 +1487,8 @@ export async function runAutopilot(root) {
       command: 'gsd run "Feature"',
       reason: "No active ShipSpec mission exists.",
       changedFiles: [],
+      health,
+      memorySignal,
       ui: null,
       reportPath: null,
       message: formatAutopilotResult({
@@ -1465,6 +1496,8 @@ export async function runAutopilot(root) {
         command: 'gsd run "Feature"',
         reason: "No active ShipSpec mission exists.",
         changedFiles: [],
+        health,
+        memorySignal,
       }),
     };
   }
@@ -1507,6 +1540,8 @@ export async function runAutopilot(root) {
     command,
     reason,
     changedFiles,
+    health,
+    memorySignal,
     ui,
     reportPath,
   };
@@ -1799,6 +1834,7 @@ export async function runShipFlow(root) {
       "Spec validation passed",
       "Auto review:",
       `- Review: .gsd/reviews/${review.activeChange.slug}.md`,
+      `Pre-ship review: ${review.riskReview.summary}`,
       report.message,
     ].join("\n"),
     verification,
@@ -2046,7 +2082,7 @@ export async function runCli(argv, options = {}) {
 
     if (command === "doctor") {
       const result = await doctorWorkspace(cwd);
-      return cliResult(result.ok ? 0 : 1, `${formatDoctor(result.checks)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${formatDoctor(result)}\n`);
     }
 
     if (command === "detect") {
@@ -2465,6 +2501,8 @@ function formatAutopilotResult(result) {
     `Why: ${result.reason}`,
   ];
 
+  if (result.health?.status !== "ready") lines.push(`Health: ${result.health.label}`);
+  if (result.memorySignal) lines.push(`Memory: ${result.memorySignal}`);
   if (result.status === "implementation-needed") lines.push("After implementation: gsd autopilot");
   if (result.status === "verification-needed") lines.push("After verification: gsd autopilot");
   if (result.changedFiles?.length) {
@@ -2488,6 +2526,14 @@ function buildAutopilotMarkdown(result) {
     "",
     ...formatChangedFiles(result.changedFiles),
     "",
+    "## Health",
+    "",
+    result.health ? `- ${result.health.label}` : "- No health summary recorded.",
+    "",
+    "## Memory Signals",
+    "",
+    result.memorySignal ? `- ${result.memorySignal}` : "- No smart memory signals recorded.",
+    "",
     "## Safety",
     "",
     "- No code edits were made by autopilot.",
@@ -2500,6 +2546,36 @@ function buildAutopilotMarkdown(result) {
     result.ui?.ok ? "- Mission Control refreshed at .gsd/ui/index.html" : "- Mission Control was not refreshed.",
     "",
   ].join("\n");
+}
+
+function summarizeDoctorForAutopilot(doctor) {
+  if (doctor.checks.some((check) => check.severity === "fail")) {
+    return {
+      status: "blocked",
+      label: "blocking setup issues found; run gsd doctor",
+    };
+  }
+  if (doctor.checks.some((check) => check.severity === "warn")) {
+    return {
+      status: "warning",
+      label: "warnings found; run gsd doctor",
+    };
+  }
+  return {
+    status: "ready",
+    label: "ready",
+  };
+}
+
+function buildAutopilotMemorySignal(memory) {
+  const commonFile = memory?.smartMemory?.commonFiles?.[0];
+  const check = memory?.smartMemory?.checks?.[0];
+  const risk = memory?.smartMemory?.recentRisks?.[0];
+
+  if (commonFile) return `common files include ${commonFile}`;
+  if (check) return `usual verification includes ${check}`;
+  if (risk) return `recent risk: ${risk}`;
+  return "";
 }
 
 function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles }) {
@@ -3390,8 +3466,41 @@ function formatChangedFiles(changedFiles) {
   return changedFiles.map((file) => `- ${file}`);
 }
 
-function formatDoctor(checks) {
-  return checks.map((check) => `${check.ok ? "PASS" : "WARN"} ${check.name}: ${check.detail}`).join("\n");
+function buildDoctorCheck({ name, ok, detail, action, command = null, fail = false }) {
+  return {
+    name,
+    ok,
+    severity: ok ? "pass" : fail ? "fail" : "warn",
+    detail,
+    action,
+    command,
+  };
+}
+
+function formatDoctor(result) {
+  const checks = result.checks ?? result;
+  const nextFixes = result.nextFixes ?? checks.filter((check) => check.severity !== "pass").map((check) => check.action).filter(Boolean);
+  const status = checks.some((check) => check.severity === "fail")
+    ? "needs setup"
+    : checks.some((check) => check.severity === "warn")
+      ? "usable with warnings"
+      : "ready";
+  const rows = checks.map((check) => {
+    const label = check.severity === "fail" ? "FAIL" : check.severity === "warn" ? "WARN" : "PASS";
+    const action = check.severity === "pass" || !check.action ? "" : `\n  Fix: ${check.action}`;
+    return `${label} ${check.name}: ${check.detail}${action}`;
+  });
+
+  return [
+    "ShipSpec Doctor",
+    "",
+    `Overall: ${status}`,
+    "",
+    ...rows,
+    "",
+    "Next fixes:",
+    ...(nextFixes.length ? nextFixes.map((fix) => `- ${fix}`) : ["- None. ShipSpec is ready."]),
+  ].join("\n");
 }
 
 function formatDetection(result) {
@@ -3929,7 +4038,34 @@ function formatContextPackValidationErrors(...errorLists) {
   return ["- Validation gaps:", ...errors.map((error) => `  - ${error}`)];
 }
 
-function buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary }) {
+function buildPreShipRiskReview({ changedFiles, evidenceSummary, decisions }) {
+  const sensitiveFiles = changedFiles.filter((file) => /(auth|token|security|payment|billing|db|database|migration)/i.test(file));
+  const uiFiles = changedFiles.filter((file) => /(ui|app|page|component|css|style|view)/i.test(file));
+  const warnings = [];
+  const manualChecks = [];
+
+  if (sensitiveFiles.length) {
+    warnings.push(`Sensitive files changed: ${sensitiveFiles.slice(0, 5).join(", ")}`);
+    manualChecks.push("Confirm auth, token, payment, or data access behavior manually.");
+  }
+  if (uiFiles.length) {
+    warnings.push("UI-facing files changed; screenshot or E2E proof may be needed.");
+    manualChecks.push("Confirm the visible user flow still renders correctly.");
+  }
+  if (evidenceSummary.length === 0) warnings.push("No verification evidence summary found.");
+  if (evidenceSummary.some((entry) => /skipped|missing|failed/i.test(entry))) {
+    warnings.push("Verification evidence contains skipped, missing, or failed checks.");
+  }
+  if (decisions.length === 0) manualChecks.push("Confirm there are no missing human product decisions.");
+
+  return {
+    summary: warnings.length ? `${warnings.length} warning${warnings.length === 1 ? "" : "s"}` : "no deterministic warnings",
+    warnings,
+    manualChecks,
+  };
+}
+
+function buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSummary, riskReview }) {
   return [
     `# Review: ${activeChange.title}`,
     "",
@@ -3947,6 +4083,14 @@ function buildReviewMarkdown({ activeChange, decisions, changedFiles, evidenceSu
     "## Verification Evidence",
     "",
     ...formatBulletList(evidenceSummary, "No verification evidence found. Run `gsd verify --full`."),
+    "",
+    "## Risk Review",
+    "",
+    ...formatBulletList(riskReview?.warnings ?? [], "No deterministic risk warnings from local changed files."),
+    "",
+    "## Manual Checks",
+    "",
+    ...formatBulletList(riskReview?.manualChecks ?? [], "No extra manual checks inferred."),
     "",
     "## Reviewer Checklist",
     "",
@@ -4455,6 +4599,40 @@ function buildUiHtml(model) {
       gap: 10px;
       margin-bottom: 14px;
     }
+    .command-drawer {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .command-drawer summary {
+      cursor: pointer;
+      padding: 13px 14px;
+      color: var(--blue);
+      font-weight: 800;
+      list-style-position: inside;
+    }
+    .command-drawer summary:hover { background: rgba(148, 163, 184, .07); }
+    .workflow-actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 14px 14px;
+    }
+    .workflow-command {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 118px;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .workflow-command h3 { margin: 0; font-size: 15px; color: var(--text); }
+    .workflow-command p { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .workflow-command .command-button { align-self: end; }
     .action-card {
       display: grid;
       gap: 8px;
@@ -4666,7 +4844,7 @@ function buildUiHtml(model) {
       .top-meta { justify-content: flex-start; }
       .mission-hero { grid-template-columns: 1fr; }
       .center-head, .command-center-grid { grid-template-columns: 1fr; display: grid; }
-      .primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .primary-actions, .workflow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .score-grid { grid-template-columns: 1fr; }
       .signal-grid, .receipt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -4695,7 +4873,7 @@ function buildUiHtml(model) {
       <div class="center-head">
         <div>
           <h2>Mission dashboard</h2>
-          <p>A clearer view of the next step, ship readiness, evidence, and project memory.</p>
+          <p>Calm mode: one next step first, deeper workflow details only when you open them.</p>
         </div>
         <span class="chip ${model.readyValidation.ok ? "pass" : "warn"}">Readiness Score ${readinessScore}%</span>
       </div>
@@ -4718,13 +4896,16 @@ function buildUiHtml(model) {
         </div>
       </div>
 
-      <div class="primary-actions">
-        ${commandCenterActions.map(([label, command, description]) => `<article class="action-card">
-          <h3>${escapeHtml(label)}</h3>
-          <p>${escapeHtml(description)}</p>
-          <button class="command-button" type="button" data-command="${escapeHtml(command)}" title="Copy command">${escapeHtml(command)}</button>
-        </article>`).join("")}
-      </div>
+      <details class="command-drawer">
+        <summary>Show workflow commands</summary>
+        <div class="workflow-actions">
+          ${commandCenterActions.map(([label, command, description]) => `<article class="workflow-command">
+            <h3>${escapeHtml(label)}</h3>
+            <p>${escapeHtml(description)}</p>
+            <button class="command-button" type="button" data-command="${escapeHtml(command)}" title="Copy command">${escapeHtml(command)}</button>
+          </article>`).join("")}
+        </div>
+      </details>
 
       <div class="progress-panel">
         <div class="progress-head">
@@ -5015,6 +5196,7 @@ function beginnerUsage() {
     "  gsd run <request>",
     "  gsd fix <small fix>",
     "  gsd ship",
+    "  gsd doctor",
     "  gsd share",
     "  gsd ask",
     "  gsd ui",
