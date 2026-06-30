@@ -633,6 +633,10 @@ export async function generateAgenticContext(root) {
   const risk = buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next });
   const likelyFiles = await inferLikelyFiles(root, activeChange, { diff, changedFiles, memory });
   const sources = await buildAgenticContextSources(root, activeChange, likelyFiles, changedFiles, memory);
+  const quality = buildContextQuality({ sources, validation, readyValidation, memory, evidenceSummary, risk, next });
+  const connectorSignals = buildConnectorSignals({ sources, memory, evidenceSummary });
+  const retrievalLoop = buildRetrievalLoop({ activeChange, sources, quality });
+  const learningSignals = buildLearningRetrievalSignals(memory);
   const contextPath = join(root, ".gsd", "context", `${activeChange.slug}.md`);
   const context = buildAgenticContextMarkdown({
     activeChange,
@@ -644,6 +648,10 @@ export async function generateAgenticContext(root) {
     risk,
     next,
     evidenceSummary,
+    quality,
+    connectorSignals,
+    retrievalLoop,
+    learningSignals,
   });
 
   await mkdir(join(root, ".gsd", "context"), { recursive: true });
@@ -655,6 +663,10 @@ export async function generateAgenticContext(root) {
     context,
     contextPath,
     sources,
+    quality,
+    connectorSignals,
+    retrievalLoop,
+    learningSignals,
     risk,
     message: `Agentic context written to .gsd/context/${activeChange.slug}.md`,
   };
@@ -1506,6 +1518,7 @@ export async function runOperation(root, request = "", options = {}) {
   const delivery = title ? await prepareDelivery(root, title, { adaptive: true }) : null;
   const activeChange = await requireActiveChange(root);
   const reasoning = delivery?.reasoning ?? (await generateReasoning(root));
+  const context = await generateAgenticContext(root);
   const loop = await runLoop(root);
   const ui = await generateUiDashboard(root);
   const operationPath = join(root, ".gsd", "operations", `${activeChange.slug}.md`);
@@ -1517,13 +1530,14 @@ export async function runOperation(root, request = "", options = {}) {
   };
 
   await mkdir(join(root, ".gsd", "operations"), { recursive: true });
-  await writeFile(operationPath, buildOperationMarkdown({ activeChange, delivery, reasoning, loop, ui, operation }));
+  await writeFile(operationPath, buildOperationMarkdown({ activeChange, delivery, reasoning, context, loop, ui, operation }));
 
   return {
     ok: loop.ok,
     activeChange,
     delivery,
     reasoning,
+    context,
     loop,
     ui,
     operation,
@@ -3946,7 +3960,7 @@ function buildReasoningMarkdown(reasoning, detection) {
   ].join("\n");
 }
 
-function buildOperationMarkdown({ activeChange, delivery, reasoning, loop, ui, operation }) {
+function buildOperationMarkdown({ activeChange, delivery, reasoning, context, loop, ui, operation }) {
   return [
     `# Operation: ${activeChange.title}`,
     "",
@@ -3963,6 +3977,12 @@ function buildOperationMarkdown({ activeChange, delivery, reasoning, loop, ui, o
     "## Reasoning",
     "",
     `- ${reasoning.message}`,
+    "",
+    "## Agentic Context",
+    "",
+    `- Context: .gsd/context/${activeChange.slug}.md`,
+    `- Quality: ${context.quality.level} (${context.quality.score}%)`,
+    ...formatBulletList(context.quality.warnings, "No context quality warnings."),
     "",
     "## Loop",
     "",
@@ -4181,7 +4201,152 @@ async function buildSourceSnippet(root, relativePath, tokens) {
     .join("\n");
 }
 
-function buildAgenticContextMarkdown({ activeChange, validation, readyValidation, diff, sources, memory, risk, next, evidenceSummary }) {
+function buildContextQuality({ sources, validation, readyValidation, memory, evidenceSummary, risk, next }) {
+  const checks = [
+    {
+      name: "Ranked local sources",
+      ok: sources.length > 0,
+      points: sources.length > 0 ? 25 : 0,
+      detail: sources.length > 0 ? `${sources.length} local source file${sources.length === 1 ? "" : "s"} ranked.` : "No local source files found.",
+    },
+    {
+      name: "Spec gate",
+      ok: validation.ok,
+      points: validation.ok ? 15 : 0,
+      detail: validation.ok ? "Spec validation passes." : "Spec validation has gaps.",
+    },
+    {
+      name: "Project memory",
+      ok: hasMemorySignals(memory),
+      points: hasMemorySignals(memory) ? 10 : 0,
+      detail: hasMemorySignals(memory) ? "Prior ShipSpec memory is available." : "No learned project memory yet.",
+    },
+    {
+      name: "Test signals",
+      ok: sources.some((source) => isTestLikePath(source.path)),
+      points: sources.some((source) => isTestLikePath(source.path)) ? 15 : 0,
+      detail: sources.some((source) => isTestLikePath(source.path)) ? "A likely test source is ranked." : "No likely test source ranked.",
+    },
+    {
+      name: "Verification evidence",
+      ok: evidenceSummary.length > 0 || readyValidation.ok,
+      points: evidenceSummary.length > 0 || readyValidation.ok ? 15 : 0,
+      detail: evidenceSummary.length > 0 ? "Verification evidence summary is present." : "Verification evidence is not ready yet.",
+    },
+    {
+      name: "Risk posture",
+      ok: risk.level !== "high",
+      points: risk.level !== "high" ? 10 : 0,
+      detail: risk.level === "high" ? "High-risk change needs explicit review." : `Risk level is ${risk.level}.`,
+    },
+    {
+      name: "Operator next step",
+      ok: Boolean(next.command),
+      points: next.command ? 10 : 0,
+      detail: next.command ? `Next command is ${next.command}.` : "No next command was inferred.",
+    },
+  ];
+  const score = checks.reduce((total, check) => total + check.points, 0);
+  const warnings = checks.filter((check) => !check.ok).map((check) => check.detail);
+
+  return {
+    score,
+    level: score >= 75 ? "strong" : score >= 45 ? "usable" : "weak",
+    checks,
+    warnings,
+  };
+}
+
+function hasMemorySignals(memory) {
+  return Boolean(
+    memory.lessons?.length ||
+      memory.patterns?.length ||
+      memory.reflections?.length ||
+      memory.smartMemory?.commonFiles?.length ||
+      memory.smartMemory?.checks?.length ||
+      memory.smartMemory?.shipPatterns?.length,
+  );
+}
+
+function isTestLikePath(path) {
+  return /(^|\/)(test|tests|__tests__)\/|(\.|-)(test|spec)\.[cm]?[jt]sx?$/iu.test(path);
+}
+
+function buildConnectorSignals({ sources, memory, evidenceSummary }) {
+  return [
+    {
+      name: "Local repo",
+      status: sources.length ? "active" : "empty",
+      detail: sources.length ? `${sources.length} ranked local source file${sources.length === 1 ? "" : "s"}.` : "No local source files ranked yet.",
+    },
+    {
+      name: "ShipSpec memory",
+      status: hasMemorySignals(memory) ? "active" : "empty",
+      detail: hasMemorySignals(memory) ? "Learned project signals are available." : "Run `gsd learn` after shipped work to improve future retrieval.",
+    },
+    {
+      name: "Verification evidence",
+      status: evidenceSummary.length ? "active" : "missing",
+      detail: evidenceSummary.length ? "Evidence can guide the evaluation loop." : "Run `gsd verify --full` after implementation.",
+    },
+    {
+      name: "External connectors",
+      status: "not configured",
+      detail: "Jira, logs, docs, and design connectors can be added later without changing the local context contract.",
+    },
+  ];
+}
+
+function buildRetrievalLoop({ activeChange, sources, quality }) {
+  const loop = [
+    `Round 1: derive intent from "${activeChange.title}" and ${activeChange.slug}.`,
+    "Round 2: rank likely files from local project structure, Git state, and ShipSpec memory.",
+    "Round 3: read top sources, then inspect adjacent files only when the quality score is weak or the task is unclear.",
+  ];
+
+  if (quality.level === "weak") {
+    loop.push("Next refinement: create or identify source/test files, then rerun `gsd context`.");
+  } else if (!sources.some((source) => isTestLikePath(source.path))) {
+    loop.push("Next refinement: locate the closest test file before implementation.");
+  } else {
+    loop.push("Next refinement: use ranked sources directly, then refresh context after code changes.");
+  }
+
+  return loop;
+}
+
+function buildLearningRetrievalSignals(memory) {
+  return [
+    `Common files: ${memory.smartMemory?.commonFiles?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Common checks: ${memory.smartMemory?.checks?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Recent risks: ${memory.smartMemory?.recentRisks?.slice(0, 3).join("; ") || "None recorded."}`,
+    `Ship pattern: ${memory.smartMemory?.shipPatterns?.[0] ?? "None recorded."}`,
+  ];
+}
+
+function formatQualityChecks(checks) {
+  return checks.map((check) => `- ${check.ok ? "PASS" : "WARN"} ${check.name}: ${check.detail}`);
+}
+
+function formatConnectorSignals(signals) {
+  return signals.map((signal) => `- ${signal.name}: ${signal.status} - ${signal.detail}`);
+}
+
+function buildAgenticContextMarkdown({
+  activeChange,
+  validation,
+  readyValidation,
+  diff,
+  sources,
+  memory,
+  risk,
+  next,
+  evidenceSummary,
+  quality,
+  connectorSignals,
+  retrievalLoop,
+  learningSignals,
+}) {
   const memorySignals = [
     `Common files: ${memory.smartMemory?.commonFiles?.slice(0, 5).join(", ") || "None recorded."}`,
     `Common checks: ${memory.smartMemory?.checks?.slice(0, 5).join(", ") || "None recorded."}`,
@@ -4214,6 +4379,30 @@ function buildAgenticContextMarkdown({ activeChange, validation, readyValidation
     "- Rank local files using likely-file inference, Git changes, project memory, and path/token matches.",
     "- Read top ranked sources first, then inspect adjacent code only when needed.",
     "- Use ShipSpec evidence and validation gaps as the evaluation loop.",
+    "",
+    "## Context Quality",
+    "",
+    `- Score: ${quality.score}%`,
+    `- Level: ${quality.level}`,
+    ...formatQualityChecks(quality.checks),
+    "",
+    "## Connector Signals",
+    "",
+    ...formatConnectorSignals(connectorSignals),
+    "",
+    "## Retrieval Loop",
+    "",
+    ...formatBulletList(retrievalLoop, "No retrieval loop recorded."),
+    "",
+    "## Learning Retrieval",
+    "",
+    ...formatBulletList(learningSignals, "No learning retrieval signals recorded."),
+    "",
+    "## Operator Next Step",
+    "",
+    `- Command: ${next.command}`,
+    `- Reason: ${next.reason}`,
+    ...formatBulletList(quality.warnings, "Context quality is sufficient for the next AI pass."),
     "",
     "## Ranked Local Sources",
     "",
