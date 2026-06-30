@@ -83,6 +83,7 @@ gsd app --open # generate and open the richer app shell
 gsd autopilot # same smart guidance as plain gsd
 gsd doctor   # diagnose setup, tests, skill install, and workflow health
 gsd next     # see next suggested action
+gsd context  # build local Agentic Context Pack for the AI pass
 gsd clean    # preview demo/test files that can be removed
 ```
 
@@ -169,6 +170,7 @@ gsd ui
 | `gsd run "Feature"` | Explicit form of `gsd "Feature"`. |
 | `gsd autopilot` | Explicit form of plain `gsd`. |
 | `gsd codex` | Hand work to Codex without long paste. |
+| `gsd context` | Build a local Agentic Context Pack with ranked files, memory, risks, and evaluation hints. |
 | `gsd ship` | Verify, validate, write review guidance, and write report. |
 | `gsd doctor` | Diagnose setup, workflow, skill, and test readiness. |
 | `gsd share` | Create AI context pack. |
@@ -233,6 +235,7 @@ The full command set is still available for teams that want explicit control.
 | `gsd decision <human decision>` | Record a human approval or product choice for the active change. |
 | `gsd prompt [--json]` | Generate an AI planning prompt from the active ShipSpec change. |
 | `gsd pack [--json]` | Generate a compact, agent-neutral context pack with spec, diff, evidence, decisions, risks, and next action. |
+| `gsd context [--json]` | Generate a local Agentic Context Pack with retrieval strategy, ranked sources, memory signals, and evaluation hints. |
 | `gsd share` | Alias for `gsd pack`, optimized for the small command surface. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |
 

@@ -23,6 +23,7 @@ import {
   generateContextPack,
   generateReasoning,
   generateReview,
+  generateAgenticContext,
   getMemorySummary,
   getNextRecommendation,
   getSpecStatus,
@@ -202,6 +203,7 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   assert.match(result.message, /Next: gsd codex/);
   assert.match(result.message, /UI: gsd ui --open/);
   assert.match(result.message, /Codex: gsd codex/);
+  assert.match(result.message, /Context: gsd context/);
   assert.match(result.message, /Risk: medium/);
   assert.match(result.message, /Likely files:/);
   assert.match(result.message, /src\/checkout-discount\.js/);
@@ -212,6 +214,7 @@ test("runMission prepares an AGI-style mission for a new request", async () => {
   assert.equal(await exists(join(root, ".gsd", "reasoning", "add-checkout-discount.md")), true);
   assert.equal(await exists(join(root, ".gsd", "prompts", "add-checkout-discount.md")), true);
   assert.equal(await exists(join(root, ".gsd", "packs", "add-checkout-discount.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "context", "add-checkout-discount.md")), true);
   assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
 
   const mission = JSON.parse(await readFile(join(root, ".gsd", "missions", "add-checkout-discount.json"), "utf8"));
@@ -1339,6 +1342,48 @@ test("generateContextPack writes a portable AI handoff pack", async () => {
   assert.match(result.pack, /Approved compact context package/);
   assert.match(result.pack, /## Next Action/);
   assert.match(result.pack, /## AI Instructions/);
+});
+
+test("generateAgenticContext writes local retrieval context for the active change", async () => {
+  const root = await tempRoot();
+  await execFileAsync("git", ["init"], { cwd: root });
+  await initWorkspace(root);
+  await startChange(root, "Add Checkout Login Guard");
+  await mkdir(join(root, "src", "auth"), { recursive: true });
+  await writeFile(join(root, "src", "auth", "login-guard.js"), "export function loginGuard() { return true; }\n");
+  await writeFile(join(root, "src", "checkout.js"), "import { loginGuard } from './auth/login-guard.js';\n");
+
+  const result = await generateAgenticContext(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.contextPath, join(root, ".gsd", "context", "add-checkout-login-guard.md"));
+  assert.equal(await exists(result.contextPath), true);
+  assert.equal(result.sources[0].path, "src/auth/login-guard.js");
+  assert.equal(result.sources.some((source) => source.path === "src/checkout.js"), true);
+
+  const context = await readFile(result.contextPath, "utf8");
+  assert.match(context, /# Agentic Context Pack/);
+  assert.match(context, /## Retrieval Strategy/);
+  assert.match(context, /## Ranked Local Sources/);
+  assert.match(context, /src\/auth\/login-guard\.js/);
+  assert.match(context, /## Memory Signals/);
+  assert.match(context, /## Evaluation Hints/);
+});
+
+test("runCli context supports json output", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Context Json");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "context-json.js"), "export const contextJson = true;\n");
+
+  const result = await runCli(["context", "--json"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.ok, true);
+  assert.match(payload.contextPath, /\.gsd\/context\/add-context-json\.md$/);
+  assert.equal(payload.sources[0].path, "src/context-json.js");
 });
 
 test("generateContextPack flags high-risk auth changes without full proof", async () => {
