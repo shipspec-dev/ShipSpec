@@ -941,11 +941,14 @@ test("runOperation orchestrates safe delivery control loop", async () => {
   assert.equal(result.activeChange.slug, "add-operator-panel");
   assert.equal(await exists(join(root, ".gsd", "operations", "add-operator-panel.md")), true);
   assert.equal(await exists(join(root, ".gsd", "reasoning", "add-operator-panel.md")), true);
+  assert.equal(await exists(join(root, ".gsd", "context", "add-operator-panel.md")), true);
   assert.equal(await exists(join(root, ".gsd", "loops", "add-operator-panel.md")), true);
   assert.equal(await exists(join(root, ".gsd", "ui", "index.html")), true);
 
   const report = await readFile(join(root, ".gsd", "operations", "add-operator-panel.md"), "utf8");
   assert.match(report, /# Operation: Add Operator Panel/);
+  assert.match(report, /## Agentic Context/);
+  assert.match(report, /\.gsd\/context\/add-operator-panel\.md/);
   assert.match(report, /Mode: safe-control-loop/);
   assert.match(report, /No code edits were made/);
   assert.match(report, /gsd loop/);
@@ -1360,10 +1363,18 @@ test("generateAgenticContext writes local retrieval context for the active chang
   assert.equal(await exists(result.contextPath), true);
   assert.equal(result.sources[0].path, "src/auth/login-guard.js");
   assert.equal(result.sources.some((source) => source.path === "src/checkout.js"), true);
+  assert.equal(typeof result.quality.score, "number");
+  assert.match(result.quality.level, /^(usable|strong)$/u);
+  assert.equal(result.quality.checks.some((check) => check.name === "Ranked local sources" && check.ok), true);
 
   const context = await readFile(result.contextPath, "utf8");
   assert.match(context, /# Agentic Context Pack/);
   assert.match(context, /## Retrieval Strategy/);
+  assert.match(context, /## Context Quality/);
+  assert.match(context, /## Connector Signals/);
+  assert.match(context, /## Retrieval Loop/);
+  assert.match(context, /## Learning Retrieval/);
+  assert.match(context, /## Operator Next Step/);
   assert.match(context, /## Ranked Local Sources/);
   assert.match(context, /src\/auth\/login-guard\.js/);
   assert.match(context, /## Memory Signals/);
@@ -1384,6 +1395,24 @@ test("runCli context supports json output", async () => {
   assert.equal(payload.ok, true);
   assert.match(payload.contextPath, /\.gsd\/context\/add-context-json\.md$/);
   assert.equal(payload.sources[0].path, "src/context-json.js");
+  assert.equal(typeof payload.quality.score, "number");
+  assert.equal(payload.quality.checks.some((check) => check.name === "Ranked local sources"), true);
+});
+
+test("generateAgenticContext marks empty retrieval context as weak", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Empty Context Feature");
+
+  const result = await generateAgenticContext(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.sources.length, 0);
+  assert.equal(result.quality.level, "weak");
+  assert.equal(result.quality.checks.some((check) => check.name === "Ranked local sources" && !check.ok), true);
+  assert.equal(result.quality.warnings.some((warning) => /No local source files/u.test(warning)), true);
+  assert.match(result.context, /Level: weak/);
+  assert.match(result.context, /No local source files found/u);
 });
 
 test("generateAgenticContext does not flag skipped none as risk", async () => {
