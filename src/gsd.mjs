@@ -622,6 +622,8 @@ export async function generateContextPack(root) {
 export async function generateAgenticContext(root) {
   await initWorkspace(root);
   const activeChange = await requireActiveChange(root);
+  const ragReportPath = join(root, ".gsd", "rag", `${activeChange.slug}.md`);
+  const ragReportExists = await exists(ragReportPath);
   const specStatus = await getSpecStatus(root);
   const validation = await validateChange(root, { ready: false });
   const readyValidation = await validateChange(root, { ready: true });
@@ -652,6 +654,7 @@ export async function generateAgenticContext(root) {
     connectorSignals,
     retrievalLoop,
     learningSignals,
+    ragReportPath: ragReportExists ? `.gsd/rag/${activeChange.slug}.md` : null,
   });
 
   await mkdir(join(root, ".gsd", "context"), { recursive: true });
@@ -667,8 +670,64 @@ export async function generateAgenticContext(root) {
     connectorSignals,
     retrievalLoop,
     learningSignals,
+    ragReportPath: ragReportExists ? ragReportPath : null,
     risk,
     message: `Agentic context written to .gsd/context/${activeChange.slug}.md`,
+  };
+}
+
+export async function generateLocalRag(root, query, options = {}) {
+  await initWorkspace(root);
+  const activeChange = await requireActiveChange(root);
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) {
+    return {
+      ok: false,
+      message: "Usage: gsd rag <query>",
+    };
+  }
+
+  const diff = await getDiffSummary(root);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const memory = await getMemorySummary(root);
+  const index = await buildLocalRagIndex(root, activeChange);
+  const citations = await rankLocalRagDocuments(root, {
+    activeChange,
+    query: normalizedQuery,
+    documents: index.documents,
+    changedFiles,
+    memory,
+  });
+  const quality = buildLocalRagQuality({ citations, memory });
+  const refinementSteps = buildLocalRagRefinementSteps({ citations, quality });
+  const reportPath = join(root, ".gsd", "rag", `${activeChange.slug}.md`);
+  const indexPath = join(root, ".gsd", "rag", "index.json");
+  const report = buildLocalRagMarkdown({
+    activeChange,
+    query: normalizedQuery,
+    citations,
+    quality,
+    refinementSteps,
+    memory,
+    exclusions: index.exclusions,
+  });
+
+  await mkdir(join(root, ".gsd", "rag"), { recursive: true });
+  await writeFile(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+  await writeFile(reportPath, report);
+
+  return {
+    ok: true,
+    activeChange,
+    query: normalizedQuery,
+    report,
+    reportPath,
+    indexPath,
+    citations,
+    quality,
+    refinementSteps,
+    exclusions: index.exclusions,
+    message: `Full Agentic RAG report written to .gsd/rag/${activeChange.slug}.md`,
   };
 }
 
@@ -2147,6 +2206,14 @@ export async function runCli(argv, options = {}) {
     if (command === "context") {
       const result = await generateAgenticContext(cwd);
       if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "rag") {
+      const json = rest.includes("--json");
+      const query = rest.filter((part) => part !== "--json").join(" ");
+      const result = await generateLocalRag(cwd, query);
+      if (json) return cliResult(result.ok ? 0 : 1, `${JSON.stringify(result, null, 2)}\n`);
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
@@ -4177,6 +4244,325 @@ async function buildAgenticContextSources(root, activeChange, likelyFiles, chang
   return sources;
 }
 
+async function buildLocalRagIndex(root, activeChange) {
+  const discovered = await walkLocalRagFiles(root);
+  const documents = [];
+
+  for (const file of discovered.files) {
+    const absolutePath = join(root, file.path);
+    const content = await readTextSnippetIfExists(absolutePath, 24_000);
+    if (!content.trim()) continue;
+    documents.push({
+      path: file.path,
+      kind: inferLocalRagKind(file.path),
+      size: file.size,
+      title: inferLocalRagTitle(file.path, content),
+      summary: summarizeLocalRagContent(content),
+    });
+  }
+
+  return {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    activeChange: activeChange.slug,
+    documents,
+    exclusions: discovered.exclusions,
+  };
+}
+
+async function walkLocalRagFiles(root, prefix = "", depth = 0, state = { files: [], exclusions: [] }) {
+  if (depth > 6) return state;
+
+  let entries = [];
+  try {
+    entries = await readdir(join(root, prefix), { withFileTypes: true });
+  } catch {
+    return state;
+  }
+
+  for (const entry of entries) {
+    const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const exclusion = getLocalRagExclusion(relativePath, entry.isDirectory());
+    if (exclusion) {
+      if (!entry.isDirectory() || shouldRecordRagDirectoryExclusion(relativePath)) {
+        state.exclusions.push({ path: relativePath, reason: exclusion });
+      }
+      if (entry.isDirectory() && shouldRecordRagDirectoryExclusion(relativePath)) {
+        await collectExcludedRagDescendants(root, relativePath, exclusion, state);
+      }
+      continue;
+    }
+
+    if (entry.isDirectory()) {
+      await walkLocalRagFiles(root, relativePath, depth + 1, state);
+      continue;
+    }
+
+    const fileStat = await stat(join(root, relativePath));
+    const sizeExclusion = getLocalRagFileSizeExclusion(fileStat.size);
+    if (sizeExclusion) {
+      state.exclusions.push({ path: relativePath, reason: sizeExclusion });
+      continue;
+    }
+
+    state.files.push({ path: relativePath, size: fileStat.size });
+  }
+
+  return {
+    files: state.files.slice(0, 750),
+    exclusions: state.exclusions.slice(0, 50),
+  };
+}
+
+async function collectExcludedRagDescendants(root, prefix, reason, state, depth = 0) {
+  if (depth > 3 || state.exclusions.length >= 50) return;
+
+  let entries = [];
+  try {
+    entries = await readdir(join(root, prefix), { withFileTypes: true });
+  } catch {
+    return;
+  }
+  if (entries.length > 12) return;
+
+  for (const entry of entries) {
+    const relativePath = `${prefix}/${entry.name}`;
+    if (entry.isDirectory()) {
+      await collectExcludedRagDescendants(root, relativePath, reason, state, depth + 1);
+    } else {
+      state.exclusions.push({ path: relativePath, reason });
+    }
+    if (state.exclusions.length >= 50) return;
+  }
+}
+
+function getLocalRagExclusion(relativePath, isDirectory) {
+  const parts = relativePath.split("/");
+  const noisyPart = parts.find((part) =>
+    [".git", "node_modules", "dist", "build", "coverage", ".next", ".turbo", ".cache", ".parcel-cache"].includes(part),
+  );
+  if (noisyPart) return `excluded noisy ${isDirectory ? "directory" : "path"}: ${noisyPart}`;
+  if (parts[0] === ".gsd" && [".gsd/rag", ".gsd/ui", ".gsd/app"].some((prefix) => relativePath === prefix || relativePath.startsWith(`${prefix}/`))) {
+    return "excluded generated ShipSpec output";
+  }
+  if (!isDirectory && /(^|\/)\.env(\.|$)/u.test(relativePath)) return "secret/env file excluded";
+  if (!isDirectory && /(^|\/)(secret|secrets|credentials|private-key)\.(json|txt|pem|key|env)$/iu.test(relativePath)) {
+    return "secret credential file excluded";
+  }
+  if (!isDirectory && /\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tgz|lock|mp4|mov|woff2?|ttf)$/iu.test(relativePath)) {
+    return "binary or generated artifact excluded";
+  }
+  return "";
+}
+
+function shouldRecordRagDirectoryExclusion(relativePath) {
+  return /(^|\/)(node_modules|dist|build|coverage)$/u.test(relativePath);
+}
+
+function getLocalRagFileSizeExclusion(size) {
+  return size > 512_000 ? "large file excluded" : "";
+}
+
+function inferLocalRagKind(path) {
+  if (path.startsWith("openspec/")) return "spec";
+  if (path.startsWith(".agent/")) return "agent";
+  if (path.startsWith(".gsd/")) return "shipspec";
+  if (isTestLikePath(path)) return "test";
+  if (/^(src|app|pages|components|lib)\//u.test(path)) return "source";
+  if (/README|docs\//iu.test(path)) return "docs";
+  return "project";
+}
+
+function inferLocalRagTitle(path, content) {
+  const firstHeading = content.split(/\r?\n/u).find((line) => /^#\s+/u.test(line));
+  return firstHeading ? firstHeading.replace(/^#\s+/u, "").trim().slice(0, 120) : basename(path);
+}
+
+function summarizeLocalRagContent(content) {
+  return content
+    .split(/\r?\n/u)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" ")
+    .slice(0, 360);
+}
+
+async function rankLocalRagDocuments(root, { activeChange, query, documents, changedFiles, memory }) {
+  const tokens = buildIntentTokens(`${query} ${activeChange.title} ${activeChange.slug}`);
+  const changed = new Set(changedFiles);
+  const memoryFiles = new Set(memory.smartMemory?.commonFiles ?? []);
+  const citations = [];
+
+  for (const document of documents) {
+    const content = await readTextSnippetIfExists(join(root, document.path), 24_000);
+    const scored = scoreLocalRagDocument(document, content, { tokens, activeChange, changed, memoryFiles });
+    if (scored.score > 0) citations.push(scored);
+  }
+
+  return citations.sort((a, b) => b.score - a.score || a.path.localeCompare(b.path)).slice(0, 8);
+}
+
+function scoreLocalRagDocument(document, content, { tokens, activeChange, changed, memoryFiles }) {
+  const lowerPath = document.path.toLowerCase();
+  const lowerContent = content.toLowerCase();
+  const reasons = [];
+  let score = scorePathForIntent(document.path, tokens, activeChange.slug);
+
+  if (score > 0) reasons.push("path-intent-match");
+  if (changed.has(document.path)) {
+    score += 45;
+    reasons.push("git-change");
+  }
+  if (memoryFiles.has(document.path)) {
+    score += 35;
+    reasons.push("learned-memory");
+  }
+  if (document.kind === "source") {
+    score += 16;
+    reasons.push("source-file");
+  }
+  if (document.kind === "test") {
+    score += 14;
+    reasons.push("test-file");
+  }
+  if (document.kind === "spec" || document.kind === "shipspec") {
+    score += 8;
+    reasons.push("shipspec-artifact");
+  }
+
+  let contentTokenHits = 0;
+  for (const token of tokens) {
+    const contentMatches = countTokenOccurrences(lowerContent, token);
+    if (contentMatches > 0) {
+      contentTokenHits += 1;
+      score += Math.min(contentMatches * 8, 32);
+      reasons.push(`content:${token}`);
+    }
+    if (lowerPath.includes(token)) {
+      score += 12;
+      reasons.push(`path:${token}`);
+    }
+  }
+  if (document.kind === "source" && contentTokenHits >= 2) {
+    score += 220;
+    reasons.push("implementation-evidence");
+  }
+  if (document.kind === "test" && contentTokenHits >= 2) {
+    score += 180;
+    reasons.push("test-evidence");
+  }
+
+  return {
+    path: document.path,
+    kind: document.kind,
+    score,
+    reasons: [...new Set(reasons)],
+    snippet: buildRagSnippet(content, tokens),
+  };
+}
+
+function countTokenOccurrences(content, token) {
+  return content.split(token).length - 1;
+}
+
+function buildRagSnippet(content, tokens) {
+  const lines = content.split(/\r?\n/u);
+  const matches = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (!line) continue;
+    const lower = line.toLowerCase();
+    if (tokens.some((token) => lower.includes(token))) {
+      matches.push(`${index + 1}: ${line.slice(0, 180)}`);
+    }
+    if (matches.length >= 4) break;
+  }
+  if (matches.length) return matches.join("\n");
+  return lines
+    .map((line, index) => `${index + 1}: ${line.trim()}`)
+    .filter((line) => !line.endsWith(":"))
+    .slice(0, 4)
+    .join("\n");
+}
+
+function buildLocalRagQuality({ citations, memory }) {
+  const hasSource = citations.some((citation) => citation.kind === "source");
+  const hasTest = citations.some((citation) => citation.kind === "test");
+  const hasMemory = hasMemorySignals(memory);
+  const checks = [
+    { name: "Citations", ok: citations.length > 0, points: citations.length ? 35 : 0, detail: `${citations.length} citation${citations.length === 1 ? "" : "s"} ranked.` },
+    { name: "Source coverage", ok: hasSource, points: hasSource ? 20 : 0, detail: hasSource ? "Source file evidence found." : "No source file evidence found." },
+    { name: "Test coverage", ok: hasTest, points: hasTest ? 20 : 0, detail: hasTest ? "Test file evidence found." : "No test file evidence found." },
+    { name: "Learning signals", ok: hasMemory, points: hasMemory ? 15 : 0, detail: hasMemory ? "Project memory is available." : "No learned memory yet." },
+    { name: "Safe local mode", ok: true, points: 10, detail: "No remote retrieval or secret indexing is used." },
+  ];
+  const score = checks.reduce((total, check) => total + check.points, 0);
+
+  return {
+    score,
+    level: score >= 75 ? "strong" : score >= 45 ? "usable" : "weak",
+    checks,
+    warnings: checks.filter((check) => !check.ok).map((check) => check.detail),
+  };
+}
+
+function buildLocalRagRefinementSteps({ citations, quality }) {
+  const steps = [];
+  if (quality.level === "weak") steps.push("Broaden the query or create source/test files, then rerun `gsd rag`.");
+  if (!citations.some((citation) => citation.kind === "test")) steps.push("Find or add the nearest test file before implementation.");
+  if (!citations.some((citation) => citation.kind === "source")) steps.push("Inspect source directories manually because no source citation ranked.");
+  steps.push("Use the top citations first, inspect adjacent files second, then refresh with `gsd context`.");
+  return steps;
+}
+
+function buildLocalRagMarkdown({ activeChange, query, citations, quality, refinementSteps, memory, exclusions }) {
+  return [
+    "# Full Agentic RAG",
+    "",
+    `Change: ${activeChange.slug}`,
+    `Query: ${query}`,
+    `Quality: ${quality.level} (${quality.score}%)`,
+    "",
+    "## Quality Checks",
+    "",
+    ...formatQualityChecks(quality.checks),
+    "",
+    "## Ranked Citations",
+    "",
+    ...formatRagCitations(citations),
+    "",
+    "## Learning Signals",
+    "",
+    ...formatBulletList(buildLearningRetrievalSignals(memory), "No learning signals recorded."),
+    "",
+    "## Refinement Steps",
+    "",
+    ...formatBulletList(refinementSteps, "No refinement needed."),
+    "",
+    "## Safety Exclusions",
+    "",
+    ...formatBulletList(exclusions.slice(0, 20).map((entry) => `${entry.path}: ${entry.reason}`), "No files were excluded."),
+    "",
+  ].join("\n");
+}
+
+function formatRagCitations(citations) {
+  if (!citations.length) return ["- No citations found."];
+  return citations.flatMap((citation, index) => [
+    `### ${index + 1}. ${citation.path}`,
+    "",
+    `- Kind: ${citation.kind}`,
+    `- Score: ${citation.score}`,
+    `- Reasons: ${citation.reasons.join(", ") || "none"}`,
+    "",
+    "```text",
+    citation.snippet,
+    "```",
+    "",
+  ]);
+}
+
 async function buildSourceSnippet(root, relativePath, tokens) {
   const content = await readTextSnippetIfExists(join(root, relativePath), 16_000);
   if (!content.trim()) return "No readable snippet.";
@@ -4346,6 +4732,7 @@ function buildAgenticContextMarkdown({
   connectorSignals,
   retrievalLoop,
   learningSignals,
+  ragReportPath,
 }) {
   const memorySignals = [
     `Common files: ${memory.smartMemory?.commonFiles?.slice(0, 5).join(", ") || "None recorded."}`,
@@ -4403,6 +4790,12 @@ function buildAgenticContextMarkdown({
     `- Command: ${next.command}`,
     `- Reason: ${next.reason}`,
     ...formatBulletList(quality.warnings, "Context quality is sufficient for the next AI pass."),
+    "",
+    "## Full Agentic RAG",
+    "",
+    ...(ragReportPath
+      ? [`- Report: ${ragReportPath}`, "- Use `gsd rag \"your question\"` to refresh full local retrieval."]
+      : ["- No full RAG report yet. Run `gsd rag \"your question\"` for cited local retrieval."]),
     "",
     "## Ranked Local Sources",
     "",
@@ -6216,6 +6609,7 @@ function beginnerUsage() {
     "  gsd doctor",
     "  gsd share",
     "  gsd ask",
+    "  gsd rag <query>",
     "  gsd ui",
     "  gsd ui --open",
     "  gsd app",
@@ -6266,6 +6660,7 @@ function usage() {
   "  prompt [--json]",
   "  pack [--json]",
   "  context [--json]",
+  "  rag [--json] <query>",
   "  share",
     "  review [--json]",
     "",

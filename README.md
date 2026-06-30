@@ -115,10 +115,12 @@ For Agentic RAG-style local retrieval:
 
 ```bash
 gsd context
+gsd rag "where should I implement login?"
 gsd context --json
+gsd rag "login flow" --json
 ```
 
-`gsd context` is local and lightweight. It ranks likely source files, gives the context a weak/usable/strong quality score, shows connector readiness, records the retrieval loop, includes learned project memory, and tells the operator the next safe command. `gsd operate` also links to this context file so the operator loop and AI handoff use the same source of truth.
+`gsd context` is local and lightweight. It ranks likely source files, gives the context a weak/usable/strong quality score, shows connector readiness, records the retrieval loop, includes learned project memory, and tells the operator the next safe command. `gsd rag` is the fuller local retrieval layer: it builds `.gsd/rag/index.json`, writes cited answers to `.gsd/rag/<change>.md`, excludes secrets and noisy generated files, and returns ranked citations with snippets, reasons, quality, and refinement steps. `gsd operate` also links to the context file so the operator loop and AI handoff use the same source of truth.
 
 ShipSpec's basic idea:
 
@@ -180,6 +182,7 @@ gsd ui
 | `gsd autopilot` | Explicit form of plain `gsd`. |
 | `gsd codex` | Hand work to Codex without long paste. |
 | `gsd context` | Build a local Agentic Context Pack with ranked files, quality score, connector signals, memory, risks, and next step. |
+| `gsd rag "query"` | Ask the full local Agentic RAG index for cited files, snippets, quality, and refinement steps. |
 | `gsd ship` | Verify, validate, write review guidance, and write report. |
 | `gsd doctor` | Diagnose setup, workflow, skill, and test readiness. |
 | `gsd share` | Create AI context pack. |
@@ -245,6 +248,7 @@ The full command set is still available for teams that want explicit control.
 | `gsd prompt [--json]` | Generate an AI planning prompt from the active ShipSpec change. |
 | `gsd pack [--json]` | Generate a compact, agent-neutral context pack with spec, diff, evidence, decisions, risks, and next action. |
 | `gsd context [--json]` | Generate a local Agentic Context Pack with retrieval strategy, quality score, connector signals, ranked sources, memory signals, and evaluation hints. |
+| `gsd rag [--json] <query>` | Build/query the full local Agentic RAG index and write `.gsd/rag/<change>.md`. |
 | `gsd share` | Alias for `gsd pack`, optimized for the small command surface. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |
 

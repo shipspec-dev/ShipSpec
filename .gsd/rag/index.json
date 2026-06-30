@@ -1,0 +1,2304 @@
+{
+  "version": 1,
+  "generatedAt": "2026-06-30T09:36:03.684Z",
+  "activeChange": "full-local-agentic-rag",
+  "documents": [
+    {
+      "path": ".agent/evidence/add-agentic-context-engine.md",
+      "kind": "agent",
+      "size": 20525,
+      "title": "Add agentic context engine Verification Evidence",
+      "summary": "# Add agentic context engine Verification Evidence Mode: full Generated: 2026-06-30T03:14:08.151Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-auto-review-before-ship.md",
+      "kind": "agent",
+      "size": 16714,
+      "title": "Add auto review before ship Verification Evidence",
+      "summary": "# Add auto review before ship Verification Evidence Mode: full Generated: 2026-06-25T06:55:58.377Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-ci-workflow-generator.md",
+      "kind": "agent",
+      "size": 5510,
+      "title": "Add CI Workflow Generator Verification Evidence",
+      "summary": "# Add CI Workflow Generator Verification Evidence Mode: full Generated: 2026-06-19T08:04:31.991Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-electron-desktop-app.md",
+      "kind": "agent",
+      "size": 15823,
+      "title": "Add Electron Desktop App Verification Evidence",
+      "summary": "# Add Electron Desktop App Verification Evidence Mode: full Generated: 2026-06-24T15:11:47.569Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-examples-self-test-packaging.md",
+      "kind": "agent",
+      "size": 6954,
+      "title": "Add Examples Self Test Packaging Verification Evidence",
+      "summary": "# Add Examples Self Test Packaging Verification Evidence Mode: full Generated: 2026-06-19T08:47:50.327Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-multi-agent-coordination.md",
+      "kind": "agent",
+      "size": 6109,
+      "title": "Add Multi Agent Coordination Verification Evidence",
+      "summary": "# Add Multi Agent Coordination Verification Evidence Mode: full Generated: 2026-06-19T08:24:06.158Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-no-copy-codex-handoff.md",
+      "kind": "agent",
+      "size": 16152,
+      "title": "Add no-copy Codex handoff Verification Evidence",
+      "summary": "# Add no-copy Codex handoff Verification Evidence Mode: full Generated: 2026-06-24T15:30:32.011Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-openspec-validation-gates.md",
+      "kind": "agent",
+      "size": 4465,
+      "title": "Add OpenSpec Validation Gates Verification Evidence",
+      "summary": "# Add OpenSpec Validation Gates Verification Evidence Mode: full Generated: 2026-06-19T07:12:05.058Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-pixel-single-page-ui.md",
+      "kind": "agent",
+      "size": 7226,
+      "title": "Add Pixel Single Page UI Verification Evidence",
+      "summary": "# Add Pixel Single Page UI Verification Evidence Mode: full Generated: 2026-06-19T09:10:06.356Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-project-detection-configure.md",
+      "kind": "agent",
+      "size": 5192,
+      "title": "Add Project Detection Configure Verification Evidence",
+      "summary": "# Add Project Detection Configure Verification Evidence Mode: full Generated: 2026-06-19T07:29:45.974Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-react-mission-control-app.md",
+      "kind": "agent",
+      "size": 19914,
+      "title": "Add React Mission Control app Verification Evidence",
+      "summary": "# Add React Mission Control app Verification Evidence Mode: full Generated: 2026-06-29T15:27:03.574Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-release-handoff.md",
+      "kind": "agent",
+      "size": 6944,
+      "title": "Add Release Handoff Verification Evidence",
+      "summary": "# Add Release Handoff Verification Evidence Mode: full Generated: 2026-06-19T08:47:30.679Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-review-report-commands.md",
+      "kind": "agent",
+      "size": 3569,
+      "title": "Add Review Report Commands Verification Evidence",
+      "summary": "# Add Review Report Commands Verification Evidence Mode: full Generated: 2026-06-19T06:58:01.806Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/add-safe-shipspec-clean-command.md",
+      "kind": "agent",
+      "size": 16718,
+      "title": "Add safe ShipSpec clean command Verification Evidence",
+      "summary": "# Add safe ShipSpec clean command Verification Evidence Mode: full Generated: 2026-06-24T16:46:20.723Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-smart-ui-command-center.md",
+      "kind": "agent",
+      "size": 17105,
+      "title": "Add Smart UI command center Verification Evidence",
+      "summary": "# Add Smart UI command center Verification Evidence Mode: full Generated: 2026-06-26T07:22:09.570Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/add-smarter-project-memory.md",
+      "kind": "agent",
+      "size": 17109,
+      "title": "Add smarter project memory Verification Evidence",
+      "summary": "# Add smarter project memory Verification Evidence Mode: full Generated: 2026-06-25T07:35:10.008Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/autopilot-apply-loop-v1.md",
+      "kind": "agent",
+      "size": 17995,
+      "title": "Autopilot Apply Loop v1 Verification Evidence",
+      "summary": "# Autopilot Apply Loop v1 Verification Evidence Mode: full Generated: 2026-06-28T03:18:28.545Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/build-gsd-mvp.md",
+      "kind": "agent",
+      "size": 2081,
+      "title": "Build GSD MVP Verification Evidence",
+      "summary": "# Build GSD MVP Verification Evidence Mode: full Generated: 2026-06-17T10:25:02.430Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/calm-mission-control-default-view.md",
+      "kind": "agent",
+      "size": 17412,
+      "title": "Calm Mission Control default view Verification Evidence",
+      "summary": "# Calm Mission Control default view Verification Evidence Mode: full Generated: 2026-06-26T09:46:54.850Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/complete-agentic-rag-production-v1.md",
+      "kind": "agent",
+      "size": 20703,
+      "title": "Complete agentic RAG production v1 Verification Evidence",
+      "summary": "# Complete agentic RAG production v1 Verification Evidence Mode: full Generated: 2026-06-30T08:21:57.330Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/full-local-agentic-rag.md",
+      "kind": "agent",
+      "size": 21165,
+      "title": "Full local agentic RAG Verification Evidence",
+      "summary": "# Full local agentic RAG Verification Evidence Mode: full Generated: 2026-06-30T09:29:30.169Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/ignore-setup-files-in-autopilot.md",
+      "kind": "agent",
+      "size": 18968,
+      "title": "Ignore Setup Files In Autopilot Verification Evidence",
+      "summary": "# Ignore Setup Files In Autopilot Verification Evidence Mode: full Generated: 2026-06-29T09:47:52.770Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/improve-gsd-developer-adoption.md",
+      "kind": "agent",
+      "size": 2707,
+      "title": "Improve GSD Developer Adoption Verification Evidence",
+      "summary": "# Improve GSD Developer Adoption Verification Evidence Mode: full Generated: 2026-06-17T10:36:58.711Z ## Checks"
+    },
+    {
+      "path": ".agent/evidence/make-dashboard-professional.md",
+      "kind": "agent",
+      "size": 17421,
+      "title": "Make dashboard professional Verification Evidence",
+      "summary": "# Make dashboard professional Verification Evidence Mode: full Generated: 2026-06-26T08:49:21.350Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/make-mission-control-compact.md",
+      "kind": "agent",
+      "size": 19271,
+      "title": "Make Mission Control Compact Verification Evidence",
+      "summary": "# Make Mission Control Compact Verification Evidence Mode: full Generated: 2026-06-29T10:15:48.608Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/make-ui-command-friendlier.md",
+      "kind": "agent",
+      "size": 17393,
+      "title": "Make UI command friendlier Verification Evidence",
+      "summary": "# Make UI command friendlier Verification Evidence Mode: full Generated: 2026-06-26T08:02:00.052Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/mission-autopilot-v1.md",
+      "kind": "agent",
+      "size": 17420,
+      "title": "Mission Autopilot v1 Verification Evidence",
+      "summary": "# Mission Autopilot v1 Verification Evidence Mode: full Generated: 2026-06-28T02:14:06.983Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/next-gen-control-layer.md",
+      "kind": "agent",
+      "size": 18598,
+      "title": "Next Gen Control Layer Verification Evidence",
+      "summary": "# Next Gen Control Layer Verification Evidence Mode: full Generated: 2026-06-29T08:15:21.924Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/polish-app-dashboard-home-screen.md",
+      "kind": "agent",
+      "size": 20074,
+      "title": "Polish app dashboard home screen Verification Evidence",
+      "summary": "# Polish app dashboard home screen Verification Evidence Mode: full Generated: 2026-06-29T16:20:00.127Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/polish-mission-control-first-screen.md",
+      "kind": "agent",
+      "size": 19622,
+      "title": "Polish Mission Control first screen Verification Evidence",
+      "summary": "# Polish Mission Control first screen Verification Evidence Mode: full Generated: 2026-06-29T14:39:31.381Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/simplify-readme.md",
+      "kind": "agent",
+      "size": 16697,
+      "title": "Simplify README Verification Evidence",
+      "summary": "# Simplify README Verification Evidence Mode: full Generated: 2026-06-24T17:02:33.825Z ## Summary"
+    },
+    {
+      "path": ".agent/evidence/smart-default-cli-v1.md",
+      "kind": "agent",
+      "size": 18131,
+      "title": "Smart Default CLI v1 Verification Evidence",
+      "summary": "# Smart Default CLI v1 Verification Evidence Mode: full Generated: 2026-06-29T05:25:53.671Z ## Summary"
+    },
+    {
+      "path": ".agent/memory.md",
+      "kind": "agent",
+      "size": 18,
+      "title": "Project Memory",
+      "summary": "# Project Memory"
+    },
+    {
+      "path": ".agent/messages/2026-06-19T08-23-40-642Z-planner.md",
+      "kind": "agent",
+      "size": 104,
+      "title": "Agent Message",
+      "summary": "# Agent Message Role: planner Created: 2026-06-19T08:23:40.642Z ## Message"
+    },
+    {
+      "path": ".agent/messages/README.md",
+      "kind": "agent",
+      "size": 149,
+      "title": "Agent Message Board",
+      "summary": "# Agent Message Board Agents post handoff notes here with `gsd message <role> <message>`. Read recent notes with `gsd inbox` before starting work."
+    },
+    {
+      "path": ".agent/roles/builder.md",
+      "kind": "agent",
+      "size": 251,
+      "title": "Builder Agent",
+      "summary": "# Builder Agent Implement only the validated scope and keep changes aligned with the active GSD change. ## Before Work - Run `gsd inbox`."
+    },
+    {
+      "path": ".agent/roles/planner.md",
+      "kind": "agent",
+      "size": 255,
+      "title": "Planner Agent",
+      "summary": "# Planner Agent Clarify intent, maintain OpenSpec proposal quality, and keep implementation scope explicit. ## Before Work - Run `gsd inbox`."
+    },
+    {
+      "path": ".agent/roles/release.md",
+      "kind": "agent",
+      "size": 251,
+      "title": "Release Agent",
+      "summary": "# Release Agent Prepare final report, release notes, and ship-readiness summary after ready validation. ## Before Work - Run `gsd inbox`."
+    },
+    {
+      "path": ".agent/roles/reviewer.md",
+      "kind": "agent",
+      "size": 235,
+      "title": "Reviewer Agent",
+      "summary": "# Reviewer Agent Review diffs, risks, spec alignment, and missing tests before handoff. ## Before Work - Run `gsd inbox`."
+    },
+    {
+      "path": ".agent/roles/tester.md",
+      "kind": "agent",
+      "size": 245,
+      "title": "Tester Agent",
+      "summary": "# Tester Agent Run verification, inspect evidence, and report failures with reproduction details. ## Before Work - Run `gsd inbox`."
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/builder.md",
+      "kind": "agent",
+      "size": 134,
+      "title": "Complete agentic RAG production v1 Builder",
+      "summary": "# Complete agentic RAG production v1 Builder Duty: Owns implementation inside the validated ShipSpec contract. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/handoff.md",
+      "kind": "agent",
+      "size": 159,
+      "title": "Complete agentic RAG production v1 Handoff",
+      "summary": "# Complete agentic RAG production v1 Handoff ## Current State - ShipSpec room created. ## Next Agent"
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/planner.md",
+      "kind": "agent",
+      "size": 135,
+      "title": "Complete agentic RAG production v1 Planner",
+      "summary": "# Complete agentic RAG production v1 Planner Duty: Owns scope clarity, acceptance criteria, and open questions. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/release.md",
+      "kind": "agent",
+      "size": 133,
+      "title": "Complete agentic RAG production v1 Release",
+      "summary": "# Complete agentic RAG production v1 Release Duty: Owns release notes, rollout concerns, and final readiness. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/reviewer.md",
+      "kind": "agent",
+      "size": 129,
+      "title": "Complete agentic RAG production v1 Reviewer",
+      "summary": "# Complete agentic RAG production v1 Reviewer Duty: Owns changed-file review, risks, and handoff quality. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/complete-agentic-rag-production-v1/tester.md",
+      "kind": "agent",
+      "size": 125,
+      "title": "Complete agentic RAG production v1 Tester",
+      "summary": "# Complete agentic RAG production v1 Tester Duty: Owns verification evidence and regression coverage. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/builder.md",
+      "kind": "agent",
+      "size": 122,
+      "title": "Full local agentic RAG Builder",
+      "summary": "# Full local agentic RAG Builder Duty: Owns implementation inside the validated ShipSpec contract. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/handoff.md",
+      "kind": "agent",
+      "size": 147,
+      "title": "Full local agentic RAG Handoff",
+      "summary": "# Full local agentic RAG Handoff ## Current State - ShipSpec room created. ## Next Agent"
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/planner.md",
+      "kind": "agent",
+      "size": 123,
+      "title": "Full local agentic RAG Planner",
+      "summary": "# Full local agentic RAG Planner Duty: Owns scope clarity, acceptance criteria, and open questions. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/release.md",
+      "kind": "agent",
+      "size": 121,
+      "title": "Full local agentic RAG Release",
+      "summary": "# Full local agentic RAG Release Duty: Owns release notes, rollout concerns, and final readiness. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/reviewer.md",
+      "kind": "agent",
+      "size": 117,
+      "title": "Full local agentic RAG Reviewer",
+      "summary": "# Full local agentic RAG Reviewer Duty: Owns changed-file review, risks, and handoff quality. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/room/full-local-agentic-rag/tester.md",
+      "kind": "agent",
+      "size": 113,
+      "title": "Full local agentic RAG Tester",
+      "summary": "# Full local agentic RAG Tester Duty: Owns verification evidence and regression coverage. ## Notes - Pending."
+    },
+    {
+      "path": ".agent/rules.md",
+      "kind": "agent",
+      "size": 85,
+      "title": "Agent Rules",
+      "summary": "# Agent Rules - Create a spec before implementation. - Verify before claiming done."
+    },
+    {
+      "path": ".cursor/rules/gsd.mdc",
+      "kind": "project",
+      "size": 679,
+      "title": "GSD Agent Instructions",
+      "summary": "--- alwaysApply: true --- # GSD Agent Instructions"
+    },
+    {
+      "path": ".gitignore",
+      "kind": "project",
+      "size": 259,
+      "title": "Local environment",
+      "summary": "node_modules/ .DS_Store # Local environment .env"
+    },
+    {
+      "path": ".gsd/context/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 4060,
+      "title": "Agentic Context Pack",
+      "summary": "# Agentic Context Pack Local Agentic RAG-style context for an AI coding pass. Generated from repo files and ShipSpec artifacts only. ## Mission - Title: Add agentic context engine"
+    },
+    {
+      "path": ".gsd/context/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 5443,
+      "title": "Agentic Context Pack",
+      "summary": "# Agentic Context Pack Local Agentic RAG-style context for an AI coding pass. Generated from repo files and ShipSpec artifacts only. ## Mission - Title: Complete agentic RAG production v1"
+    },
+    {
+      "path": ".gsd/contracts/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 733,
+      "title": "Complete agentic RAG production v1 Contract",
+      "summary": "# Complete agentic RAG production v1 Contract ## Acceptance Criteria - [ ] The active ShipSpec proposal acceptance criteria are satisfied. - [ ] The implementation stays inside the validated scope."
+    },
+    {
+      "path": ".gsd/contracts/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 721,
+      "title": "Full local agentic RAG Contract",
+      "summary": "# Full local agentic RAG Contract ## Acceptance Criteria - [ ] The active ShipSpec proposal acceptance criteria are satisfied. - [ ] The implementation stays inside the validated scope."
+    },
+    {
+      "path": ".gsd/current.json",
+      "kind": "shipspec",
+      "size": 119,
+      "title": "current.json",
+      "summary": "{ \"title\": \"Full local agentic RAG\", \"slug\": \"full-local-agentic-rag\", \"startedAt\": \"2026-06-30T08:54:49.292Z\""
+    },
+    {
+      "path": ".gsd/decisions/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 215,
+      "title": "Decisions: Add Electron Desktop App",
+      "summary": "# Decisions: Add Electron Desktop App Change: add-electron-desktop-app ## Human Decisions - 2026-06-24T09:50:18.112Z Human decision: Approved gsd decision command for recording human approvals in ShipSpec prompts"
+    },
+    {
+      "path": ".gsd/done/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 289,
+      "title": "Add agentic context engine Done Report",
+      "summary": "# Add agentic context engine Done Report ## Change openspec/changes/add-agentic-context-engine ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/add-auto-review-before-ship.md",
+      "kind": "shipspec",
+      "size": 280,
+      "title": "Add auto review before ship Done Report",
+      "summary": "# Add auto review before ship Done Report ## Change openspec/changes/add-auto-review-before-ship ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 322,
+      "title": "Add React Mission Control app Done Report",
+      "summary": "# Add React Mission Control app Done Report ## Change openspec/changes/add-react-mission-control-app ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/add-safe-shipspec-clean-command.md",
+      "kind": "shipspec",
+      "size": 304,
+      "title": "Add safe ShipSpec clean command Done Report",
+      "summary": "# Add safe ShipSpec clean command Done Report ## Change openspec/changes/add-safe-shipspec-clean-command ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/add-smart-ui-command-center.md",
+      "kind": "shipspec",
+      "size": 292,
+      "title": "Add Smart UI command center Done Report",
+      "summary": "# Add Smart UI command center Done Report ## Change openspec/changes/add-smart-ui-command-center ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 277,
+      "title": "Add smarter project memory Done Report",
+      "summary": "# Add smarter project memory Done Report ## Change openspec/changes/add-smarter-project-memory ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/autopilot-apply-loop-v1.md",
+      "kind": "shipspec",
+      "size": 280,
+      "title": "Autopilot Apply Loop v1 Done Report",
+      "summary": "# Autopilot Apply Loop v1 Done Report ## Change openspec/changes/autopilot-apply-loop-v1 ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/build-gsd-mvp.md",
+      "kind": "shipspec",
+      "size": 185,
+      "title": "Build GSD MVP Done Report",
+      "summary": "# Build GSD MVP Done Report ## Change openspec/changes/build-gsd-mvp ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/calm-mission-control-default-view.md",
+      "kind": "shipspec",
+      "size": 310,
+      "title": "Calm Mission Control default view Done Report",
+      "summary": "# Calm Mission Control default view Done Report ## Change openspec/changes/calm-mission-control-default-view ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 313,
+      "title": "Complete agentic RAG production v1 Done Report",
+      "summary": "# Complete agentic RAG production v1 Done Report ## Change openspec/changes/complete-agentic-rag-production-v1 ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 277,
+      "title": "Full local agentic RAG Done Report",
+      "summary": "# Full local agentic RAG Done Report ## Change openspec/changes/full-local-agentic-rag ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/ignore-setup-files-in-autopilot.md",
+      "kind": "shipspec",
+      "size": 292,
+      "title": "Ignore Setup Files In Autopilot Done Report",
+      "summary": "# Ignore Setup Files In Autopilot Done Report ## Change openspec/changes/ignore-setup-files-in-autopilot ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/improve-gsd-developer-adoption.md",
+      "kind": "shipspec",
+      "size": 582,
+      "title": "Improve GSD Developer Adoption Done Report",
+      "summary": "# Improve GSD Developer Adoption Done Report ## Change openspec/changes/improve-gsd-developer-adoption ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/make-dashboard-professional.md",
+      "kind": "shipspec",
+      "size": 357,
+      "title": "Make dashboard professional Done Report",
+      "summary": "# Make dashboard professional Done Report ## Change openspec/changes/make-dashboard-professional ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/make-mission-control-compact.md",
+      "kind": "shipspec",
+      "size": 295,
+      "title": "Make Mission Control Compact Done Report",
+      "summary": "# Make Mission Control Compact Done Report ## Change openspec/changes/make-mission-control-compact ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/make-ui-command-friendlier.md",
+      "kind": "shipspec",
+      "size": 289,
+      "title": "Make UI command friendlier Done Report",
+      "summary": "# Make UI command friendlier Done Report ## Change openspec/changes/make-ui-command-friendlier ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/mission-autopilot-v1.md",
+      "kind": "shipspec",
+      "size": 271,
+      "title": "Mission Autopilot v1 Done Report",
+      "summary": "# Mission Autopilot v1 Done Report ## Change openspec/changes/mission-autopilot-v1 ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/next-gen-control-layer.md",
+      "kind": "shipspec",
+      "size": 277,
+      "title": "Next Gen Control Layer Done Report",
+      "summary": "# Next Gen Control Layer Done Report ## Change openspec/changes/next-gen-control-layer ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 307,
+      "title": "Polish app dashboard home screen Done Report",
+      "summary": "# Polish app dashboard home screen Done Report ## Change openspec/changes/polish-app-dashboard-home-screen ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 340,
+      "title": "Polish Mission Control first screen Done Report",
+      "summary": "# Polish Mission Control first screen Done Report ## Change openspec/changes/polish-mission-control-first-screen ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/simplify-readme.md",
+      "kind": "shipspec",
+      "size": 222,
+      "title": "Simplify README Done Report",
+      "summary": "# Simplify README Done Report ## Change openspec/changes/simplify-readme ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/done/smart-default-cli-v1.md",
+      "kind": "shipspec",
+      "size": 271,
+      "title": "Smart Default CLI v1 Done Report",
+      "summary": "# Smart Default CLI v1 Done Report ## Change openspec/changes/smart-default-cli-v1 ## Verification Evidence"
+    },
+    {
+      "path": ".gsd/intake/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 293,
+      "title": "Complete agentic RAG production v1",
+      "summary": "# Complete agentic RAG production v1 ## Source - Local request ## Problem"
+    },
+    {
+      "path": ".gsd/intake/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 281,
+      "title": "Full local agentic RAG",
+      "summary": "# Full local agentic RAG ## Source - Local request ## Problem"
+    },
+    {
+      "path": ".gsd/loops/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 797,
+      "title": "Loop: Complete agentic RAG production v1",
+      "summary": "# Loop: Complete agentic RAG production v1 Mode: one-pass Change: complete-agentic-rag-production-v1 Generated: 2026-06-30T08:17:37.030Z"
+    },
+    {
+      "path": ".gsd/memory/add-smarter-project-memory.json",
+      "kind": "shipspec",
+      "size": 1199,
+      "title": "add-smarter-project-memory.json",
+      "summary": "{ \"slug\": \"add-smarter-project-memory\", \"title\": \"Add smarter project memory\", \"learnedAt\": \"2026-06-25T07:35:10.638Z\","
+    },
+    {
+      "path": ".gsd/missions/add-agentic-context-engine.json",
+      "kind": "shipspec",
+      "size": 1537,
+      "title": "add-agentic-context-engine.json",
+      "summary": "{ \"title\": \"Add agentic context engine\", \"slug\": \"add-agentic-context-engine\", \"request\": \"Add agentic context engine\","
+    },
+    {
+      "path": ".gsd/missions/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 1123,
+      "title": "Mission: Add agentic context engine",
+      "summary": "# Mission: Add agentic context engine Slug: add-agentic-context-engine Phase: planning-ready Risk: medium"
+    },
+    {
+      "path": ".gsd/missions/add-no-copy-codex-handoff.json",
+      "kind": "shipspec",
+      "size": 1237,
+      "title": "add-no-copy-codex-handoff.json",
+      "summary": "{ \"title\": \"Add no-copy Codex handoff\", \"slug\": \"add-no-copy-codex-handoff\", \"request\": \"Add no-copy Codex handoff\","
+    },
+    {
+      "path": ".gsd/missions/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 927,
+      "title": "Mission: Add no-copy Codex handoff",
+      "summary": "# Mission: Add no-copy Codex handoff Slug: add-no-copy-codex-handoff Phase: review-ready Risk: medium"
+    },
+    {
+      "path": ".gsd/missions/add-react-mission-control-app.json",
+      "kind": "shipspec",
+      "size": 1570,
+      "title": "add-react-mission-control-app.json",
+      "summary": "{ \"title\": \"Add React Mission Control app\", \"slug\": \"add-react-mission-control-app\", \"request\": \"Add React Mission Control app\","
+    },
+    {
+      "path": ".gsd/missions/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 1153,
+      "title": "Mission: Add React Mission Control app",
+      "summary": "# Mission: Add React Mission Control app Slug: add-react-mission-control-app Phase: planning-ready Risk: medium"
+    },
+    {
+      "path": ".gsd/missions/polish-app-dashboard-home-screen.json",
+      "kind": "shipspec",
+      "size": 1630,
+      "title": "polish-app-dashboard-home-screen.json",
+      "summary": "{ \"title\": \"Polish app dashboard home screen\", \"slug\": \"polish-app-dashboard-home-screen\", \"request\": \"Polish app dashboard home screen\","
+    },
+    {
+      "path": ".gsd/missions/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 1210,
+      "title": "Mission: Polish app dashboard home screen",
+      "summary": "# Mission: Polish app dashboard home screen Slug: polish-app-dashboard-home-screen Phase: planning-ready Risk: medium"
+    },
+    {
+      "path": ".gsd/missions/polish-mission-control-first-screen.json",
+      "kind": "shipspec",
+      "size": 1627,
+      "title": "polish-mission-control-first-screen.json",
+      "summary": "{ \"title\": \"Polish Mission Control first screen\", \"slug\": \"polish-mission-control-first-screen\", \"request\": \"Polish Mission Control first screen\","
+    },
+    {
+      "path": ".gsd/missions/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 1204,
+      "title": "Mission: Polish Mission Control first screen",
+      "summary": "# Mission: Polish Mission Control first screen Slug: polish-mission-control-first-screen Phase: planning-ready Risk: medium"
+    },
+    {
+      "path": ".gsd/packs/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 1713,
+      "title": "ShipSpec Context Pack",
+      "summary": "# ShipSpec Context Pack Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning. ## Active Change - Title: Add agentic context engine"
+    },
+    {
+      "path": ".gsd/packs/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 1566,
+      "title": "ShipSpec Context Pack",
+      "summary": "# ShipSpec Context Pack Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning. ## Active Change - Title: Add no-copy Codex handoff"
+    },
+    {
+      "path": ".gsd/packs/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 1734,
+      "title": "ShipSpec Context Pack",
+      "summary": "# ShipSpec Context Pack Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning. ## Active Change - Title: Add React Mission Control app"
+    },
+    {
+      "path": ".gsd/packs/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 1779,
+      "title": "ShipSpec Context Pack",
+      "summary": "# ShipSpec Context Pack Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning. ## Active Change - Title: Polish app dashboard home screen"
+    },
+    {
+      "path": ".gsd/packs/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 1764,
+      "title": "ShipSpec Context Pack",
+      "summary": "# ShipSpec Context Pack Use this as a compact, agent-neutral handoff for implementation, review, or follow-up planning. ## Active Change - Title: Polish Mission Control first screen"
+    },
+    {
+      "path": ".gsd/prompts/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 1024,
+      "title": "add-agentic-context-engine.md",
+      "summary": "Use $shipspec. Active change: Add agentic context engine Slug: add-agentic-context-engine You are in AI planning mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/prompts/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 1100,
+      "title": "add-electron-desktop-app.md",
+      "summary": "Use $shipspec. Active change: Add Electron Desktop App Slug: add-electron-desktop-app You are in Codex Plan mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/prompts/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 1019,
+      "title": "add-no-copy-codex-handoff.md",
+      "summary": "Use $shipspec. Active change: Add no-copy Codex handoff Slug: add-no-copy-codex-handoff You are in AI planning mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/prompts/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 1039,
+      "title": "add-react-mission-control-app.md",
+      "summary": "Use $shipspec. Active change: Add React Mission Control app Slug: add-react-mission-control-app You are in AI planning mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/prompts/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 1054,
+      "title": "polish-app-dashboard-home-screen.md",
+      "summary": "Use $shipspec. Active change: Polish app dashboard home screen Slug: polish-app-dashboard-home-screen You are in AI planning mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/prompts/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 1069,
+      "title": "polish-mission-control-first-screen.md",
+      "summary": "Use $shipspec. Active change: Polish Mission Control first screen Slug: polish-mission-control-first-screen You are in AI planning mode. Use ShipSpec as the source of truth and prepare a plan before coding."
+    },
+    {
+      "path": ".gsd/reasoning/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 1141,
+      "title": "Reasoning: Add agentic context engine",
+      "summary": "# Reasoning: Add agentic context engine Change: add-agentic-context-engine Generated: 2026-06-30T02:29:11.519Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reasoning/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 1135,
+      "title": "Reasoning: Add Electron Desktop App",
+      "summary": "# Reasoning: Add Electron Desktop App Change: add-electron-desktop-app Generated: 2026-06-23T14:14:46.581Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reasoning/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 1138,
+      "title": "Reasoning: Add no-copy Codex handoff",
+      "summary": "# Reasoning: Add no-copy Codex handoff Change: add-no-copy-codex-handoff Generated: 2026-06-24T15:30:51.899Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reasoning/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 1150,
+      "title": "Reasoning: Add React Mission Control app",
+      "summary": "# Reasoning: Add React Mission Control app Change: add-react-mission-control-app Generated: 2026-06-29T15:11:56.054Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reasoning/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 1126,
+      "title": "Reasoning: Polish app dashboard home screen",
+      "summary": "# Reasoning: Polish app dashboard home screen Change: polish-app-dashboard-home-screen Generated: 2026-06-29T15:55:55.515Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reasoning/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 1135,
+      "title": "Reasoning: Polish Mission Control first screen",
+      "summary": "# Reasoning: Polish Mission Control first screen Change: polish-mission-control-first-screen Generated: 2026-06-29T10:57:32.212Z ## What Matters"
+    },
+    {
+      "path": ".gsd/reflections/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 1196,
+      "title": "Reflection: Add no-copy Codex handoff",
+      "summary": "# Reflection: Add no-copy Codex handoff Change: add-no-copy-codex-handoff Readiness: needs attention Generated: 2026-06-24T15:29:10.300Z"
+    },
+    {
+      "path": ".gsd/reflections/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 912,
+      "title": "Reflection: Add smarter project memory",
+      "summary": "# Reflection: Add smarter project memory Change: add-smarter-project-memory Readiness: needs attention Generated: 2026-06-25T07:35:10.562Z"
+    },
+    {
+      "path": ".gsd/reflections/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 1188,
+      "title": "Reflection: Complete agentic RAG production v1",
+      "summary": "# Reflection: Complete agentic RAG production v1 Change: complete-agentic-rag-production-v1 Readiness: needs attention Generated: 2026-06-30T08:17:37.029Z"
+    },
+    {
+      "path": ".gsd/releases/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 754,
+      "title": "Release: Add agentic context engine",
+      "summary": "# Release: Add agentic context engine ## Summary Release handoff for `add-agentic-context-engine`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 66062,
+      "title": "Release: Add Electron Desktop App",
+      "summary": "# Release: Add Electron Desktop App ## Summary Release handoff for `add-electron-desktop-app`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-examples-self-test-packaging.md",
+      "kind": "shipspec",
+      "size": 1280,
+      "title": "Release: Add Examples Self Test Packaging",
+      "summary": "# Release: Add Examples Self Test Packaging ## Summary Release handoff for `add-examples-self-test-packaging`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-pixel-single-page-ui.md",
+      "kind": "shipspec",
+      "size": 1240,
+      "title": "Release: Add Pixel Single Page UI",
+      "summary": "# Release: Add Pixel Single Page UI ## Summary Release handoff for `add-pixel-single-page-ui`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 796,
+      "title": "Release: Add React Mission Control app",
+      "summary": "# Release: Add React Mission Control app ## Summary Release handoff for `add-react-mission-control-app`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-release-handoff.md",
+      "kind": "shipspec",
+      "size": 1210,
+      "title": "Release: Add Release Handoff",
+      "summary": "# Release: Add Release Handoff ## Summary Release handoff for `add-release-handoff`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-smart-ui-command-center.md",
+      "kind": "shipspec",
+      "size": 760,
+      "title": "Release: Add Smart UI command center",
+      "summary": "# Release: Add Smart UI command center ## Summary Release handoff for `add-smart-ui-command-center`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 742,
+      "title": "Release: Add smarter project memory",
+      "summary": "# Release: Add smarter project memory ## Summary Release handoff for `add-smarter-project-memory`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/autopilot-apply-loop-v1.md",
+      "kind": "shipspec",
+      "size": 736,
+      "title": "Release: Autopilot Apply Loop v1",
+      "summary": "# Release: Autopilot Apply Loop v1 ## Summary Release handoff for `autopilot-apply-loop-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/calm-mission-control-default-view.md",
+      "kind": "shipspec",
+      "size": 796,
+      "title": "Release: Calm Mission Control default view",
+      "summary": "# Release: Calm Mission Control default view ## Summary Release handoff for `calm-mission-control-default-view`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 802,
+      "title": "Release: Complete agentic RAG production v1",
+      "summary": "# Release: Complete agentic RAG production v1 ## Summary Release handoff for `complete-agentic-rag-production-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 730,
+      "title": "Release: Full local agentic RAG",
+      "summary": "# Release: Full local agentic RAG ## Summary Release handoff for `full-local-agentic-rag`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/ignore-setup-files-in-autopilot.md",
+      "kind": "shipspec",
+      "size": 772,
+      "title": "Release: Ignore Setup Files In Autopilot",
+      "summary": "# Release: Ignore Setup Files In Autopilot ## Summary Release handoff for `ignore-setup-files-in-autopilot`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/make-dashboard-professional.md",
+      "kind": "shipspec",
+      "size": 825,
+      "title": "Release: Make dashboard professional",
+      "summary": "# Release: Make dashboard professional ## Summary Release handoff for `make-dashboard-professional`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/make-mission-control-compact.md",
+      "kind": "shipspec",
+      "size": 766,
+      "title": "Release: Make Mission Control Compact",
+      "summary": "# Release: Make Mission Control Compact ## Summary Release handoff for `make-mission-control-compact`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/make-ui-command-friendlier.md",
+      "kind": "shipspec",
+      "size": 754,
+      "title": "Release: Make UI command friendlier",
+      "summary": "# Release: Make UI command friendlier ## Summary Release handoff for `make-ui-command-friendlier`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/mission-autopilot-v1.md",
+      "kind": "shipspec",
+      "size": 718,
+      "title": "Release: Mission Autopilot v1",
+      "summary": "# Release: Mission Autopilot v1 ## Summary Release handoff for `mission-autopilot-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/next-gen-control-layer.md",
+      "kind": "shipspec",
+      "size": 730,
+      "title": "Release: Next Gen Control Layer",
+      "summary": "# Release: Next Gen Control Layer ## Summary Release handoff for `next-gen-control-layer`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 790,
+      "title": "Release: Polish app dashboard home screen",
+      "summary": "# Release: Polish app dashboard home screen ## Summary Release handoff for `polish-app-dashboard-home-screen`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 832,
+      "title": "Release: Polish Mission Control first screen",
+      "summary": "# Release: Polish Mission Control first screen ## Summary Release handoff for `polish-mission-control-first-screen`. ## Spec"
+    },
+    {
+      "path": ".gsd/releases/smart-default-cli-v1.md",
+      "kind": "shipspec",
+      "size": 718,
+      "title": "Release: Smart Default CLI v1",
+      "summary": "# Release: Smart Default CLI v1 ## Summary Release handoff for `smart-default-cli-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 525,
+      "title": "Add agentic context engine PR Report",
+      "summary": "# Add agentic context engine PR Report ## Summary Prepared review report for `add-agentic-context-engine`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-auto-review-before-ship.md",
+      "kind": "shipspec",
+      "size": 530,
+      "title": "Add auto review before ship PR Report",
+      "summary": "# Add auto review before ship PR Report ## Summary Prepared review report for `add-auto-review-before-ship`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-ci-workflow-generator.md",
+      "kind": "shipspec",
+      "size": 567,
+      "title": "Add CI Workflow Generator PR Report",
+      "summary": "# Add CI Workflow Generator PR Report ## Summary Prepared review report for `add-ci-workflow-generator`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 447,
+      "title": "Add Electron Desktop App PR Report",
+      "summary": "# Add Electron Desktop App PR Report ## Summary Prepared review report for `add-electron-desktop-app`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-examples-self-test-packaging.md",
+      "kind": "shipspec",
+      "size": 989,
+      "title": "Add Examples Self Test Packaging PR Report",
+      "summary": "# Add Examples Self Test Packaging PR Report ## Summary Prepared review report for `add-examples-self-test-packaging`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-multi-agent-coordination.md",
+      "kind": "shipspec",
+      "size": 639,
+      "title": "Add Multi Agent Coordination PR Report",
+      "summary": "# Add Multi Agent Coordination PR Report ## Summary Prepared review report for `add-multi-agent-coordination`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 490,
+      "title": "Add no-copy Codex handoff PR Report",
+      "summary": "# Add no-copy Codex handoff PR Report ## Summary Prepared review report for `add-no-copy-codex-handoff`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-openspec-validation-gates.md",
+      "kind": "shipspec",
+      "size": 555,
+      "title": "Add OpenSpec Validation Gates PR Report",
+      "summary": "# Add OpenSpec Validation Gates PR Report ## Summary Prepared review report for `add-openspec-validation-gates`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-pixel-single-page-ui.md",
+      "kind": "shipspec",
+      "size": 957,
+      "title": "Add Pixel Single Page UI PR Report",
+      "summary": "# Add Pixel Single Page UI PR Report ## Summary Prepared review report for `add-pixel-single-page-ui`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-project-detection-configure.md",
+      "kind": "shipspec",
+      "size": 563,
+      "title": "Add Project Detection Configure PR Report",
+      "summary": "# Add Project Detection Configure PR Report ## Summary Prepared review report for `add-project-detection-configure`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 576,
+      "title": "Add React Mission Control app PR Report",
+      "summary": "# Add React Mission Control app PR Report ## Summary Prepared review report for `add-react-mission-control-app`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-release-handoff.md",
+      "kind": "shipspec",
+      "size": 937,
+      "title": "Add Release Handoff PR Report",
+      "summary": "# Add Release Handoff PR Report ## Summary Prepared review report for `add-release-handoff`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-review-report-commands.md",
+      "kind": "shipspec",
+      "size": 543,
+      "title": "Add Review Report Commands PR Report",
+      "summary": "# Add Review Report Commands PR Report ## Summary Prepared review report for `add-review-report-commands`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-safe-shipspec-clean-command.md",
+      "kind": "shipspec",
+      "size": 487,
+      "title": "Add safe ShipSpec clean command PR Report",
+      "summary": "# Add safe ShipSpec clean command PR Report ## Summary Prepared review report for `add-safe-shipspec-clean-command`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-smart-ui-command-center.md",
+      "kind": "shipspec",
+      "size": 542,
+      "title": "Add Smart UI command center PR Report",
+      "summary": "# Add Smart UI command center PR Report ## Summary Prepared review report for `add-smart-ui-command-center`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 525,
+      "title": "Add smarter project memory PR Report",
+      "summary": "# Add smarter project memory PR Report ## Summary Prepared review report for `add-smarter-project-memory`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/autopilot-apply-loop-v1.md",
+      "kind": "shipspec",
+      "size": 522,
+      "title": "Autopilot Apply Loop v1 PR Report",
+      "summary": "# Autopilot Apply Loop v1 PR Report ## Summary Prepared review report for `autopilot-apply-loop-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/calm-mission-control-default-view.md",
+      "kind": "shipspec",
+      "size": 572,
+      "title": "Calm Mission Control default view PR Report",
+      "summary": "# Calm Mission Control default view PR Report ## Summary Prepared review report for `calm-mission-control-default-view`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 577,
+      "title": "Complete agentic RAG production v1 PR Report",
+      "summary": "# Complete agentic RAG production v1 PR Report ## Summary Prepared review report for `complete-agentic-rag-production-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 517,
+      "title": "Full local agentic RAG PR Report",
+      "summary": "# Full local agentic RAG PR Report ## Summary Prepared review report for `full-local-agentic-rag`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/ignore-setup-files-in-autopilot.md",
+      "kind": "shipspec",
+      "size": 550,
+      "title": "Ignore Setup Files In Autopilot PR Report",
+      "summary": "# Ignore Setup Files In Autopilot PR Report ## Summary Prepared review report for `ignore-setup-files-in-autopilot`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/make-dashboard-professional.md",
+      "kind": "shipspec",
+      "size": 607,
+      "title": "Make dashboard professional PR Report",
+      "summary": "# Make dashboard professional PR Report ## Summary Prepared review report for `make-dashboard-professional`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/make-mission-control-compact.md",
+      "kind": "shipspec",
+      "size": 547,
+      "title": "Make Mission Control Compact PR Report",
+      "summary": "# Make Mission Control Compact PR Report ## Summary Prepared review report for `make-mission-control-compact`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/make-ui-command-friendlier.md",
+      "kind": "shipspec",
+      "size": 537,
+      "title": "Make UI command friendlier PR Report",
+      "summary": "# Make UI command friendlier PR Report ## Summary Prepared review report for `make-ui-command-friendlier`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/mission-autopilot-v1.md",
+      "kind": "shipspec",
+      "size": 507,
+      "title": "Mission Autopilot v1 PR Report",
+      "summary": "# Mission Autopilot v1 PR Report ## Summary Prepared review report for `mission-autopilot-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/next-gen-control-layer.md",
+      "kind": "shipspec",
+      "size": 517,
+      "title": "Next Gen Control Layer PR Report",
+      "summary": "# Next Gen Control Layer PR Report ## Summary Prepared review report for `next-gen-control-layer`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 567,
+      "title": "Polish app dashboard home screen PR Report",
+      "summary": "# Polish app dashboard home screen PR Report ## Summary Prepared review report for `polish-app-dashboard-home-screen`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 606,
+      "title": "Polish Mission Control first screen PR Report",
+      "summary": "# Polish Mission Control first screen PR Report ## Summary Prepared review report for `polish-mission-control-first-screen`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/simplify-readme.md",
+      "kind": "shipspec",
+      "size": 389,
+      "title": "Simplify README PR Report",
+      "summary": "# Simplify README PR Report ## Summary Prepared review report for `simplify-readme`. ## Spec"
+    },
+    {
+      "path": ".gsd/reports/smart-default-cli-v1.md",
+      "kind": "shipspec",
+      "size": 507,
+      "title": "Smart Default CLI v1 PR Report",
+      "summary": "# Smart Default CLI v1 PR Report ## Summary Prepared review report for `smart-default-cli-v1`. ## Spec"
+    },
+    {
+      "path": ".gsd/reviews/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 1073,
+      "title": "Review: Add agentic context engine",
+      "summary": "# Review: Add agentic context engine Change: add-agentic-context-engine Generated: 2026-06-30T03:14:08.345Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/add-auto-review-before-ship.md",
+      "kind": "shipspec",
+      "size": 912,
+      "title": "Review: Add auto review before ship",
+      "summary": "# Review: Add auto review before ship Change: add-auto-review-before-ship Generated: 2026-06-25T06:55:58.453Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 988,
+      "title": "Review: Add Electron Desktop App",
+      "summary": "# Review: Add Electron Desktop App Change: add-electron-desktop-app Generated: 2026-06-24T10:14:55.424Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 1113,
+      "title": "Review: Add React Mission Control app",
+      "summary": "# Review: Add React Mission Control app Change: add-react-mission-control-app Generated: 2026-06-29T15:27:03.679Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/add-smart-ui-command-center.md",
+      "kind": "shipspec",
+      "size": 924,
+      "title": "Review: Add Smart UI command center",
+      "summary": "# Review: Add Smart UI command center Change: add-smart-ui-command-center Generated: 2026-06-26T07:22:09.670Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 910,
+      "title": "Review: Add smarter project memory",
+      "summary": "# Review: Add smarter project memory Change: add-smarter-project-memory Generated: 2026-06-25T07:35:10.092Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/autopilot-apply-loop-v1.md",
+      "kind": "shipspec",
+      "size": 916,
+      "title": "Review: Autopilot Apply Loop v1",
+      "summary": "# Review: Autopilot Apply Loop v1 Change: autopilot-apply-loop-v1 Generated: 2026-06-28T03:18:28.644Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/calm-mission-control-default-view.md",
+      "kind": "shipspec",
+      "size": 936,
+      "title": "Review: Calm Mission Control default view",
+      "summary": "# Review: Calm Mission Control default view Change: calm-mission-control-default-view Generated: 2026-06-26T09:46:54.944Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 1089,
+      "title": "Review: Complete agentic RAG production v1",
+      "summary": "# Review: Complete agentic RAG production v1 Change: complete-agentic-rag-production-v1 Generated: 2026-06-30T08:21:57.473Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 1065,
+      "title": "Review: Full local agentic RAG",
+      "summary": "# Review: Full local agentic RAG Change: full-local-agentic-rag Generated: 2026-06-30T09:29:30.295Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/ignore-setup-files-in-autopilot.md",
+      "kind": "shipspec",
+      "size": 1081,
+      "title": "Review: Ignore Setup Files In Autopilot",
+      "summary": "# Review: Ignore Setup Files In Autopilot Change: ignore-setup-files-in-autopilot Generated: 2026-06-29T09:47:52.857Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/make-dashboard-professional.md",
+      "kind": "shipspec",
+      "size": 989,
+      "title": "Review: Make dashboard professional",
+      "summary": "# Review: Make dashboard professional Change: make-dashboard-professional Generated: 2026-06-26T08:49:21.440Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/make-mission-control-compact.md",
+      "kind": "shipspec",
+      "size": 1087,
+      "title": "Review: Make Mission Control Compact",
+      "summary": "# Review: Make Mission Control Compact Change: make-mission-control-compact Generated: 2026-06-29T10:15:48.681Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/make-ui-command-friendlier.md",
+      "kind": "shipspec",
+      "size": 922,
+      "title": "Review: Make UI command friendlier",
+      "summary": "# Review: Make UI command friendlier Change: make-ui-command-friendlier Generated: 2026-06-26T08:02:00.163Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/mission-autopilot-v1.md",
+      "kind": "shipspec",
+      "size": 910,
+      "title": "Review: Mission Autopilot v1",
+      "summary": "# Review: Mission Autopilot v1 Change: mission-autopilot-v1 Generated: 2026-06-28T02:14:07.073Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/next-gen-control-layer.md",
+      "kind": "shipspec",
+      "size": 1075,
+      "title": "Review: Next Gen Control Layer",
+      "summary": "# Review: Next Gen Control Layer Change: next-gen-control-layer Generated: 2026-06-29T08:15:22.035Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 1085,
+      "title": "Review: Polish app dashboard home screen",
+      "summary": "# Review: Polish app dashboard home screen Change: polish-app-dashboard-home-screen Generated: 2026-06-29T16:20:00.241Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 1125,
+      "title": "Review: Polish Mission Control first screen",
+      "summary": "# Review: Polish Mission Control first screen Change: polish-mission-control-first-screen Generated: 2026-06-29T14:39:31.486Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/reviews/smart-default-cli-v1.md",
+      "kind": "shipspec",
+      "size": 910,
+      "title": "Review: Smart Default CLI v1",
+      "summary": "# Review: Smart Default CLI v1 Change: smart-default-cli-v1 Generated: 2026-06-29T05:25:53.778Z ## Human Decisions To Verify"
+    },
+    {
+      "path": ".gsd/tasks/add-agentic-context-engine.md",
+      "kind": "shipspec",
+      "size": 175,
+      "title": "Add agentic context engine Delivery Checklist",
+      "summary": "# Add agentic context engine Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-auto-review-before-ship.md",
+      "kind": "shipspec",
+      "size": 176,
+      "title": "Add auto review before ship Delivery Checklist",
+      "summary": "# Add auto review before ship Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-ci-workflow-generator.md",
+      "kind": "shipspec",
+      "size": 174,
+      "title": "Add CI Workflow Generator Delivery Checklist",
+      "summary": "# Add CI Workflow Generator Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-electron-desktop-app.md",
+      "kind": "shipspec",
+      "size": 173,
+      "title": "Add Electron Desktop App Delivery Checklist",
+      "summary": "# Add Electron Desktop App Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-examples-self-test-packaging.md",
+      "kind": "shipspec",
+      "size": 181,
+      "title": "Add Examples Self Test Packaging Delivery Checklist",
+      "summary": "# Add Examples Self Test Packaging Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-multi-agent-coordination.md",
+      "kind": "shipspec",
+      "size": 177,
+      "title": "Add Multi Agent Coordination Delivery Checklist",
+      "summary": "# Add Multi Agent Coordination Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-no-copy-codex-handoff.md",
+      "kind": "shipspec",
+      "size": 174,
+      "title": "Add no-copy Codex handoff Delivery Checklist",
+      "summary": "# Add no-copy Codex handoff Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-openspec-validation-gates.md",
+      "kind": "shipspec",
+      "size": 178,
+      "title": "Add OpenSpec Validation Gates Delivery Checklist",
+      "summary": "# Add OpenSpec Validation Gates Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-pixel-single-page-ui.md",
+      "kind": "shipspec",
+      "size": 173,
+      "title": "Add Pixel Single Page UI Delivery Checklist",
+      "summary": "# Add Pixel Single Page UI Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-project-detection-configure.md",
+      "kind": "shipspec",
+      "size": 180,
+      "title": "Add Project Detection Configure Delivery Checklist",
+      "summary": "# Add Project Detection Configure Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-react-mission-control-app.md",
+      "kind": "shipspec",
+      "size": 178,
+      "title": "Add React Mission Control app Delivery Checklist",
+      "summary": "# Add React Mission Control app Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-release-handoff.md",
+      "kind": "shipspec",
+      "size": 168,
+      "title": "Add Release Handoff Delivery Checklist",
+      "summary": "# Add Release Handoff Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-review-report-commands.md",
+      "kind": "shipspec",
+      "size": 175,
+      "title": "Add Review Report Commands Delivery Checklist",
+      "summary": "# Add Review Report Commands Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-safe-shipspec-clean-command.md",
+      "kind": "shipspec",
+      "size": 180,
+      "title": "Add safe ShipSpec clean command Delivery Checklist",
+      "summary": "# Add safe ShipSpec clean command Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-smart-ui-command-center.md",
+      "kind": "shipspec",
+      "size": 176,
+      "title": "Add Smart UI command center Delivery Checklist",
+      "summary": "# Add Smart UI command center Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/add-smarter-project-memory.md",
+      "kind": "shipspec",
+      "size": 175,
+      "title": "Add smarter project memory Delivery Checklist",
+      "summary": "# Add smarter project memory Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/autopilot-apply-loop-v1.md",
+      "kind": "shipspec",
+      "size": 172,
+      "title": "Autopilot Apply Loop v1 Delivery Checklist",
+      "summary": "# Autopilot Apply Loop v1 Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/build-gsd-mvp.md",
+      "kind": "shipspec",
+      "size": 162,
+      "title": "Build GSD MVP Delivery Checklist",
+      "summary": "# Build GSD MVP Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/calm-mission-control-default-view.md",
+      "kind": "shipspec",
+      "size": 182,
+      "title": "Calm Mission Control default view Delivery Checklist",
+      "summary": "# Calm Mission Control default view Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/complete-agentic-rag-production-v1.md",
+      "kind": "shipspec",
+      "size": 183,
+      "title": "Complete agentic RAG production v1 Delivery Checklist",
+      "summary": "# Complete agentic RAG production v1 Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/full-local-agentic-rag.md",
+      "kind": "shipspec",
+      "size": 171,
+      "title": "Full local agentic RAG Delivery Checklist",
+      "summary": "# Full local agentic RAG Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/ignore-setup-files-in-autopilot.md",
+      "kind": "shipspec",
+      "size": 180,
+      "title": "Ignore Setup Files In Autopilot Delivery Checklist",
+      "summary": "# Ignore Setup Files In Autopilot Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/improve-gsd-developer-adoption.md",
+      "kind": "shipspec",
+      "size": 179,
+      "title": "Improve GSD Developer Adoption Delivery Checklist",
+      "summary": "# Improve GSD Developer Adoption Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/make-dashboard-professional.md",
+      "kind": "shipspec",
+      "size": 176,
+      "title": "Make dashboard professional Delivery Checklist",
+      "summary": "# Make dashboard professional Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/make-mission-control-compact.md",
+      "kind": "shipspec",
+      "size": 177,
+      "title": "Make Mission Control Compact Delivery Checklist",
+      "summary": "# Make Mission Control Compact Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/make-ui-command-friendlier.md",
+      "kind": "shipspec",
+      "size": 175,
+      "title": "Make UI command friendlier Delivery Checklist",
+      "summary": "# Make UI command friendlier Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/mission-autopilot-v1.md",
+      "kind": "shipspec",
+      "size": 169,
+      "title": "Mission Autopilot v1 Delivery Checklist",
+      "summary": "# Mission Autopilot v1 Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/next-gen-control-layer.md",
+      "kind": "shipspec",
+      "size": 171,
+      "title": "Next Gen Control Layer Delivery Checklist",
+      "summary": "# Next Gen Control Layer Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/polish-app-dashboard-home-screen.md",
+      "kind": "shipspec",
+      "size": 181,
+      "title": "Polish app dashboard home screen Delivery Checklist",
+      "summary": "# Polish app dashboard home screen Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/polish-mission-control-first-screen.md",
+      "kind": "shipspec",
+      "size": 184,
+      "title": "Polish Mission Control first screen Delivery Checklist",
+      "summary": "# Polish Mission Control first screen Delivery Checklist - [ ] Spec reviewed - [ ] Plan reviewed - [ ] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/simplify-readme.md",
+      "kind": "shipspec",
+      "size": 164,
+      "title": "Simplify README Delivery Checklist",
+      "summary": "# Simplify README Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/tasks/smart-default-cli-v1.md",
+      "kind": "shipspec",
+      "size": 169,
+      "title": "Smart Default CLI v1 Delivery Checklist",
+      "summary": "# Smart Default CLI v1 Delivery Checklist - [x] Spec reviewed - [x] Plan reviewed - [x] Code implemented"
+    },
+    {
+      "path": ".gsd/workflow.json",
+      "kind": "shipspec",
+      "size": 419,
+      "title": "workflow.json",
+      "summary": "{ \"checks\": [ { \"name\": \"lint\","
+    },
+    {
+      "path": "AGENTS.md",
+      "kind": "project",
+      "size": 667,
+      "title": "ShipSpec Agent Instructions",
+      "summary": "# ShipSpec Agent Instructions Use ShipSpec as the shared delivery protocol for humans and AI agents. ## Required Workflow - Always check active ShipSpec change before editing."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "kind": "project",
+      "size": 1864,
+      "title": "Changelog",
+      "summary": "# Changelog ## 0.4.0 - Added `gsd reflect` for lightweight local readiness critique. - Added `gsd learn` for governed self-improvement lessons and project patterns."
+    },
+    {
+      "path": "CLAUDE.md",
+      "kind": "project",
+      "size": 667,
+      "title": "ShipSpec Agent Instructions",
+      "summary": "# ShipSpec Agent Instructions Use ShipSpec as the shared delivery protocol for humans and AI agents. ## Required Workflow - Always check active ShipSpec change before editing."
+    },
+    {
+      "path": "GEMINI.md",
+      "kind": "project",
+      "size": 667,
+      "title": "ShipSpec Agent Instructions",
+      "summary": "# ShipSpec Agent Instructions Use ShipSpec as the shared delivery protocol for humans and AI agents. ## Required Workflow - Always check active ShipSpec change before editing."
+    },
+    {
+      "path": "LICENSE",
+      "kind": "project",
+      "size": 1078,
+      "title": "LICENSE",
+      "summary": "MIT License Copyright (c) 2026 ShipSpec contributors Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal"
+    },
+    {
+      "path": "README.md",
+      "kind": "docs",
+      "size": 14155,
+      "title": "ShipSpec",
+      "summary": "# ShipSpec ShipSpec helps humans and AI agents ship software with less confusion. It keeps the important delivery facts inside your repo: - what you are building"
+    },
+    {
+      "path": "apps/desktop/main.js",
+      "kind": "project",
+      "size": 1773,
+      "title": "main.js",
+      "summary": "\"use strict\"; const { app, BrowserWindow, dialog, ipcMain } = require('electron'); const { execFile } = require('node:child_process'); const path = require('node:path');"
+    },
+    {
+      "path": "apps/desktop/package-lock.json",
+      "kind": "project",
+      "size": 5751,
+      "title": "package-lock.json",
+      "summary": "{ \"name\": \"gsd-desktop\", \"version\": \"0.4.0\", \"lockfileVersion\": 3,"
+    },
+    {
+      "path": "apps/desktop/package.json",
+      "kind": "project",
+      "size": 190,
+      "title": "package.json",
+      "summary": "{ \"name\": \"gsd-desktop\", \"version\": \"0.4.0\", \"private\": true,"
+    },
+    {
+      "path": "apps/desktop/preload.js",
+      "kind": "project",
+      "size": 301,
+      "title": "preload.js",
+      "summary": "\"use strict\"; const { contextBridge, ipcRenderer } = require('electron'); contextBridge.exposeInMainWorld('gsdDesktop', { getProject: () => ipcRenderer.invoke('project:get'),"
+    },
+    {
+      "path": "apps/desktop/renderer/app.js",
+      "kind": "project",
+      "size": 2256,
+      "title": "app.js",
+      "summary": "const stages = ['Spec', 'Validate', 'Verify', 'Report', 'Release', 'Ready']; const output = document.querySelector('#output'); const inbox = document.querySelector('#inbox'); const projectPath = document.querySelector('#projectPath');"
+    },
+    {
+      "path": "apps/desktop/renderer/index.html",
+      "kind": "project",
+      "size": 1404,
+      "title": "index.html",
+      "summary": "<!doctype html> <html lang=\"en\"> <head> <meta charset=\"utf-8\">"
+    },
+    {
+      "path": "apps/desktop/renderer/styles.css",
+      "kind": "project",
+      "size": 2141,
+      "title": "styles.css",
+      "summary": "@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap'); :root { --bg: #11131f; --panel: #1b2033;"
+    },
+    {
+      "path": "bin/gsd.mjs",
+      "kind": "project",
+      "size": 286,
+      "title": "gsd.mjs",
+      "summary": "#!/usr/bin/env node import { runCli } from \"../src/gsd.mjs\"; const result = await runCli(process.argv.slice(2), { cwd: process.cwd() }); if (result.stdout) process.stdout.write(result.stdout);"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-06-17-gsd-mvp.md",
+      "kind": "docs",
+      "size": 2849,
+      "title": "GSD MVP Implementation Plan",
+      "summary": "# GSD MVP Implementation Plan > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Goal:** Build a repo-local `gsd` CLI that initializes delivery folders, starts a change, runs verificatio"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-06-24-agi-style-run.md",
+      "kind": "docs",
+      "size": 21374,
+      "title": "AGI-Style Run Implementation Plan",
+      "summary": "# AGI-Style Run Implementation Plan > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Goal:** Add `gsd run [request]` as ShipSpec's safe AGI-style delivery operator command. **Architect"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-06-26-professional-dashboard-ui.md",
+      "kind": "docs",
+      "size": 2814,
+      "title": "Professional Dashboard UI Implementation Plan",
+      "summary": "# Professional Dashboard UI Implementation Plan > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Goal:** Make the generated `gsd ui` dashboard feel like a professional developer tool i"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-06-24-agi-style-run-design.md",
+      "kind": "docs",
+      "size": 5578,
+      "title": "AGI-Style ShipSpec Run Design",
+      "summary": "# AGI-Style ShipSpec Run Design ## Summary ShipSpec should move from a command collection into an AGI-style software delivery operator. The first step is a single outcome command: ```bash"
+    },
+    {
+      "path": "examples/node-basic/.gsd/current.json",
+      "kind": "project",
+      "size": 103,
+      "title": "current.json",
+      "summary": "{ \"title\": \"Example Change\", \"slug\": \"example-change\", \"startedAt\": \"2026-06-19T08:47:17.094Z\""
+    },
+    {
+      "path": "examples/node-basic/.gsd/workflow.json",
+      "kind": "project",
+      "size": 419,
+      "title": "workflow.json",
+      "summary": "{ \"checks\": [ { \"name\": \"lint\","
+    },
+    {
+      "path": "examples/node-basic/README.md",
+      "kind": "docs",
+      "size": 190,
+      "title": "Node Basic ShipSpec Example",
+      "summary": "# Node Basic ShipSpec Example This example shows a minimal Node project using ShipSpec delivery artifacts. Try: ```bash"
+    },
+    {
+      "path": "examples/node-basic/index.mjs",
+      "kind": "project",
+      "size": 55,
+      "title": "index.mjs",
+      "summary": "export function hello() { return 'hello from gsd'; }"
+    },
+    {
+      "path": "examples/node-basic/openspec/changes/example-change/proposal.md",
+      "kind": "project",
+      "size": 176,
+      "title": "Example Change",
+      "summary": "# Example Change ## Intent Demonstrate a minimal GSD change. ## Acceptance Criteria"
+    },
+    {
+      "path": "examples/node-basic/openspec/changes/example-change/tasks.md",
+      "kind": "project",
+      "size": 58,
+      "title": "Example Change Tasks",
+      "summary": "# Example Change Tasks - [ ] Review the example workflow"
+    },
+    {
+      "path": "examples/node-basic/package.json",
+      "kind": "project",
+      "size": 258,
+      "title": "package.json",
+      "summary": "{ \"name\": \"gsd-node-basic-example\", \"version\": \"0.1.0\", \"type\": \"module\","
+    },
+    {
+      "path": "openspec/changes/add-agentic-context-engine/proposal.md",
+      "kind": "spec",
+      "size": 2232,
+      "title": "Add agentic context engine",
+      "summary": "# Add agentic context engine ## Intent Add a lightweight Agentic Context Engine to ShipSpec. ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-agentic-context-engine/tasks.md",
+      "kind": "spec",
+      "size": 310,
+      "title": "Add agentic context engine Tasks",
+      "summary": "# Add agentic context engine Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for `gsd context`"
+    },
+    {
+      "path": "openspec/changes/add-auto-review-before-ship/proposal.md",
+      "kind": "spec",
+      "size": 1954,
+      "title": "Add auto review before ship",
+      "summary": "# Add auto review before ship ## Intent Add auto review before ship ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-auto-review-before-ship/tasks.md",
+      "kind": "spec",
+      "size": 329,
+      "title": "Add auto review before ship Tasks",
+      "summary": "# Add auto review before ship Tasks - [x] Add failing tests for `gsd ship` auto-review output and artifact creation. - [x] Wire `runShipFlow` to generate review after passing verification and ready validation. - [x] Include the review artifact in ship output and report context."
+    },
+    {
+      "path": "openspec/changes/add-ci-workflow-generator/proposal.md",
+      "kind": "spec",
+      "size": 819,
+      "title": "Add CI Workflow Generator",
+      "summary": "# Add CI Workflow Generator ## Intent Add CI Workflow Generator ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-ci-workflow-generator/tasks.md",
+      "kind": "spec",
+      "size": 133,
+      "title": "Add CI Workflow Generator Tasks",
+      "summary": "# Add CI Workflow Generator Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-electron-desktop-app/proposal.md",
+      "kind": "spec",
+      "size": 817,
+      "title": "Add Electron Desktop App",
+      "summary": "# Add Electron Desktop App ## Intent Add Electron Desktop App ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-electron-desktop-app/tasks.md",
+      "kind": "spec",
+      "size": 132,
+      "title": "Add Electron Desktop App Tasks",
+      "summary": "# Add Electron Desktop App Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-examples-self-test-packaging/proposal.md",
+      "kind": "spec",
+      "size": 833,
+      "title": "Add Examples Self Test Packaging",
+      "summary": "# Add Examples Self Test Packaging ## Intent Add Examples Self Test Packaging ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-examples-self-test-packaging/tasks.md",
+      "kind": "spec",
+      "size": 140,
+      "title": "Add Examples Self Test Packaging Tasks",
+      "summary": "# Add Examples Self Test Packaging Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-multi-agent-coordination/proposal.md",
+      "kind": "spec",
+      "size": 825,
+      "title": "Add Multi Agent Coordination",
+      "summary": "# Add Multi Agent Coordination ## Intent Add Multi Agent Coordination ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-multi-agent-coordination/tasks.md",
+      "kind": "spec",
+      "size": 136,
+      "title": "Add Multi Agent Coordination Tasks",
+      "summary": "# Add Multi Agent Coordination Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-no-copy-codex-handoff/proposal.md",
+      "kind": "spec",
+      "size": 1873,
+      "title": "Add no-copy Codex handoff",
+      "summary": "# Add no-copy Codex handoff ## Intent Add no-copy Codex handoff ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-no-copy-codex-handoff/tasks.md",
+      "kind": "spec",
+      "size": 322,
+      "title": "Add no-copy Codex handoff Tasks",
+      "summary": "# Add no-copy Codex handoff Tasks - [ ] Add failing tests for no-copy Codex handoff output. - [ ] Implement `generateCodexHandoff()` and `gsd codex`. - [ ] Add `Codex: gsd codex` to `gsd run` output."
+    },
+    {
+      "path": "openspec/changes/add-openspec-validation-gates/proposal.md",
+      "kind": "spec",
+      "size": 827,
+      "title": "Add OpenSpec Validation Gates",
+      "summary": "# Add OpenSpec Validation Gates ## Intent Add OpenSpec Validation Gates ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-openspec-validation-gates/tasks.md",
+      "kind": "spec",
+      "size": 137,
+      "title": "Add OpenSpec Validation Gates Tasks",
+      "summary": "# Add OpenSpec Validation Gates Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-pixel-single-page-ui/proposal.md",
+      "kind": "spec",
+      "size": 817,
+      "title": "Add Pixel Single Page UI",
+      "summary": "# Add Pixel Single Page UI ## Intent Add Pixel Single Page UI ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-pixel-single-page-ui/tasks.md",
+      "kind": "spec",
+      "size": 132,
+      "title": "Add Pixel Single Page UI Tasks",
+      "summary": "# Add Pixel Single Page UI Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-project-detection-configure/proposal.md",
+      "kind": "spec",
+      "size": 831,
+      "title": "Add Project Detection Configure",
+      "summary": "# Add Project Detection Configure ## Intent Add Project Detection Configure ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-project-detection-configure/tasks.md",
+      "kind": "spec",
+      "size": 139,
+      "title": "Add Project Detection Configure Tasks",
+      "summary": "# Add Project Detection Configure Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-react-mission-control-app/proposal.md",
+      "kind": "spec",
+      "size": 2434,
+      "title": "Add React Mission Control app",
+      "summary": "# Add React Mission Control app ## Intent Add a richer local Mission Control app command while keeping `gsd ui` as the fast static fallback. ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-react-mission-control-app/tasks.md",
+      "kind": "spec",
+      "size": 376,
+      "title": "Add React Mission Control app Tasks",
+      "summary": "# Add React Mission Control app Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing CLI/app generator tests"
+    },
+    {
+      "path": "openspec/changes/add-release-handoff/proposal.md",
+      "kind": "spec",
+      "size": 807,
+      "title": "Add Release Handoff",
+      "summary": "# Add Release Handoff ## Intent Add Release Handoff ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-release-handoff/tasks.md",
+      "kind": "spec",
+      "size": 127,
+      "title": "Add Release Handoff Tasks",
+      "summary": "# Add Release Handoff Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-review-report-commands/proposal.md",
+      "kind": "spec",
+      "size": 821,
+      "title": "Add Review Report Commands",
+      "summary": "# Add Review Report Commands ## Intent Add Review Report Commands ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-review-report-commands/tasks.md",
+      "kind": "spec",
+      "size": 134,
+      "title": "Add Review Report Commands Tasks",
+      "summary": "# Add Review Report Commands Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/add-safe-shipspec-clean-command/proposal.md",
+      "kind": "spec",
+      "size": 1717,
+      "title": "Add safe ShipSpec clean command",
+      "summary": "# Add safe ShipSpec clean command ## Intent Add safe ShipSpec clean command ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-safe-shipspec-clean-command/tasks.md",
+      "kind": "spec",
+      "size": 435,
+      "title": "Add safe ShipSpec clean command Tasks",
+      "summary": "# Add safe ShipSpec clean command Tasks - [x] Add failing tests for cleanup preview, apply mode, active-change protection, and advanced help. - [x] Implement safe cleanup candidate detection for known dummy/test ShipSpec slugs. - [x] Add `gsd clean` preview output and `gsd clean --apply` deletion behavior."
+    },
+    {
+      "path": "openspec/changes/add-smart-ui-command-center/proposal.md",
+      "kind": "spec",
+      "size": 1893,
+      "title": "Add Smart UI command center",
+      "summary": "# Add Smart UI command center ## Intent Add Smart UI command center ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-smart-ui-command-center/tasks.md",
+      "kind": "spec",
+      "size": 406,
+      "title": "Add Smart UI command center Tasks",
+      "summary": "# Add Smart UI command center Tasks - [x] Add failing tests for Command Center, primary actions, readiness score, memory, timeline, and evidence receipt. - [x] Update `gsd ui` data model with readiness score and memory summary. - [x] Redesign top of `gsd ui` as action-first Command Center."
+    },
+    {
+      "path": "openspec/changes/add-smarter-project-memory/proposal.md",
+      "kind": "spec",
+      "size": 1944,
+      "title": "Add smarter project memory",
+      "summary": "# Add smarter project memory ## Intent Add smarter project memory ## Problem"
+    },
+    {
+      "path": "openspec/changes/add-smarter-project-memory/tasks.md",
+      "kind": "spec",
+      "size": 337,
+      "title": "Add smarter project memory Tasks",
+      "summary": "# Add smarter project memory Tasks - [x] Add failing tests for structured memory written by `gsd learn`. - [x] Add failing tests for `gsd memory` summary output. - [x] Add failing tests for memory included in `gsd codex`."
+    },
+    {
+      "path": "openspec/changes/autopilot-apply-loop-v1/proposal.md",
+      "kind": "spec",
+      "size": 2581,
+      "title": "Autopilot Apply Loop v1",
+      "summary": "# Autopilot Apply Loop v1 ## Intent Add a safe `gsd autopilot` command that guides the current ShipSpec mission from prepared handoff to implementation, verification, and review without editing code or deploying. ## Problem"
+    },
+    {
+      "path": "openspec/changes/autopilot-apply-loop-v1/tasks.md",
+      "kind": "spec",
+      "size": 257,
+      "title": "Autopilot Apply Loop v1 Tasks",
+      "summary": "# Autopilot Apply Loop v1 Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for `gsd autopilot` states"
+    },
+    {
+      "path": "openspec/changes/build-gsd-mvp/proposal.md",
+      "kind": "spec",
+      "size": 99,
+      "title": "Build GSD MVP",
+      "summary": "# Build GSD MVP ## Intent Build GSD MVP ## Scope"
+    },
+    {
+      "path": "openspec/changes/build-gsd-mvp/tasks.md",
+      "kind": "spec",
+      "size": 121,
+      "title": "Build GSD MVP Tasks",
+      "summary": "# Build GSD MVP Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/calm-mission-control-default-view/proposal.md",
+      "kind": "spec",
+      "size": 1886,
+      "title": "Calm Mission Control default view",
+      "summary": "# Calm Mission Control default view ## Intent Calm Mission Control default view ## Problem"
+    },
+    {
+      "path": "openspec/changes/calm-mission-control-default-view/tasks.md",
+      "kind": "spec",
+      "size": 253,
+      "title": "Calm Mission Control default view Tasks",
+      "summary": "# Calm Mission Control default view Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for collapsed advanced sections"
+    },
+    {
+      "path": "openspec/changes/complete-agentic-rag-production-v1/proposal.md",
+      "kind": "spec",
+      "size": 2256,
+      "title": "Complete agentic RAG production v1",
+      "summary": "# Complete agentic RAG production v1 ## Intent Complete agentic RAG production v1 ## Problem"
+    },
+    {
+      "path": "openspec/changes/complete-agentic-rag-production-v1/tasks.md",
+      "kind": "spec",
+      "size": 410,
+      "title": "Complete Agentic RAG Production V1 Tasks",
+      "summary": "# Complete Agentic RAG Production V1 Tasks - [x] Clarify scope and production boundary - [x] Add TDD coverage for context quality and weak context - [x] Add TDD coverage for operator context linkage"
+    },
+    {
+      "path": "openspec/changes/full-local-agentic-rag/proposal.md",
+      "kind": "spec",
+      "size": 2644,
+      "title": "Full local agentic RAG",
+      "summary": "# Full local agentic RAG ## Intent Full local agentic RAG ## Problem"
+    },
+    {
+      "path": "openspec/changes/full-local-agentic-rag/tasks.md",
+      "kind": "spec",
+      "size": 394,
+      "title": "Full local agentic RAG Tasks",
+      "summary": "# Full local agentic RAG Tasks - [x] Clarify local-only production scope - [x] Add TDD coverage for `gsd rag` reports and JSON output - [x] Add TDD coverage for safe indexing exclusions"
+    },
+    {
+      "path": "openspec/changes/ignore-setup-files-in-autopilot/proposal.md",
+      "kind": "spec",
+      "size": 1727,
+      "title": "Ignore Setup Files In Autopilot",
+      "summary": "# Ignore Setup Files In Autopilot ## Intent Keep autopilot focused on real implementation changes after ShipSpec creates setup files. ## Problem"
+    },
+    {
+      "path": "openspec/changes/ignore-setup-files-in-autopilot/tasks.md",
+      "kind": "spec",
+      "size": 330,
+      "title": "Ignore Setup Files In Autopilot Tasks",
+      "summary": "# Ignore Setup Files In Autopilot Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add regression test for setup-file routing"
+    },
+    {
+      "path": "openspec/changes/improve-gsd-developer-adoption/proposal.md",
+      "kind": "spec",
+      "size": 829,
+      "title": "Improve GSD Developer Adoption",
+      "summary": "# Improve GSD Developer Adoption ## Intent Improve GSD Developer Adoption ## Problem"
+    },
+    {
+      "path": "openspec/changes/improve-gsd-developer-adoption/tasks.md",
+      "kind": "spec",
+      "size": 138,
+      "title": "Improve GSD Developer Adoption Tasks",
+      "summary": "# Improve GSD Developer Adoption Tasks - [ ] Clarify scope - [ ] Write implementation plan - [ ] Implement changes"
+    },
+    {
+      "path": "openspec/changes/make-dashboard-professional/proposal.md",
+      "kind": "spec",
+      "size": 1942,
+      "title": "Make dashboard professional",
+      "summary": "# Make dashboard professional ## Intent Make dashboard professional ## Problem"
+    },
+    {
+      "path": "openspec/changes/make-dashboard-professional/tasks.md",
+      "kind": "spec",
+      "size": 287,
+      "title": "Make dashboard professional Tasks",
+      "summary": "# Make dashboard professional Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing dashboard tests for professional typography and Mission Control"
+    },
+    {
+      "path": "openspec/changes/make-mission-control-compact/proposal.md",
+      "kind": "spec",
+      "size": 2019,
+      "title": "Make Mission Control Compact",
+      "summary": "# Make Mission Control Compact ## Intent Make Mission Control feel like a compact app cockpit instead of a report page. ## Problem"
+    },
+    {
+      "path": "openspec/changes/make-mission-control-compact/tasks.md",
+      "kind": "spec",
+      "size": 350,
+      "title": "Make Mission Control Compact Tasks",
+      "summary": "# Make Mission Control Compact Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing compact Mission Control tests"
+    },
+    {
+      "path": "openspec/changes/make-ui-command-friendlier/proposal.md",
+      "kind": "spec",
+      "size": 1882,
+      "title": "Make UI command friendlier",
+      "summary": "# Make UI command friendlier ## Intent Make UI command friendlier ## Problem"
+    },
+    {
+      "path": "openspec/changes/make-ui-command-friendlier/tasks.md",
+      "kind": "spec",
+      "size": 249,
+      "title": "Make UI command friendlier Tasks",
+      "summary": "# Make UI command friendlier Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing CLI tests for friendly UI output and open flags"
+    },
+    {
+      "path": "openspec/changes/mission-autopilot-v1/proposal.md",
+      "kind": "spec",
+      "size": 2652,
+      "title": "Mission Autopilot v1",
+      "summary": "# Mission Autopilot v1 ## Intent Make `gsd run \"<request>\"` feel like the main ShipSpec operator command: it should prepare the mission, identify likely relevant files, estimate risk, refresh the UI, and print a short next-step handoff. ## Problem"
+    },
+    {
+      "path": "openspec/changes/mission-autopilot-v1/tasks.md",
+      "kind": "spec",
+      "size": 334,
+      "title": "Mission Autopilot v1 Tasks",
+      "summary": "# Mission Autopilot v1 Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for Mission Autopilot likely files and short output"
+    },
+    {
+      "path": "openspec/changes/next-gen-control-layer/proposal.md",
+      "kind": "spec",
+      "size": 2553,
+      "title": "Next Gen Control Layer",
+      "summary": "# Next Gen Control Layer ## Intent Make ShipSpec feel like an AI delivery control layer instead of a bag of commands. ## Problem"
+    },
+    {
+      "path": "openspec/changes/next-gen-control-layer/tasks.md",
+      "kind": "spec",
+      "size": 373,
+      "title": "Next Gen Control Layer Tasks",
+      "summary": "# Next Gen Control Layer Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for doctor/router/review/UI upgrades"
+    },
+    {
+      "path": "openspec/changes/polish-app-dashboard-home-screen/proposal.md",
+      "kind": "spec",
+      "size": 2438,
+      "title": "Polish app dashboard home screen",
+      "summary": "# Polish app dashboard home screen ## Intent Polish the `gsd app` home screen into a denser, more useful dashboard. ## Problem"
+    },
+    {
+      "path": "openspec/changes/polish-app-dashboard-home-screen/tasks.md",
+      "kind": "spec",
+      "size": 406,
+      "title": "Polish app dashboard home screen Tasks",
+      "summary": "# Polish app dashboard home screen Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing app home layout tests"
+    },
+    {
+      "path": "openspec/changes/polish-mission-control-first-screen/proposal.md",
+      "kind": "spec",
+      "size": 2030,
+      "title": "Polish Mission Control first screen",
+      "summary": "# Polish Mission Control first screen ## Intent Make the Mission Control first screen feel like a focused command center instead of a report page. ## Problem"
+    },
+    {
+      "path": "openspec/changes/polish-mission-control-first-screen/tasks.md",
+      "kind": "spec",
+      "size": 362,
+      "title": "Polish Mission Control First Screen Tasks",
+      "summary": "# Polish Mission Control First Screen Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing compact-first-screen tests"
+    },
+    {
+      "path": "openspec/changes/simplify-readme/proposal.md",
+      "kind": "spec",
+      "size": 1405,
+      "title": "Simplify README",
+      "summary": "# Simplify README ## Intent Simplify README ## Problem"
+    },
+    {
+      "path": "openspec/changes/simplify-readme/tasks.md",
+      "kind": "spec",
+      "size": 243,
+      "title": "Simplify README Tasks",
+      "summary": "# Simplify README Tasks - [x] Simplify README opening and core value. - [x] Replace repeated command guidance with one short default flow. - [x] Keep advanced commands in collapsible reference."
+    },
+    {
+      "path": "openspec/changes/smart-default-cli-v1/proposal.md",
+      "kind": "spec",
+      "size": 2268,
+      "title": "Smart Default CLI v1",
+      "summary": "# Smart Default CLI v1 ## Intent Make the beginner CLI feel like one smart command: `gsd \"Feature\"` starts a mission, plain `gsd` guides the active mission with autopilot, and advanced commands remain available. ## Problem"
+    },
+    {
+      "path": "openspec/changes/smart-default-cli-v1/tasks.md",
+      "kind": "spec",
+      "size": 292,
+      "title": "Smart Default CLI v1 Tasks",
+      "summary": "# Smart Default CLI v1 Tasks - [x] Clarify scope - [x] Write implementation plan - [x] Add failing tests for smart default CLI behavior"
+    },
+    {
+      "path": "package-lock.json",
+      "kind": "project",
+      "size": 1556,
+      "title": "package-lock.json",
+      "summary": "{ \"name\": \"shipspec\", \"version\": \"0.4.0\", \"lockfileVersion\": 3,"
+    },
+    {
+      "path": "package.json",
+      "kind": "project",
+      "size": 1357,
+      "title": "package.json",
+      "summary": "{ \"name\": \"shipspec\", \"version\": \"0.4.0\", \"description\": \"Spec-to-ship workflow for AI-assisted software delivery.\","
+    },
+    {
+      "path": "skills/shipspec/SKILL.md",
+      "kind": "project",
+      "size": 3511,
+      "title": "ShipSpec",
+      "summary": "--- name: shipspec description: Use when implementing a feature, working from a Jira/task/request link, preparing or validating a spec, coordinating AI agents, collecting verification evidence, or preparing a review/ship handoff with ShipSpec or gsd. ---"
+    },
+    {
+      "path": "skills/shipspec/agents/openai.yaml",
+      "kind": "project",
+      "size": 262,
+      "title": "openai.yaml",
+      "summary": "interface: display_name: \"ShipSpec\" short_description: \"Spec, verify, and hand off agent work\" brand_color: \"#58F07A\""
+    },
+    {
+      "path": "src/adapters/github.ts",
+      "kind": "source",
+      "size": 317,
+      "title": "github.ts",
+      "summary": "import type { ShipSpecAdapter } from \"./index.js\"; export const githubAdapter: ShipSpecAdapter = { name: \"GitHub\", summary: \"Connects reports, releases, and generated CI to GitHub review workflows.\","
+    },
+    {
+      "path": "src/adapters/index.ts",
+      "kind": "source",
+      "size": 592,
+      "title": "index.ts",
+      "summary": "export type AdapterCapability = | \"spec\" | \"discipline\" | \"automation\""
+    },
+    {
+      "path": "src/adapters/openspec.ts",
+      "kind": "source",
+      "size": 303,
+      "title": "openspec.ts",
+      "summary": "import type { ShipSpecAdapter } from \"./index.js\"; export const openspecAdapter: ShipSpecAdapter = { name: \"OpenSpec\", summary: \"Connects ShipSpec changes to openspec/changes proposals and task checklists.\","
+    },
+    {
+      "path": "src/adapters/project-scripts.ts",
+      "kind": "source",
+      "size": 322,
+      "title": "project-scripts.ts",
+      "summary": "import type { ShipSpecAdapter } from \"./index.js\"; export const projectScriptsAdapter: ShipSpecAdapter = { name: \"Project scripts\", summary: \"Connects package.json scripts to ShipSpec verification commands.\","
+    },
+    {
+      "path": "src/adapters/superpowers.ts",
+      "kind": "source",
+      "size": 344,
+      "title": "superpowers.ts",
+      "summary": "import type { ShipSpecAdapter } from \"./index.js\"; export const superpowersAdapter: ShipSpecAdapter = { name: \"Superpowers\", summary: \"Maps ShipSpec delivery gates to docs/superpowers planning and verification discipline.\","
+    },
+    {
+      "path": "src/gsd.mjs",
+      "kind": "source",
+      "size": 228276,
+      "title": "gsd.mjs",
+      "summary": "import { execFile } from \"node:child_process\"; import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from \"node:fs/promises\"; import { homedir } from \"node:os\"; import { dirname, basename, join } from \"node:path\";"
+    },
+    {
+      "path": "test/gsd.test.mjs",
+      "kind": "test",
+      "size": 114939,
+      "title": "gsd.test.mjs",
+      "summary": "import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { mkdir, mkdtemp, readFile, stat, writeFile } from \"node:fs/promises\"; import { join } from \"node:path\";"
+    },
+    {
+      "path": "tsconfig.json",
+      "kind": "project",
+      "size": 235,
+      "title": "tsconfig.json",
+      "summary": "{ \"compilerOptions\": { \"target\": \"ES2022\", \"module\": \"NodeNext\","
+    }
+  ],
+  "exclusions": [
+    {
+      "path": ".git",
+      "reason": "excluded noisy path: .git"
+    },
+    {
+      "path": "node_modules",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/.bin/tsc",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/.bin/tsserver",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/.package-lock.json",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/LICENSE.txt",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/README.md",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/SECURITY.md",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/ThirdPartyNoticeText.txt",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/bin/tsc",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/bin/tsserver",
+      "reason": "excluded noisy directory: node_modules"
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "reason": "excluded noisy directory: node_modules"
+    }
+  ]
+}

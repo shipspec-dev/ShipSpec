@@ -1399,6 +1399,80 @@ test("runCli context supports json output", async () => {
   assert.equal(payload.quality.checks.some((check) => check.name === "Ranked local sources"), true);
 });
 
+test("runCli rag writes cited local retrieval report and json output", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Login Guard");
+  await mkdir(join(root, "src", "auth"), { recursive: true });
+  await writeFile(join(root, "src", "auth", "login-guard.js"), "export function loginGuard(user) { return Boolean(user?.id); }\n");
+  await writeFile(join(root, "src", "auth", "login-guard.test.js"), "import { loginGuard } from './login-guard.js';\n");
+
+  const result = await runCli(["rag", "login guard", "--json"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.ok, true);
+  assert.equal(payload.query, "login guard");
+  assert.match(payload.reportPath, /\.gsd\/rag\/add-login-guard\.md$/);
+  assert.match(payload.indexPath, /\.gsd\/rag\/index\.json$/);
+  assert.equal(await exists(join(root, ".gsd", "rag", "index.json")), true);
+  assert.equal(await exists(join(root, ".gsd", "rag", "add-login-guard.md")), true);
+  assert.equal(payload.citations.some((citation) => citation.path === "src/auth/login-guard.js"), true);
+  assert.equal(payload.citations.some((citation) => citation.path === "src/auth/login-guard.test.js"), true);
+  assert.equal(payload.quality.level, "strong");
+  assert.equal(payload.refinementSteps.length > 0, true);
+
+  const report = await readFile(join(root, ".gsd", "rag", "add-login-guard.md"), "utf8");
+  assert.match(report, /# Full Agentic RAG/);
+  assert.match(report, /## Ranked Citations/);
+  assert.match(report, /src\/auth\/login-guard\.js/);
+  assert.match(report, /## Refinement Steps/);
+});
+
+test("runCli rag excludes unsafe and noisy files from the local index", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Login Index");
+  await mkdir(join(root, "src"), { recursive: true });
+  await mkdir(join(root, "node_modules", "pkg"), { recursive: true });
+  await mkdir(join(root, "dist"), { recursive: true });
+  await writeFile(join(root, "src", "login.js"), "export const loginIndex = true;\n");
+  await writeFile(join(root, ".env"), "SECRET_TOKEN=keep-out\n");
+  await writeFile(join(root, "node_modules", "pkg", "login.js"), "module.exports = true;\n");
+  await writeFile(join(root, "dist", "login.js"), "export const generated = true;\n");
+
+  const result = await runCli(["rag", "login", "--json"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  const payload = JSON.parse(result.stdout);
+  const index = JSON.parse(await readFile(join(root, ".gsd", "rag", "index.json"), "utf8"));
+  const indexedPaths = index.documents.map((document) => document.path);
+
+  assert.equal(indexedPaths.includes("src/login.js"), true);
+  assert.equal(indexedPaths.includes(".env"), false);
+  assert.equal(indexedPaths.includes("node_modules/pkg/login.js"), false);
+  assert.equal(indexedPaths.includes("dist/login.js"), false);
+  assert.equal(payload.exclusions.some((entry) => entry.path === ".env" && /secret/u.test(entry.reason)), true);
+  assert.equal(payload.exclusions.some((entry) => entry.path === "node_modules/pkg/login.js"), true);
+  assert.equal(payload.exclusions.some((entry) => entry.path === "dist/login.js"), true);
+});
+
+test("generateAgenticContext links the full RAG report when available", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add Login Context Rag");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "login-context-rag.js"), "export const loginContextRag = true;\n");
+  await runCli(["rag", "login context", "--json"], { cwd: root });
+
+  const result = await generateAgenticContext(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.ragReportPath, join(root, ".gsd", "rag", "add-login-context-rag.md"));
+  assert.match(result.context, /## Full Agentic RAG/);
+  assert.match(result.context, /\.gsd\/rag\/add-login-context-rag\.md/);
+});
+
 test("generateAgenticContext marks empty retrieval context as weak", async () => {
   const root = await tempRoot();
   await initWorkspace(root);
