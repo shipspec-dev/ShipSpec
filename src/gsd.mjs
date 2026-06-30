@@ -619,6 +619,47 @@ export async function generateContextPack(root) {
   };
 }
 
+export async function generateAgenticContext(root) {
+  await initWorkspace(root);
+  const activeChange = await requireActiveChange(root);
+  const specStatus = await getSpecStatus(root);
+  const validation = await validateChange(root, { ready: false });
+  const readyValidation = await validateChange(root, { ready: true });
+  const diff = await getDiffSummary(root);
+  const evidenceSummary = await readEvidenceSummary(root, activeChange.slug);
+  const next = await getNextRecommendation(root);
+  const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])];
+  const memory = await getMemorySummary(root);
+  const risk = buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceSummary, next });
+  const likelyFiles = await inferLikelyFiles(root, activeChange, { diff, changedFiles, memory });
+  const sources = await buildAgenticContextSources(root, activeChange, likelyFiles, changedFiles, memory);
+  const contextPath = join(root, ".gsd", "context", `${activeChange.slug}.md`);
+  const context = buildAgenticContextMarkdown({
+    activeChange,
+    validation,
+    readyValidation,
+    diff,
+    sources,
+    memory,
+    risk,
+    next,
+    evidenceSummary,
+  });
+
+  await mkdir(join(root, ".gsd", "context"), { recursive: true });
+  await writeFile(contextPath, context);
+
+  return {
+    ok: true,
+    activeChange,
+    context,
+    contextPath,
+    sources,
+    risk,
+    message: `Agentic context written to .gsd/context/${activeChange.slug}.md`,
+  };
+}
+
 export async function generateRelease(root) {
   const activeChange = await requireActiveChange(root);
   const specValidation = await validateChange(root, { ready: false });
@@ -1374,6 +1415,7 @@ export async function runMission(root, request = "", options = {}) {
   const reasoning = specValidation.ok ? await generateReasoning(root) : null;
   const prompt = specValidation.ok ? await generatePlanPrompt(root) : null;
   let pack = specValidation.ok ? await generateContextPack(root) : null;
+  const context = specValidation.ok ? await generateAgenticContext(root) : null;
   const report = readyValidation?.ok ? await generateReport(root) : null;
   if (report?.ok) pack = await generateContextPack(root);
   const reflection = !title && readyValidation && !readyValidation.ok ? await generateReflection(root) : null;
@@ -1399,6 +1441,7 @@ export async function runMission(root, request = "", options = {}) {
       reasoning: reasoning ? `.gsd/reasoning/${activeChange.slug}.md` : null,
       prompt: prompt ? `.gsd/prompts/${activeChange.slug}.md` : null,
       pack: pack ? `.gsd/packs/${activeChange.slug}.md` : null,
+      context: context ? `.gsd/context/${activeChange.slug}.md` : null,
       report: report?.ok ? `.gsd/reports/${activeChange.slug}.md` : null,
       reflection: reflection ? `.gsd/reflections/${activeChange.slug}.md` : null,
       ui: ".gsd/ui/index.html",
@@ -1417,6 +1460,7 @@ export async function runMission(root, request = "", options = {}) {
     reasoning,
     prompt,
     pack,
+    context,
     readyValidation,
     report,
     reflection,
@@ -1619,12 +1663,16 @@ export async function generateCodexHandoff(root) {
   if (!(await exists(join(root, ".gsd", "packs", `${slug}.md`)))) {
     await generateContextPack(root);
   }
+  if (!(await exists(join(root, ".gsd", "context", `${slug}.md`)))) {
+    await generateAgenticContext(root);
+  }
 
   const candidateFiles = [
     ".gsd/current.json",
     `.gsd/missions/${slug}.md`,
     `.gsd/prompts/${slug}.md`,
     `.gsd/packs/${slug}.md`,
+    `.gsd/context/${slug}.md`,
     `openspec/changes/${slug}/proposal.md`,
     `openspec/changes/${slug}/tasks.md`,
   ];
@@ -2082,6 +2130,12 @@ export async function runCli(argv, options = {}) {
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
     }
 
+    if (command === "context") {
+      const result = await generateAgenticContext(cwd);
+      if (rest.includes("--json")) return cliResult(0, `${JSON.stringify(result, null, 2)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
     if (command === "codex") {
       const result = await generateCodexHandoff(cwd);
       return cliResult(result.ok ? 0 : 1, `${result.handoff}\n`);
@@ -2346,6 +2400,7 @@ async function formatOperatorGuide(root) {
     "- gsd next               Show the next best action",
     "- gsd ship               Verify, validate ready, and report",
     "- gsd share              Create a portable AI context pack",
+    "- gsd context            Create an Agentic Context Pack",
     "- gsd ui                 Refresh the Mission Control dashboard",
     "",
     "Advanced:",
@@ -2489,12 +2544,14 @@ function formatMissionResult({ mission }) {
       "Next: gsd codex",
       "UI: gsd ui --open",
       "Codex: gsd codex",
+      "Context: gsd context",
       `Risk: ${mission.risk.level}`,
       "Likely files:",
       ...formatBulletList(mission.likelyFiles?.slice(0, 5) ?? [], "No likely files inferred yet."),
       `Mission file: ${mission.artifacts.mission}`,
       mission.artifacts.prompt ? `Prompt: ${mission.artifacts.prompt}` : null,
       mission.artifacts.pack ? `Pack: ${mission.artifacts.pack}` : null,
+      mission.artifacts.context ? `Context: ${mission.artifacts.context}` : null,
     ].filter(Boolean).join("\n");
   }
 
@@ -2509,6 +2566,7 @@ function formatMissionResult({ mission }) {
 
   if (mission.artifacts.prompt) lines.push(`Prompt: ${mission.artifacts.prompt}`);
   if (mission.artifacts.pack) lines.push(`Pack: ${mission.artifacts.pack}`);
+  if (mission.artifacts.context) lines.push(`Context: ${mission.artifacts.context}`);
   if (mission.artifacts.report) lines.push(`Report: ${mission.artifacts.report}`);
   if (mission.artifacts.ui) lines.push(`UI: ${mission.artifacts.ui}`);
   if (mission.artifacts.ui) lines.push("Open dashboard: gsd ui --open");
@@ -4060,6 +4118,148 @@ function buildContextPackMarkdown({
     "- Do not deploy or access secrets from this pack.",
     "",
   ].join("\n");
+}
+
+async function buildAgenticContextSources(root, activeChange, likelyFiles, changedFiles, memory) {
+  const projectFiles = await listProjectFiles(root);
+  const tokens = buildIntentTokens(`${activeChange.title} ${activeChange.slug}`);
+  const candidates = new Map();
+
+  const addCandidate = (path, score, reason) => {
+    if (!isLikelyFileCandidate(path)) return;
+    const existing = candidates.get(path) ?? { path, score: 0, reasons: [] };
+    existing.score += score;
+    existing.reasons.push(reason);
+    candidates.set(path, existing);
+  };
+
+  for (const file of likelyFiles) addCandidate(file, 120, "likely-file");
+  for (const file of changedFiles) addCandidate(file, 90, "changed-file");
+  for (const file of memory.smartMemory?.commonFiles ?? []) addCandidate(file, 45, "project-memory");
+
+  for (const file of projectFiles) {
+    const score = scorePathForIntent(file, tokens, activeChange.slug);
+    if (score > 0) addCandidate(file, score, "intent-match");
+  }
+
+  const sources = [...candidates.values()]
+    .map((source) => ({
+      ...source,
+      reasons: [...new Set(source.reasons)],
+    }))
+    .sort((a, b) => b.score - a.score || a.path.localeCompare(b.path))
+    .slice(0, 10);
+
+  for (const source of sources) {
+    source.snippet = await buildSourceSnippet(root, source.path, tokens);
+  }
+
+  return sources;
+}
+
+async function buildSourceSnippet(root, relativePath, tokens) {
+  const content = await readTextSnippetIfExists(join(root, relativePath), 16_000);
+  if (!content.trim()) return "No readable snippet.";
+
+  const lines = content.split(/\r?\n/u);
+  const matched = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (!line) continue;
+    const lower = line.toLowerCase();
+    if (tokens.some((token) => lower.includes(token))) {
+      matched.push(`${index + 1}: ${line.slice(0, 180)}`);
+    }
+    if (matched.length >= 3) break;
+  }
+
+  if (matched.length) return matched.join("\n");
+  return lines
+    .map((line, index) => `${index + 1}: ${line.trim()}`)
+    .filter((line) => !line.endsWith(":"))
+    .slice(0, 3)
+    .join("\n");
+}
+
+function buildAgenticContextMarkdown({ activeChange, validation, readyValidation, diff, sources, memory, risk, next, evidenceSummary }) {
+  const memorySignals = [
+    `Common files: ${memory.smartMemory?.commonFiles?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Common checks: ${memory.smartMemory?.checks?.slice(0, 5).join(", ") || "None recorded."}`,
+    `Recent risks: ${memory.smartMemory?.recentRisks?.slice(0, 3).join("; ") || "None recorded."}`,
+    `Ship pattern: ${memory.smartMemory?.shipPatterns?.[0] ?? "None recorded."}`,
+  ];
+  const evaluationHints = [
+    validation.ok ? "Spec validation currently passes." : "Fix spec validation before implementation.",
+    readyValidation.ok ? "Ready validation passes; focus on review/release evidence." : "Ready validation has gaps; implementation should refresh verification evidence.",
+    risk.level === "high" ? "High risk: require explicit human review before ship." : `Risk level: ${risk.level}.`,
+    "After coding, run `gsd verify --full`, `gsd review`, and `gsd validate --ready`.",
+  ];
+
+  return [
+    "# Agentic Context Pack",
+    "",
+    "Local Agentic RAG-style context for an AI coding pass. Generated from repo files and ShipSpec artifacts only.",
+    "",
+    "## Mission",
+    "",
+    `- Title: ${activeChange.title}`,
+    `- Slug: ${activeChange.slug}`,
+    `- Branch: ${diff.branch}`,
+    `- Next command: ${next.command}`,
+    `- Next reason: ${next.reason}`,
+    "",
+    "## Retrieval Strategy",
+    "",
+    "- Decompose the request into intent tokens from the title and slug.",
+    "- Rank local files using likely-file inference, Git changes, project memory, and path/token matches.",
+    "- Read top ranked sources first, then inspect adjacent code only when needed.",
+    "- Use ShipSpec evidence and validation gaps as the evaluation loop.",
+    "",
+    "## Ranked Local Sources",
+    "",
+    ...formatAgenticSources(sources),
+    "",
+    "## Memory Signals",
+    "",
+    ...formatBulletList(memorySignals, "No memory signals recorded."),
+    "",
+    "## Evidence Signals",
+    "",
+    ...formatBulletList(evidenceSummary, "No verification evidence summary available yet."),
+    "",
+    "## Risk Signals",
+    "",
+    `- Level: ${risk.level}`,
+    ...risk.reasons.map((reason) => `- ${reason}`),
+    "",
+    "## Evaluation Hints",
+    "",
+    ...formatBulletList(evaluationHints, "No evaluation hints."),
+    "",
+    "## AI Handoff",
+    "",
+    "- Read the active proposal and tasks before coding.",
+    "- Start from the ranked sources above.",
+    "- Keep edits scoped to the active change.",
+    "- If retrieved context is weak, inspect neighboring files before editing.",
+    "- Do not deploy or access secrets from this context pack.",
+    "",
+  ].join("\n");
+}
+
+function formatAgenticSources(sources) {
+  if (!sources.length) return ["- No local sources ranked."];
+  return sources.flatMap((source, index) => [
+    `### ${index + 1}. ${source.path}`,
+    "",
+    `- Score: ${source.score}`,
+    `- Signals: ${source.reasons.join(", ")}`,
+    "",
+    "```text",
+    source.snippet,
+    "```",
+    "",
+  ]);
 }
 
 function formatContextPackValidationErrors(...errorLists) {
@@ -5874,9 +6074,10 @@ function usage() {
     "  reason [--json]",
     "  operate [--dry-run] [--json] <request>",
     "  decision <human decision>",
-    "  prompt [--json]",
-    "  pack [--json]",
-    "  share",
+  "  prompt [--json]",
+  "  pack [--json]",
+  "  context [--json]",
+  "  share",
     "  review [--json]",
     "",
     "Self-improvement:",
