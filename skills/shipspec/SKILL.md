@@ -47,6 +47,14 @@ gsd codex
 
 `gsd codex` prints a short instruction that tells Codex to use `$shipspec` and read the active mission, prompt, pack, proposal, and tasks from repo files. Prefer this over asking the user to paste long context.
 
+For full local Agentic RAG before implementation or review, use:
+
+```bash
+gsd rag "<question or feature area>"
+```
+
+`gsd rag` builds a private local index under `.gsd/rag/`, writes a cited retrieval report for the active change, ranks local files with snippets and reasons, scores context quality, and excludes secrets, dependency folders, build output, binaries, generated files, and huge files. Use it when the AI needs stronger file evidence than the normal context pack.
+
 If there is no active change, create the ShipSpec package from the user's request:
 
 ```bash
