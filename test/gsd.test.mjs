@@ -1386,6 +1386,23 @@ test("runCli context supports json output", async () => {
   assert.equal(payload.sources[0].path, "src/context-json.js");
 });
 
+test("generateAgenticContext does not flag skipped none as risk", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Clean Context Risk");
+  await writeFile(
+    join(root, ".gsd", "workflow.json"),
+    JSON.stringify({ checks: [{ name: "unit", command: "node -e \"process.exit(0)\"", required: true }] }, null, 2),
+  );
+  await verifyChange(root, { full: true });
+
+  const result = await generateAgenticContext(root);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.risk.reasons.includes("verification skipped checks"), false);
+  assert.doesNotMatch(result.context, /verification skipped checks/);
+});
+
 test("generateContextPack flags high-risk auth changes without full proof", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });

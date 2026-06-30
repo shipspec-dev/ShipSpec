@@ -1,7 +1,7 @@
 # Review: Add agentic context engine
 
 Change: add-agentic-context-engine
-Generated: 2026-06-30T02:51:50.744Z
+Generated: 2026-06-30T03:14:08.345Z
 
 ## Human Decisions To Verify
 
@@ -9,9 +9,9 @@ Generated: 2026-06-30T02:51:50.744Z
 
 ## Changed Files
 
-- README.md
 - src/gsd.mjs
 - test/gsd.test.mjs
+- README.md
 
 ## Verification Evidence
 

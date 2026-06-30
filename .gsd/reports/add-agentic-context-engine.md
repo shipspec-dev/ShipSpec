@@ -18,7 +18,6 @@ openspec/changes/add-agentic-context-engine
 
 ## Changed Files
 
-- README.md
 - src/gsd.mjs
 - test/gsd.test.mjs
 

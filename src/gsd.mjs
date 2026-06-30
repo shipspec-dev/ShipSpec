@@ -2713,7 +2713,7 @@ function buildRiskSummary({ specStatus, readyValidation, changedFiles, evidenceS
 
   if (!specStatus.evidence) reasons.push("Verification evidence missing");
   if (!readyValidation.ok) reasons.push("ready validation failing");
-  if (evidenceSummary.some((entry) => /^Skipped:/i.test(entry))) reasons.push("verification skipped checks");
+  if (evidenceSummary.some((entry) => evidenceEntryHasProblem(entry))) reasons.push("verification skipped checks");
   if (sensitiveFiles.length > 0) reasons.push(`Sensitive area changed: ${sensitiveFiles.slice(0, 3).join(", ")}`);
   if (uiFiles.length > 0) reasons.push("UI changed; consider screenshot or E2E proof");
   if (next?.command && !["gsd release", "gsd done"].includes(next.command)) reasons.push(`next action pending: ${next.command}`);
