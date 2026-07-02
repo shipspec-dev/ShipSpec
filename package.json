@@ -29,6 +29,8 @@
     "src",
     "skills",
     "examples",
+    "docs/demo.md",
+    "docs/demo.svg",
     "apps/desktop/main.js",
     "apps/desktop/package.json",
     "apps/desktop/preload.js",

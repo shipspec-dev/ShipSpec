@@ -1,0 +1,58 @@
+{
+  "title": "Finish launch onboarding and release",
+  "slug": "finish-launch-onboarding-and-release",
+  "request": "Finish launch onboarding and release",
+  "phase": "planning-ready",
+  "risk": {
+    "level": "high",
+    "reasons": [
+      "Verification evidence missing",
+      "ready validation failing",
+      "Sensitive area changed: examples/jira-codex-login/src/auth/login.js",
+      "UI changed; consider screenshot or E2E proof",
+      "next action pending: gsd operate"
+    ]
+  },
+  "likelyFiles": [
+    "src/gsd.mjs",
+    "test/gsd.test.mjs",
+    "README.md",
+    "skills/shipspec/SKILL.md",
+    "CHANGELOG.md",
+    "examples/jira-codex-login/README.md",
+    "examples/jira-codex-login/src/auth/login.js",
+    "examples/node-basic/package.json"
+  ],
+  "nextAction": {
+    "command": "open .gsd/prompts/finish-launch-onboarding-and-release.md",
+    "reason": "Mission prompt and context pack are ready for an AI coding pass.",
+    "otherCommands": [
+      "open .gsd/packs/finish-launch-onboarding-and-release.md",
+      "gsd ui"
+    ]
+  },
+  "validation": {
+    "spec": "pass",
+    "ready": "not-run",
+    "errors": []
+  },
+  "artifacts": {
+    "mission": ".gsd/missions/finish-launch-onboarding-and-release.md",
+    "missionJson": ".gsd/missions/finish-launch-onboarding-and-release.json",
+    "reasoning": ".gsd/reasoning/finish-launch-onboarding-and-release.md",
+    "prompt": ".gsd/prompts/finish-launch-onboarding-and-release.md",
+    "pack": ".gsd/packs/finish-launch-onboarding-and-release.md",
+    "context": ".gsd/context/finish-launch-onboarding-and-release.md",
+    "report": null,
+    "reflection": null,
+    "ui": ".gsd/ui/index.html"
+  },
+  "safety": {
+    "localOnly": true,
+    "externalActions": false,
+    "destructiveActions": false,
+    "deployment": false,
+    "maxLoops": 1
+  },
+  "generatedAt": "2026-07-02T14:27:11.430Z"
+}

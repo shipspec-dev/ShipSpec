@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added packaged launch demo docs under `docs/` with a short Jira-to-Codex-to-ship walkthrough.
+- Stabilized agent inbox message ordering when multiple messages are written in the same millisecond.
 - Added `gsd route` to recommend relevant AI skills from mission text, Agentic RAG, likely files, and local project evidence.
 - Updated `gsd codex` to include Agentic RAG-first skill routing automatically.
 - Added a Jira-to-Codex login demo under `examples/jira-codex-login`.
