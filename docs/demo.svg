@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">ShipSpec two-minute demo</title>
+  <desc id="desc">Animated demo showing Jira to Codex to verified ship flow.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#101827"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <style>
+      .title { font: 800 54px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #e8eef8; }
+      .sub { font: 500 22px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #9aa8bd; }
+      .label { font: 800 16px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #38bdf8; letter-spacing: 2px; }
+      .body { font: 650 28px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #e8eef8; }
+      .mono { font: 700 28px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #36d981; }
+      .muted { fill: #9aa8bd; }
+      .yellow { fill: #f6c453; }
+      .green { fill: #36d981; }
+      .blue { fill: #38bdf8; }
+      .panel { fill: #121b2e; stroke: rgba(148,163,184,.28); stroke-width: 2; }
+      .terminal { fill: #0b1220; stroke: rgba(148,163,184,.28); stroke-width: 2; }
+      .step { opacity: 0; animation: show 16s infinite; }
+      .s1 { animation-delay: 0s; }
+      .s2 { animation-delay: 4s; }
+      .s3 { animation-delay: 8s; }
+      .s4 { animation-delay: 12s; }
+      @keyframes show {
+        0%, 4% { opacity: 0; transform: translateY(10px); }
+        8%, 24% { opacity: 1; transform: translateY(0); }
+        28%, 100% { opacity: 0; transform: translateY(-8px); }
+      }
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1050" cy="120" r="180" fill="#12314a" opacity="0.28"/>
+  <circle cx="120" cy="590" r="220" fill="#163728" opacity="0.22"/>
+  <text x="70" y="92" class="title">ShipSpec</text>
+  <text x="72" y="130" class="sub">Jira to Codex to verified ship, without losing context.</text>
+  <g transform="translate(70 175)" filter="url(#shadow)">
+    <rect class="panel" width="1060" height="420" rx="18"/>
+    <g transform="translate(36 34)">
+      <rect class="terminal" width="988" height="350" rx="14"/>
+      <g class="step s1">
+        <text x="34" y="54" class="label">STEP 1 - START MISSION</text>
+        <text x="34" y="112" class="mono">gsd run "https://example.atlassian.net/browse/AUTH-42"</text>
+        <text x="34" y="178" class="body">ShipSpec creates a mission, spec, prompt, context pack, and UI.</text>
+        <text x="34" y="236" class="sub">Output: Mission ready • Next: gsd codex • Risk: medium</text>
+      </g>
+      <g class="step s2">
+        <text x="34" y="54" class="label">STEP 2 - RETRIEVE CONTEXT</text>
+        <text x="34" y="112" class="mono">gsd rag "AUTH-42 login page affected files"</text>
+        <text x="34" y="178" class="body">Agentic RAG ranks local files, snippets, reasons, and quality.</text>
+        <text x="34" y="236" class="sub">Output: cited report in .gsd/rag/add-login-page.md</text>
+      </g>
+      <g class="step s3">
+        <text x="34" y="54" class="label">STEP 3 - HAND TO CODEX</text>
+        <text x="34" y="112" class="mono">gsd codex</text>
+        <text x="34" y="178" class="body">Codex gets repo file paths, likely files, and skill routing.</text>
+        <text x="34" y="236" class="sub">No long paste. No random skills. Repo files are source of truth.</text>
+      </g>
+      <g class="step s4">
+        <text x="34" y="54" class="label">STEP 4 - VERIFY AND SHIP</text>
+        <text x="34" y="112" class="mono">gsd ship</text>
+        <text x="34" y="178" class="body">ShipSpec runs checks, review, report, and handoff evidence.</text>
+        <text x="34" y="236" class="sub">Output: .agent/evidence, .gsd/reports, ready for PR.</text>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(70 620)">
+    <rect x="0" y="-32" width="164" height="38" rx="19" fill="none" stroke="#36d981" stroke-width="2"/>
+    <text x="22" y="-7" class="sub green">local first</text>
+    <rect x="184" y="-32" width="214" height="38" rx="19" fill="none" stroke="#38bdf8" stroke-width="2"/>
+    <text x="206" y="-7" class="sub blue">Agentic RAG</text>
+    <rect x="418" y="-32" width="210" height="38" rx="19" fill="none" stroke="#f6c453" stroke-width="2"/>
+    <text x="440" y="-7" class="sub yellow">skill route</text>
+  </g>
+</svg>

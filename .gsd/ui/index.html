@@ -444,11 +444,11 @@
     <header>
       <div>
         <h1>ShipSpec Mission Control</h1>
-        <p class="slug">Add Agentic RAG skill router / add-agentic-rag-skill-router</p>
+        <p class="slug">Finish launch onboarding and release / finish-launch-onboarding-and-release</p>
       </div>
       <div class="top-meta">
         <span class="chip pass">Spec PASS</span>
-        <span class="chip pass">Ready PASS</span>
+        <span class="chip warn">Ready WAIT</span>
         <span class="chip">Branch main</span>
       </div>
     </header>
@@ -459,7 +459,7 @@
           <h2>Mission dashboard</h2>
           <p>Calm mode: one next step first, deeper workflow details only when you open them.</p>
         </div>
-        <span class="chip pass">Readiness Score 100%</span>
+        <span class="chip warn">Readiness Score 33%</span>
       </div>
 
       <div class="cockpit-shell">
@@ -470,27 +470,27 @@
         </div>
         <div class="status-card">
           <div class="eyebrow">Current mission</div>
-          <h2>Add Agentic RAG skill router</h2>
-          <p class="reason">add-agentic-rag-skill-router</p>
+          <h2>Finish launch onboarding and release</h2>
+          <p class="reason">finish-launch-onboarding-and-release</p>
           <span class="chip pass">Spec ready</span>
           <h3>Likely Files</h3>
           <div class="likely-preview">
-            <div class="row file-row" title="skills/shipspec/SKILL.md">SKILL.md</div><div class="row file-row" title="src/gsd.mjs">gsd.mjs</div><div class="row file-row" title="test/gsd.test.mjs">gsd.test.mjs</div>
+            <div class="row file-row" title="src/gsd.mjs">gsd.mjs</div><div class="row file-row" title="test/gsd.test.mjs">gsd.test.mjs</div><div class="row file-row" title="README.md">README.md</div>
           </div>
           <p class="likely-note">8 likely files. Open full list below.</p>
           <details class="file-list-drawer">
             <summary>Full file list</summary>
             <div class="rows">
-              <div class="row">skills/shipspec/SKILL.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div><div class="row">CHANGELOG.md</div><div class="row">examples/jira-codex-login/README.md</div><div class="row">examples/jira-codex-login/src/auth/login.js</div><div class="row">examples/node-basic/package.json</div>
+              <div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">README.md</div><div class="row">skills/shipspec/SKILL.md</div><div class="row">CHANGELOG.md</div><div class="row">examples/jira-codex-login/README.md</div><div class="row">examples/jira-codex-login/src/auth/login.js</div><div class="row">examples/node-basic/package.json</div>
             </div>
           </details>
         </div>
         <div class="readiness-strip">
           <div class="eyebrow">Readiness</div>
-          <div class="readiness-score">100% <span>ready</span></div>
-          <p class="reason">Ready to ship.</p>
+          <div class="readiness-score">33% <span>ready</span></div>
+          <p class="reason">Verification evidence is missing. Run `gsd verify` first.</p>
           <div class="readiness-mini">
-            <div class="mini-signal"><span>Spec</span><span class="pass">PASS</span></div><div class="mini-signal"><span>Evidence</span><span class="pass">PASS</span></div><div class="mini-signal"><span>Report</span><span class="pass">PASS</span></div>
+            <div class="mini-signal"><span>Spec</span><span class="pass">PASS</span></div><div class="mini-signal"><span>Evidence</span><span class="warn">WAIT</span></div><div class="mini-signal"><span>Report</span><span class="warn">WAIT</span></div>
           </div>
         </div>
       </div>
@@ -505,7 +505,7 @@
           </article><article class="workflow-command">
             <h3>Open Prompt</h3>
             <p>Review the implementation brief before coding.</p>
-            <button class="command-button" type="button" data-command="open .gsd/prompts/add-agentic-rag-skill-router.md" title="Copy command">open .gsd/prompts/add-agentic-rag-skill-router.md</button>
+            <button class="command-button" type="button" data-command="open .gsd/prompts/finish-launch-onboarding-and-release.md" title="Copy command">open .gsd/prompts/finish-launch-onboarding-and-release.md</button>
           </article><article class="workflow-command">
             <h3>Run Checks</h3>
             <p>Collect verification evidence for this mission.</p>
@@ -530,22 +530,22 @@
             <div class="progress-head">
               <div>
                 <h2>Progress</h2>
-                <p>Ready to ship.</p>
+                <p>Verification evidence is missing. Run `gsd verify` first.</p>
               </div>
-              <span class="chip pass">100% ready</span>
+              <span class="chip warn">33% ready</span>
             </div>
             <div class="progress-grid">
-              <div class="signal"><span class="pass">PASS</span> Spec</div><div class="signal"><span class="pass">PASS</span> Validation</div><div class="signal"><span class="pass">PASS</span> Evidence</div><div class="signal"><span class="pass">PASS</span> Review</div><div class="signal"><span class="pass">PASS</span> Report</div><div class="signal"><span class="pass">PASS</span> Ready</div>
+              <div class="signal"><span class="pass">PASS</span> Spec</div><div class="signal"><span class="pass">PASS</span> Validation</div><div class="signal"><span class="warn">WAIT</span> Evidence</div><div class="signal"><span class="warn">WAIT</span> Review</div><div class="signal"><span class="warn">WAIT</span> Report</div><div class="signal"><span class="warn">WAIT</span> Ready</div>
             </div>
           </div>
 
           <div class="score-grid">
-            <div class="score-number" aria-label="Readiness Score">100%</div>
+            <div class="score-number" aria-label="Readiness Score">33%</div>
             <div>
               <h3>Readiness Score</h3>
-              <p class="reason">Ready to ship.</p>
+              <p class="reason">Verification evidence is missing. Run `gsd verify` first.</p>
               <div class="signal-grid">
-                <div class="signal"><span class="pass">PASS</span> Spec</div><div class="signal"><span class="pass">PASS</span> Validation</div><div class="signal"><span class="pass">PASS</span> Evidence</div><div class="signal"><span class="pass">PASS</span> Review</div><div class="signal"><span class="pass">PASS</span> Report</div><div class="signal"><span class="pass">PASS</span> Ready</div>
+                <div class="signal"><span class="pass">PASS</span> Spec</div><div class="signal"><span class="pass">PASS</span> Validation</div><div class="signal"><span class="warn">WAIT</span> Evidence</div><div class="signal"><span class="warn">WAIT</span> Review</div><div class="signal"><span class="warn">WAIT</span> Report</div><div class="signal"><span class="warn">WAIT</span> Ready</div>
               </div>
             </div>
           </div>
@@ -576,7 +576,7 @@
             <div>
               <h3>Evidence Receipt</h3>
               <div class="receipt-grid">
-                <div class="receipt-item"><strong>Change</strong>add-agentic-rag-skill-router</div><div class="receipt-item"><strong>Branch</strong>main</div><div class="receipt-item"><strong>Evidence</strong>present</div><div class="receipt-item"><strong>Review</strong>present</div><div class="receipt-item"><strong>Report</strong>present</div><div class="receipt-item"><strong>Release</strong>present</div>
+                <div class="receipt-item"><strong>Change</strong>finish-launch-onboarding-and-release</div><div class="receipt-item"><strong>Branch</strong>main</div><div class="receipt-item"><strong>Evidence</strong>missing</div><div class="receipt-item"><strong>Review</strong>missing</div><div class="receipt-item"><strong>Report</strong>missing</div><div class="receipt-item"><strong>Release</strong>missing</div>
               </div>
             </div>
             <div>
@@ -589,9 +589,9 @@
 
           <div class="detail-grid">
             <div>
-              <h3>Changed Files</h3>
+              <h3>Committed Files</h3>
               <div class="rows">
-                <div class="row">.cursor/rules/gsd.mdc</div><div class="row">CHANGELOG.md</div><div class="row">README.md</div><div class="row">examples/node-basic/.gsd/current.json</div><div class="row">examples/node-basic/package.json</div><div class="row">skills/shipspec/SKILL.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div><div class="row">examples/jira-codex-login/.gsd/current.json</div><div class="row">examples/jira-codex-login/.gsd/rag/add-login-page.md</div><div class="row">examples/jira-codex-login/.gsd/routes/add-login-page.md</div><div class="row">examples/jira-codex-login/README.md</div><div class="row">examples/jira-codex-login/openspec/changes/add-login-page/proposal.md</div><div class="row">examples/jira-codex-login/openspec/changes/add-login-page/tasks.md</div><div class="row">examples/jira-codex-login/src/auth/login.js</div>
+                <div class="row">.cursor/rules/gsd.mdc</div><div class="row">CHANGELOG.md</div><div class="row">README.md</div><div class="row">examples/jira-codex-login/.gsd/current.json</div><div class="row">examples/jira-codex-login/.gsd/rag/add-login-page.md</div><div class="row">examples/jira-codex-login/.gsd/routes/add-login-page.md</div><div class="row">examples/jira-codex-login/README.md</div><div class="row">examples/jira-codex-login/openspec/changes/add-login-page/proposal.md</div><div class="row">examples/jira-codex-login/openspec/changes/add-login-page/tasks.md</div><div class="row">examples/jira-codex-login/src/auth/login.js</div><div class="row">examples/node-basic/.gsd/current.json</div><div class="row">examples/node-basic/package.json</div><div class="row">skills/shipspec/SKILL.md</div><div class="row">src/gsd.mjs</div><div class="row">test/gsd.test.mjs</div>
               </div>
             </div>
             <div>
@@ -611,38 +611,38 @@
             <div>
               <h3>Workflow</h3>
               <div class="rows">
-                <div class="row">Active change: add-agentic-rag-skill-router</div>
-                <div class="row">Evidence: present</div>
-                <div class="row">Report: present</div>
-                <div class="row">Release: present</div>
+                <div class="row">Active change: finish-launch-onboarding-and-release</div>
+                <div class="row">Evidence: missing</div>
+                <div class="row">Report: missing</div>
+                <div class="row">Release: missing</div>
               </div>
             </div>
             <div>
               <h3>Self-Improving Loop</h3>
               <div class="rows">
-                <div class="row">Loop: present</div>
-                <div class="row">Reflection: present</div>
-                <div class="row">Learn: learned</div>
+                <div class="row">Loop: missing</div>
+                <div class="row">Reflection: missing</div>
+                <div class="row">Learn: skipped</div>
               </div>
             </div>
           </div>
 
           <h3>Pipeline</h3>
           <div class="pipeline">
-            <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Report</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Release</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Ready</strong><span class="chip pass">PASS</span></div>
+            <div class="stage"><strong>Spec</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Validate</strong><span class="chip pass">PASS</span></div><div class="stage"><strong>Verify</strong><span class="chip warn">WAIT</span></div><div class="stage"><strong>Report</strong><span class="chip warn">WAIT</span></div><div class="stage"><strong>Release</strong><span class="chip warn">WAIT</span></div><div class="stage"><strong>Ready</strong><span class="chip warn">WAIT</span></div>
           </div>
 
           <div class="detail-grid">
             <div>
               <h3>Next Actions</h3>
               <div class="rows">
-                <div class="row">Proceed to review or release handoff.</div>
+                <div class="row">Operation report is missing for the active change.</div>
               </div>
             </div>
             <div>
               <h3>ShipSpec Audit</h3>
               <div class="rows">
-                <div class="row">PASS Request intake</div><div class="row">PASS Spec</div><div class="row">PASS Contract</div><div class="row">PASS Agent room</div><div class="row">PASS Evidence</div><div class="row">PASS Report</div><div class="row">PASS Release</div><div class="row">PASS Done</div>
+                <div class="row">WAIT Request intake</div><div class="row">PASS Spec</div><div class="row">WAIT Contract</div><div class="row">WAIT Agent room</div><div class="row">WAIT Evidence</div><div class="row">WAIT Report</div><div class="row">WAIT Release</div><div class="row">WAIT Done</div>
               </div>
             </div>
           </div>
@@ -678,14 +678,14 @@
             <div>
               <h3>Ship Evidence</h3>
               <div class="rows">
-                <div class="row">Review: present</div><div class="row">Checklist: ready</div><div class="row">Verified: lint passed</div><div class="row">Verified: unit passed</div><div class="row">Verified: typecheck passed</div><div class="row">Verified: e2e passed</div>
+                <div class="row">Review: missing</div><div class="row">Checklist: missing</div><div class="row">No review evidence summary recorded.</div>
               </div>
             </div>
             <div>
               <h3>ShipSpec Files</h3>
               <div class="rows">
-                <div class="row">Contract: present</div>
-                <div class="row">Agent room: present</div>
+                <div class="row">Contract: missing</div>
+                <div class="row">Agent room: missing</div>
               </div>
             </div>
           </div>

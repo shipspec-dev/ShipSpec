@@ -19,6 +19,8 @@ ShipSpec keeps the delivery facts inside your repo:
 
 It is built for teams that want AI coding to be less random and easier to review.
 
+See the short launch walkthrough: [ShipSpec Two-Minute Demo](docs/demo.md).
+
 ## Fast Start
 
 From any project folder:
@@ -88,6 +90,8 @@ gsd next     # see next suggested action
 gsd context  # build local Agentic Context Pack for the AI pass
 gsd clean    # preview demo/test files that can be removed
 ```
+
+Example flow: [Jira to Codex login demo](examples/jira-codex-login/README.md).
 
 `gsd ui` shows ShipSpec Mission Control: a compact local dashboard with one next command, current mission status, readiness, and short likely-file names first. Workflow commands, full file paths, progress, evidence, memory, and audit details stay collapsed until you open them. Use `gsd ui --open` when you want ShipSpec to open it for you.
 

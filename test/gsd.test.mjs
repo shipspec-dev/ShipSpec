@@ -620,6 +620,8 @@ test("package is ready for TypeScript core and npm publishing", async () => {
 
   assert.equal(packageJson.private, false);
   assert.equal(packageJson.files.includes("skills"), true);
+  assert.equal(packageJson.files.includes("docs/demo.md"), true);
+  assert.equal(packageJson.files.includes("docs/demo.svg"), true);
   assert.equal(packageJson.files.includes("apps/desktop"), false);
   assert.equal(packageJson.files.includes("apps/desktop/renderer"), true);
   assert.equal(packageJson.scripts.build, "tsc --noEmit");
@@ -627,6 +629,8 @@ test("package is ready for TypeScript core and npm publishing", async () => {
   assert.equal(packageJson.devDependencies.typescript, "^5.5.0");
   assert.equal(packageJson.devDependencies["@types/node"], "^20.14.0");
   assert.equal(await exists(join(root, "tsconfig.json")), true);
+  assert.equal(await exists(join(root, "docs", "demo.svg")), true);
+  assert.equal(await exists(join(root, "docs", "demo.md")), true);
   assert.equal(await exists(join(root, "src", "adapters", "index.ts")), true);
   assert.equal(await exists(join(root, "src", "adapters", "openspec.ts")), true);
   assert.equal(await exists(join(root, "src", "adapters", "superpowers.ts")), true);

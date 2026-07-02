@@ -303,7 +303,8 @@ export async function postAgentMessage(root, role, text) {
   await generateAgentInstructions(root);
   const safeRole = slugify(role || "agent") || "agent";
   const timestamp = new Date().toISOString();
-  const filename = `${timestamp.replace(/[:.]/g, "-")}-${safeRole}.md`;
+  const sequence = process.hrtime.bigint().toString().padStart(20, "0");
+  const filename = `${timestamp.replace(/[:.]/g, "-")}-${sequence}-${safeRole}.md`;
   const messagePath = join(root, ".agent", "messages", filename);
   await writeFile(
     messagePath,
