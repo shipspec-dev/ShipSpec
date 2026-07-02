@@ -1,6 +1,6 @@
 # Builder Agent
 
-Implement only the validated scope and keep changes aligned with the active GSD change.
+Implement only the validated scope and keep changes aligned with the active ShipSpec change.
 
 ## Before Work
 

@@ -731,6 +731,42 @@ export async function generateLocalRag(root, query, options = {}) {
   };
 }
 
+export async function generateSkillRoute(root) {
+  await initWorkspace(root);
+  const activeChange = await requireActiveChange(root);
+  const likelyFiles = await inferLikelyFiles(root, activeChange);
+  const ragReportPath = join(root, ".gsd", "rag", `${activeChange.slug}.md`);
+  const ragReportExists = await exists(ragReportPath);
+  const ragReport = ragReportExists ? await readTextSnippetIfExists(ragReportPath, 18_000) : "";
+  const recommendedSkills = buildSkillRecommendations({
+    activeChange,
+    likelyFiles,
+    ragReportExists,
+    ragReport,
+  });
+  const routePath = join(root, ".gsd", "routes", `${activeChange.slug}.md`);
+  const route = buildSkillRouteMarkdown({
+    activeChange,
+    likelyFiles,
+    recommendedSkills,
+    ragReportPath: ragReportExists ? `.gsd/rag/${activeChange.slug}.md` : null,
+  });
+
+  await mkdir(join(root, ".gsd", "routes"), { recursive: true });
+  await writeFile(routePath, route);
+
+  return {
+    ok: true,
+    activeChange,
+    recommendedSkills,
+    likelyFiles,
+    ragReportPath: ragReportExists ? ragReportPath : null,
+    routePath,
+    route,
+    message: `Skill route written to .gsd/routes/${activeChange.slug}.md`,
+  };
+}
+
 export async function generateRelease(root) {
   const activeChange = await requireActiveChange(root);
   const specValidation = await validateChange(root, { ready: false });
@@ -803,8 +839,13 @@ export async function generateRelease(root) {
 
 export async function generateExamples(root) {
   const exampleRoot = join(root, "examples", "node-basic");
+  const jiraExampleRoot = join(root, "examples", "jira-codex-login");
   await mkdir(join(exampleRoot, ".gsd"), { recursive: true });
   await mkdir(join(exampleRoot, "openspec", "changes", "example-change"), { recursive: true });
+  await mkdir(join(jiraExampleRoot, ".gsd", "routes"), { recursive: true });
+  await mkdir(join(jiraExampleRoot, ".gsd", "rag"), { recursive: true });
+  await mkdir(join(jiraExampleRoot, "openspec", "changes", "add-login-page"), { recursive: true });
+  await mkdir(join(jiraExampleRoot, "src", "auth"), { recursive: true });
 
   await writeFile(
     join(exampleRoot, "package.json"),
@@ -862,7 +903,7 @@ export async function generateExamples(root) {
   );
   await writeFile(
     join(exampleRoot, ".gsd", "current.json"),
-    `${JSON.stringify({ title: "Example Change", slug: "example-change", startedAt: new Date().toISOString() }, null, 2)}\n`,
+    `${JSON.stringify({ title: "Example Change", slug: "example-change", startedAt: "2026-01-01T00:00:00.000Z" }, null, 2)}\n`,
   );
   await writeFile(
     join(exampleRoot, "openspec", "changes", "example-change", "proposal.md"),
@@ -888,9 +929,113 @@ export async function generateExamples(root) {
     "# Example Change Tasks\n\n- [ ] Review the example workflow\n",
   );
 
+  await writeFile(
+    join(jiraExampleRoot, "README.md"),
+    [
+      "# Jira to Codex ShipSpec Demo",
+      "",
+      "This example shows the public ShipSpec story: start from a Jira item, let Agentic RAG find context, hand the mission to Codex, then verify and ship.",
+      "",
+      "Run this from a real project root:",
+      "",
+      "```bash",
+      'gsd run "https://example.atlassian.net/browse/AUTH-42"',
+      'gsd rag "AUTH-42 login page affected files"',
+      "gsd codex",
+      "# Codex implements from repo files",
+      "gsd ship",
+      "gsd share",
+      "```",
+      "",
+      "What ShipSpec prepares:",
+      "",
+      "- a mission under `.gsd/missions/`",
+      "- a no-copy Codex handoff from `gsd codex`",
+      "- a local RAG report with citations under `.gsd/rag/`",
+      "- a skill route under `.gsd/routes/` so Codex uses relevant workflows only",
+      "- verification evidence and a report after `gsd ship`",
+      "",
+    ].join("\n"),
+  );
+  await writeFile(join(jiraExampleRoot, "src", "auth", "login.js"), "export function renderLoginPage() {\n  return '<form>Login</form>';\n}\n");
+  await writeFile(
+    join(jiraExampleRoot, ".gsd", "current.json"),
+    `${JSON.stringify({ title: "Add Login Page", slug: "add-login-page", startedAt: "2026-07-02T00:00:00.000Z" }, null, 2)}\n`,
+  );
+  await writeFile(
+    join(jiraExampleRoot, ".gsd", "routes", "add-login-page.md"),
+    [
+      "# ShipSpec Skill Route",
+      "",
+      "Mission: add-login-page",
+      "",
+      "## Routing Rule",
+      "",
+      "- Read Agentic RAG before choosing optional skills.",
+      "- Use only skills supported by local evidence.",
+      "",
+      "## Recommended Skills",
+      "",
+      "1. shipspec (required) - Use the active mission, spec, context pack, and verification workflow.",
+      "2. agentic-rag (required) - Read cited local files before optional skills.",
+      "3. test-driven-development (required) - Add or update tests before production code.",
+      "4. frontend-app-builder (recommended) - Login page is a user-facing UI change.",
+      "5. codex-security (recommended) - Login touches auth/session risk.",
+      "",
+      "## Context Priority",
+      "",
+      "1. .gsd/rag/add-login-page.md",
+      "2. .gsd/packs/add-login-page.md",
+      "3. .gsd/prompts/add-login-page.md",
+      "",
+    ].join("\n"),
+  );
+  await writeFile(
+    join(jiraExampleRoot, ".gsd", "rag", "add-login-page.md"),
+    [
+      "# Full Agentic RAG",
+      "",
+      "Change: add-login-page",
+      "Query: AUTH-42 login page affected files",
+      "Quality: usable (65%)",
+      "",
+      "## Ranked Citations",
+      "",
+      "### 1. src/auth/login.js",
+      "",
+      "- Kind: source",
+      "- Reasons: path:login, source-file",
+      "",
+    ].join("\n"),
+  );
+  await writeFile(
+    join(jiraExampleRoot, "openspec", "changes", "add-login-page", "proposal.md"),
+    [
+      "# Add Login Page",
+      "",
+      "## Intent",
+      "",
+      "Demonstrate a Jira-driven login feature flow.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- [ ] Login page renders with username and password fields.",
+      "- [ ] Auth-sensitive behavior is reviewed before ship.",
+      "",
+      "## Verification Plan",
+      "",
+      "- Run `gsd ship`.",
+      "",
+    ].join("\n"),
+  );
+  await writeFile(
+    join(jiraExampleRoot, "openspec", "changes", "add-login-page", "tasks.md"),
+    "# Add Login Page Tasks\n\n- [ ] Run Agentic RAG\n- [ ] Hand to Codex\n- [ ] Verify and ship\n",
+  );
+
   return {
     ok: true,
-    message: "Examples written to examples/node-basic",
+    message: "Examples written to examples/node-basic and examples/jira-codex-login",
     exampleRoot,
   };
 }
@@ -985,6 +1130,7 @@ async function buildDashboardModel(root) {
   const operation = activeChange ? await getOperationUiState(root, activeChange.slug) : null;
   const decisions = activeChange ? await readDecisionEntries(root, activeChange.slug) : [];
   const review = activeChange ? await getReviewUiState(root, activeChange.slug) : null;
+  const route = activeChange ? await getRouteUiState(root, activeChange.slug) : null;
   const memory = await getMemorySummary(root);
   const next = await getNextRecommendation(root);
   const likelyFiles = activeChange ? await inferLikelyFiles(root, activeChange, { diff }) : [];
@@ -1005,6 +1151,7 @@ async function buildDashboardModel(root) {
     operation,
     decisions,
     review,
+    route,
     memory,
     next,
     likelyFiles,
@@ -1756,13 +1903,15 @@ export async function generateCodexHandoff(root) {
   }
 
   const likelyFiles = await inferLikelyFiles(root, activeChange);
-  const handoff = buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles });
+  const skillRoute = await generateSkillRoute(root);
+  const handoff = buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles, skillRoute });
 
   return {
     ok: true,
     activeChange,
     files,
     likelyFiles,
+    skillRoute,
     handoff,
     message: handoff,
   };
@@ -2215,6 +2364,12 @@ export async function runCli(argv, options = {}) {
       const result = await generateLocalRag(cwd, query);
       if (json) return cliResult(result.ok ? 0 : 1, `${JSON.stringify(result, null, 2)}\n`);
       return cliResult(result.ok ? 0 : 1, `${result.message}\n`);
+    }
+
+    if (command === "route") {
+      const result = await generateSkillRoute(cwd);
+      if (rest.includes("--json")) return cliResult(result.ok ? 0 : 1, `${JSON.stringify(result, null, 2)}\n`);
+      return cliResult(result.ok ? 0 : 1, `${result.route}\n`);
     }
 
     if (command === "codex") {
@@ -2741,8 +2896,9 @@ function buildAutopilotMemorySignal(memory) {
   return "";
 }
 
-function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles }) {
+function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles, skillRoute }) {
   const memoryLines = formatCodexMemoryLines(memory);
+  const routeLines = formatCodexSkillRouteLines(skillRoute);
   return [
     "Use $shipspec and implement the active ShipSpec mission.",
     `Mission: ${activeChange.slug}`,
@@ -2751,6 +2907,7 @@ function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles })
     ...formatBulletList(files, "No ShipSpec files found."),
     "",
     ...(likelyFiles.length ? ["Likely project files:", ...formatBulletList(likelyFiles.slice(0, 8), "No likely project files inferred."), ""] : []),
+    ...routeLines,
     ...(memoryLines.length ? ["Project memory:", ...memoryLines, ""] : []),
     "Do not ask me to paste long context. Use repo files as the source of truth.",
     "Stop before coding if the mission/spec is unclear.",
@@ -2760,6 +2917,99 @@ function buildCodexHandoffMarkdown({ activeChange, files, memory, likelyFiles })
     "- gsd ship",
     "- gsd share",
   ].join("\n");
+}
+
+function buildSkillRecommendations({ activeChange, likelyFiles, ragReportExists, ragReport }) {
+  const text = [
+    activeChange.title,
+    activeChange.slug,
+    likelyFiles.join(" "),
+    ragReport,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const recommendations = [];
+  const add = (name, reason, priority = "recommended") => {
+    if (recommendations.some((skill) => skill.name === name)) return;
+    recommendations.push({ name, priority, reason });
+  };
+
+  add("shipspec", "Always use the active ShipSpec mission, spec, context pack, and verification workflow.", "required");
+  add(
+    "agentic-rag",
+    ragReportExists
+      ? "Read the local RAG report before choosing optional skills or editing code."
+      : "Run `gsd rag \"<feature area>\"` when file context is weak or the repo has many possible skills.",
+    ragReportExists ? "required" : "recommended",
+  );
+  add("test-driven-development", "This is an implementation mission; write or update focused tests before production code.", "required");
+
+  if (/\b(jira|atlassian|ticket|issue|story|bug-\d+|[a-z]+-\d{2,})\b/iu.test(text)) {
+    add("sdach-ai", "The request looks ticket-driven, so use the delivery item workflow for requirement clarity.", "recommended");
+  }
+  if (/\b(bug|fix|error|fail|failed|failure|crash|timeout|regression|exception|broken)\b/iu.test(text)) {
+    add("systematic-debugging", "The mission looks like a defect or failure, so investigate cause before changing code.", "recommended");
+  }
+  if (/\b(ui|ux|frontend|front-end|react|component|page|screen|css|layout|dashboard|form|button)\b/iu.test(text) || likelyFiles.some((file) => /\.(jsx|tsx|css|scss)$/iu.test(file))) {
+    add("frontend-app-builder", "The mission touches user-facing UI or frontend files.", "recommended");
+  }
+  if (/\b(auth|login|password|token|session|permission|role|payment|stripe|secret|credential|security|xss|csrf|sql injection)\b/iu.test(text)) {
+    add("codex-security", "Security-sensitive terms are present, so review auth/data handling risks before shipping.", "recommended");
+  }
+  if (/\b(database|postgres|sql|migration|schema|table|column)\b/iu.test(text)) {
+    add("supabase-postgres-best-practices", "Database or query changes need schema/query performance checks.", "optional");
+  }
+  if (/\b(slack|message|channel|notification)\b/iu.test(text)) {
+    add("slack", "Slack-related work should use the Slack workflow and avoid guessing message context.", "optional");
+  }
+
+  return recommendations;
+}
+
+function buildSkillRouteMarkdown({ activeChange, likelyFiles, recommendedSkills, ragReportPath }) {
+  return [
+    "# ShipSpec Skill Route",
+    "",
+    `Mission: ${activeChange.slug}`,
+    "",
+    "## Routing Rule",
+    "",
+    "- Read Agentic RAG before choosing optional skills.",
+    "- Use only skills that match repo evidence, mission text, or retrieved files.",
+    "- Do not use random skills just because they are installed.",
+    "",
+    "## Recommended Skills",
+    "",
+    ...recommendedSkills.map((skill, index) => `${index + 1}. ${skill.name} (${skill.priority}) - ${skill.reason}`),
+    "",
+    "## Context Priority",
+    "",
+    ...(ragReportPath
+      ? [`1. ${ragReportPath}`, `2. .gsd/packs/${activeChange.slug}.md`, `3. .gsd/prompts/${activeChange.slug}.md`]
+      : [`1. Run \`gsd rag "${activeChange.title}"\` for cited local retrieval.`, `2. .gsd/packs/${activeChange.slug}.md`, `3. .gsd/prompts/${activeChange.slug}.md`]),
+    "",
+    "## Likely Files",
+    "",
+    ...formatBulletList(likelyFiles, "No likely files inferred."),
+    "",
+  ].join("\n");
+}
+
+function formatCodexSkillRouteLines(route) {
+  if (!route?.recommendedSkills?.length) return [];
+  const ragLine = route.ragReportPath ? `- Read Agentic RAG first: .gsd/rag/${route.activeChange.slug}.md` : `- Run Agentic RAG first if context feels weak: gsd rag "${route.activeChange.title}"`;
+  const skillLines = route.recommendedSkills.map((skill) => {
+    if (skill.name === "agentic-rag") return `- Agentic RAG gate: ${skill.reason}`;
+    return `- Recommended skill ${skill.name}: ${skill.reason}`;
+  });
+  return [
+    "Skill routing:",
+    "- Read Agentic RAG before choosing optional skills.",
+    ...skillLines,
+    ragLine,
+    "- Do not use unrelated skills just because they are installed.",
+    "",
+  ];
 }
 
 function formatCodexMemoryLines(memory) {
@@ -3158,6 +3408,18 @@ async function getReviewUiState(root, slug) {
   };
 }
 
+async function getRouteUiState(root, slug) {
+  const routePath = join(root, ".gsd", "routes", `${slug}.md`);
+  const routeContent = await readTextSnippetIfExists(routePath, 16_000);
+
+  return {
+    present: Boolean(routeContent),
+    path: `.gsd/routes/${slug}.md`,
+    skills: extractNumberedMarkdownItemsAfterHeading(routeContent, "Recommended Skills").slice(0, 5),
+    contextPriority: extractNumberedMarkdownItemsAfterHeading(routeContent, "Context Priority").slice(0, 3),
+  };
+}
+
 async function buildStructuredMemory(root, activeChange, reflection) {
   const diff = await getDiffSummary(root);
   const changedFiles = [...new Set([...diff.stagedFiles, ...diff.unstagedFiles, ...(diff.committedFiles ?? [])])].sort();
@@ -3318,6 +3580,22 @@ function extractMarkdownBulletsAfterHeading(markdown, heading) {
   }
 
   return bullets;
+}
+
+function extractNumberedMarkdownItemsAfterHeading(markdown, heading) {
+  if (!markdown) return [];
+  const lines = markdown.split("\n");
+  const headingIndex = lines.findIndex((line) => line.trim().toLowerCase() === `## ${heading}`.toLowerCase());
+  if (headingIndex === -1) return [];
+  const items = [];
+
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (line.startsWith("## ")) break;
+    const match = line.match(/^\d+\.\s+(.*)$/u);
+    if (match) items.push(match[1].trim());
+  }
+
+  return items;
 }
 
 function extractMarkdownField(markdown, field) {
@@ -5242,6 +5520,7 @@ function buildAppHtml(model) {
   const files = model.likelyFiles?.length ? model.likelyFiles : ["No likely files inferred yet."];
   const primaryCommands = [
     "gsd operate",
+    "gsd route",
     "gsd codex",
     "gsd verify --full",
     "gsd ship",
@@ -5273,11 +5552,18 @@ function buildAppHtml(model) {
     `Checks: ${memory.checks?.slice(0, 5).join(", ") || "None recorded."}`,
     `Ship pattern: ${memory.shipPatterns?.[0] ?? "None recorded."}`,
   ];
+  const routeRows = model.route?.present
+    ? [
+        `Route: ${model.route.path}`,
+        ...(model.route.skills?.length ? model.route.skills : ["No skill recommendations recorded."]),
+      ]
+    : ["Route: missing", "Run gsd route to recommend skills from local evidence."];
   const messages = model.messages.length ? model.messages.slice(0, 8) : [{ role: "system", text: "No agent messages yet." }];
   const visibleFiles = files.slice(0, 5);
   const nextActions = [
     [model.next?.command ?? "gsd next", model.next?.reason ?? "Run gsd next for guidance."],
     ["gsd codex", "Give Codex the prepared mission context."],
+    ["gsd route", "Show which skills ShipSpec recommends for this mission."],
     ["gsd verify --full", "Collect full verification evidence."],
     ["gsd ship", "Review, report, and prepare the handoff."],
   ].filter(([command], index, actions) => actions.findIndex(([other]) => other === command) === index);
@@ -5574,6 +5860,12 @@ function buildAppHtml(model) {
           <div class="section">
             <h3>Blocker</h3>
             <p class="note">${escapeHtml(readinessReason)}</p>
+          </div>
+          <div class="section">
+            <h3>Skill route</h3>
+            <div class="rows">
+              ${routeRows.map((item) => `<div class="row">${escapeHtml(item)}</div>`).join("")}
+            </div>
           </div>
         </div>
       </section>
@@ -6609,6 +6901,7 @@ function beginnerUsage() {
     "  gsd doctor",
     "  gsd share",
     "  gsd ask",
+    "  gsd route",
     "  gsd rag <query>",
     "  gsd ui",
     "  gsd ui --open",
@@ -6660,6 +6953,7 @@ function usage() {
   "  prompt [--json]",
   "  pack [--json]",
   "  context [--json]",
+  "  route [--json]",
   "  rag [--json] <query>",
   "  share",
     "  review [--json]",

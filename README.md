@@ -1,31 +1,43 @@
 # ShipSpec
 
-ShipSpec helps humans and AI agents ship software with less confusion.
+ShipSpec helps humans and AI agents turn a request, Jira item, or feature idea into a verified code change.
 
-It keeps the important delivery facts inside your repo:
-
-- what you are building
-- what the AI should read
-- what checks passed
-- what is ready for review
-
-The command is short:
+Most developers only need three commands:
 
 ```bash
-gsd
+gsd run "https://example.atlassian.net/browse/AUTH-42"
+gsd codex
+gsd ship
 ```
+
+ShipSpec keeps the delivery facts inside your repo:
+
+- the mission and spec
+- the files and context the AI should read
+- the skill route Codex should follow
+- the checks, review notes, and ship report
+
+It is built for teams that want AI coding to be less random and easier to review.
 
 ## Fast Start
 
 From any project folder:
 
 ```bash
-gsd "Add user profile page"
-gsd
+gsd run "Add user profile page"
 gsd codex
 ```
 
-Then follow the next command from `gsd`. When it says `gsd codex`, open Codex and use that output.
+Open Codex and use the `gsd codex` output. Codex reads the repo files directly, including the mission, context pack, likely files, Agentic RAG report when present, and skill route.
+
+After the feature is implemented:
+
+```bash
+gsd ship
+gsd share
+```
+
+That is the main flow.
 
 If something feels off, run the health check:
 
@@ -39,22 +51,14 @@ To open the visual Mission Control dashboard immediately:
 gsd run --open "Add user profile page"
 ```
 
-After the feature is implemented:
-
-```bash
-gsd ship
-gsd share
-```
-
-That is the main flow.
-
-`gsd "Feature"` is Mission Autopilot. It prepares the mission, prompt, context pack, reasoning, likely files, risk level, and dashboard in one step. Plain `gsd` then guides the next safe step.
+`gsd "Feature"` is the short alias for `gsd run "Feature"`. Plain `gsd` guides the next safe step for the active mission.
 
 ShipSpec now behaves like a small AI delivery control layer:
 
 - `gsd doctor` checks repo health, scripts, workflow, Git, and ShipSpec skill setup.
 - `gsd` routes you to the next safe action from local state.
-- `gsd codex` includes likely files and learned project memory.
+- `gsd route` recommends the right skills from local evidence.
+- `gsd codex` includes likely files, skill routing, and learned project memory.
 - `gsd ship` verifies, validates, writes review guidance, and creates the report.
 - `gsd ui` opens a calm mission view first, with detailed evidence collapsed.
 
@@ -62,13 +66,11 @@ ShipSpec now behaves like a small AI delivery control layer:
 
 ```bash
 cd /path/to/project
-gsd "Your feature"
-gsd
+gsd run "Your feature"
 gsd codex
 
 # AI or human implements
 
-gsd
 gsd ship
 gsd share
 ```
@@ -104,6 +106,15 @@ gsd fix "Navbar spacing"
 ```bash
 gsd codex
 ```
+
+When a repo has many available AI skills, use the skill router:
+
+```bash
+gsd route
+gsd route --json
+```
+
+`gsd route` writes `.gsd/routes/<change>.md` and recommends only the skills that match the mission, local RAG evidence, likely files, and project memory. `gsd codex` includes this route automatically, so Codex reads Agentic RAG first and avoids random unrelated skills.
 
 For other AI tools, use:
 
@@ -182,6 +193,7 @@ gsd ui
 | `gsd autopilot` | Explicit form of plain `gsd`. |
 | `gsd codex` | Hand work to Codex without long paste. |
 | `gsd context` | Build a local Agentic Context Pack with ranked files, quality score, connector signals, memory, risks, and next step. |
+| `gsd route` | Recommend the right AI skills from mission text, Agentic RAG, likely files, and memory. |
 | `gsd rag "query"` | Ask the full local Agentic RAG index for cited files, snippets, quality, and refinement steps. |
 | `gsd ship` | Verify, validate, write review guidance, and write report. |
 | `gsd doctor` | Diagnose setup, workflow, skill, and test readiness. |
@@ -248,6 +260,7 @@ The full command set is still available for teams that want explicit control.
 | `gsd prompt [--json]` | Generate an AI planning prompt from the active ShipSpec change. |
 | `gsd pack [--json]` | Generate a compact, agent-neutral context pack with spec, diff, evidence, decisions, risks, and next action. |
 | `gsd context [--json]` | Generate a local Agentic Context Pack with retrieval strategy, quality score, connector signals, ranked sources, memory signals, and evaluation hints. |
+| `gsd route [--json]` | Write `.gsd/routes/<change>.md` with Agentic RAG-first skill recommendations for Codex and humans. |
 | `gsd rag [--json] <query>` | Build/query the full local Agentic RAG index and write `.gsd/rag/<change>.md`. |
 | `gsd share` | Alias for `gsd pack`, optimized for the small command surface. |
 | `gsd review [--json]` | Generate a decision-aware review checklist from local ShipSpec state. |

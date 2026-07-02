@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added `gsd route` to recommend relevant AI skills from mission text, Agentic RAG, likely files, and local project evidence.
+- Updated `gsd codex` to include Agentic RAG-first skill routing automatically.
+- Added a Jira-to-Codex login demo under `examples/jira-codex-login`.
+- Surfaced skill routing in the richer `gsd app` Mission Control shell.
+
 ## 0.4.0
 
 - Added `gsd reflect` for lightweight local readiness critique.

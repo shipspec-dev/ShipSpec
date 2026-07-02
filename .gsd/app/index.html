@@ -234,15 +234,15 @@
     <main class="main">
       <div class="topbar">
         <div class="title">
-          <h2>Add agentic context engine</h2>
-          <p>add-agentic-context-engine / codex/agentic-context-engine</p>
+          <h2>Add Agentic RAG skill router</h2>
+          <p>add-agentic-rag-skill-router / main</p>
         </div>
         <span class="pill pass">Ready PASS</span>
       </div>
 
       <div class="copy-status" role="status" aria-live="polite"></div>
       <section class="command-strip" aria-label="Primary commands">
-        <button class="command primary" type="button" data-command="gsd operate">gsd operate</button><button class="command primary" type="button" data-command="gsd codex">gsd codex</button><button class="command primary" type="button" data-command="gsd verify --full">gsd verify --full</button><button class="command primary" type="button" data-command="gsd ship">gsd ship</button>
+        <button class="command primary" type="button" data-command="gsd operate">gsd operate</button><button class="command primary" type="button" data-command="gsd route">gsd route</button><button class="command primary" type="button" data-command="gsd codex">gsd codex</button><button class="command primary" type="button" data-command="gsd verify --full">gsd verify --full</button><button class="command primary" type="button" data-command="gsd ship">gsd ship</button>
       </section>
 
       <section class="next-action" aria-label="Next action">
@@ -259,14 +259,14 @@
             <div class="next-actions">
               <h3>Next actions</h3>
               <div class="rows">
-                <div class="row action-row"><button class="command" type="button" data-command="gsd operate">gsd operate</button><span>Operation report is missing for the active change.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd codex">gsd codex</button><span>Give Codex the prepared mission context.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd verify --full">gsd verify --full</button><span>Collect full verification evidence.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd ship">gsd ship</button><span>Review, report, and prepare the handoff.</span></div>
+                <div class="row action-row"><button class="command" type="button" data-command="gsd operate">gsd operate</button><span>Operation report is missing for the active change.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd codex">gsd codex</button><span>Give Codex the prepared mission context.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd route">gsd route</button><span>Show which skills ShipSpec recommends for this mission.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd verify --full">gsd verify --full</button><span>Collect full verification evidence.</span></div><div class="row action-row"><button class="command" type="button" data-command="gsd ship">gsd ship</button><span>Review, report, and prepare the handoff.</span></div>
               </div>
             </div>
           </div>
           <div class="section">
             <h3>Mission</h3>
             <div class="rows">
-              <div class="row">Change: add-agentic-context-engine</div>
+              <div class="row">Change: add-agentic-rag-skill-router</div>
               <div class="row">Spec: ready</div>
               <div class="row">Prompt: present</div>
             </div>
@@ -275,7 +275,7 @@
             <div class="home-files">
               <h3>Likely files</h3>
               <div class="rows">
-                <div class="row file-row" data-file="src/gsd.mjs"><span class="file-name">gsd.mjs</span><span class="file-path">src/gsd.mjs</span></div><div class="row file-row" data-file="test/gsd.test.mjs"><span class="file-name">gsd.test.mjs</span><span class="file-path">test/gsd.test.mjs</span></div><div class="row file-row" data-file="readme.md"><span class="file-name">README.md</span><span class="file-path">README.md</span></div><div class="row file-row" data-file="src/adapters/index.ts"><span class="file-name">index.ts</span><span class="file-path">src/adapters/index.ts</span></div><div class="row file-row" data-file="src/adapters/github.ts"><span class="file-name">github.ts</span><span class="file-path">src/adapters/github.ts</span></div>
+                <div class="row file-row" data-file="skills/shipspec/skill.md"><span class="file-name">SKILL.md</span><span class="file-path">skills/shipspec/SKILL.md</span></div><div class="row file-row" data-file="src/gsd.mjs"><span class="file-name">gsd.mjs</span><span class="file-path">src/gsd.mjs</span></div><div class="row file-row" data-file="test/gsd.test.mjs"><span class="file-name">gsd.test.mjs</span><span class="file-path">test/gsd.test.mjs</span></div><div class="row file-row" data-file="readme.md"><span class="file-name">README.md</span><span class="file-path">README.md</span></div><div class="row file-row" data-file="changelog.md"><span class="file-name">CHANGELOG.md</span><span class="file-path">CHANGELOG.md</span></div>
               </div>
             </div>
           </div>
@@ -291,6 +291,12 @@
             <h3>Blocker</h3>
             <p class="note">Ready to ship.</p>
           </div>
+          <div class="section">
+            <h3>Skill route</h3>
+            <div class="rows">
+              <div class="row">Route: .gsd/routes/add-agentic-rag-skill-router.md</div><div class="row">shipspec (required) - Always use the active ShipSpec mission, spec, context pack, and verification workflow.</div><div class="row">agentic-rag (recommended) - Run `gsd rag &quot;&lt;feature area&gt;&quot;` when file context is weak or the repo has many possible skills.</div><div class="row">test-driven-development (required) - This is an implementation mission; write or update focused tests before production code.</div><div class="row">sdach-ai (recommended) - The request looks ticket-driven, so use the delivery item workflow for requirement clarity.</div><div class="row">codex-security (recommended) - Security-sensitive terms are present, so review auth/data handling risks before shipping.</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -301,14 +307,14 @@
             <input class="search" type="search" placeholder="Search likely files" aria-label="Search likely files">
           </div>
           <div class="rows file-list">
-            <div class="row file-row" data-file="src/gsd.mjs"><span class="file-name">gsd.mjs</span><span class="file-path">src/gsd.mjs</span></div><div class="row file-row" data-file="test/gsd.test.mjs"><span class="file-name">gsd.test.mjs</span><span class="file-path">test/gsd.test.mjs</span></div><div class="row file-row" data-file="readme.md"><span class="file-name">README.md</span><span class="file-path">README.md</span></div><div class="row file-row" data-file="src/adapters/index.ts"><span class="file-name">index.ts</span><span class="file-path">src/adapters/index.ts</span></div><div class="row file-row" data-file="src/adapters/github.ts"><span class="file-name">github.ts</span><span class="file-path">src/adapters/github.ts</span></div><div class="row file-row" data-file="src/adapters/openspec.ts"><span class="file-name">openspec.ts</span><span class="file-path">src/adapters/openspec.ts</span></div><div class="row file-row" data-file="src/adapters/project-scripts.ts"><span class="file-name">project-scripts.ts</span><span class="file-path">src/adapters/project-scripts.ts</span></div><div class="row file-row" data-file="src/adapters/superpowers.ts"><span class="file-name">superpowers.ts</span><span class="file-path">src/adapters/superpowers.ts</span></div>
+            <div class="row file-row" data-file="skills/shipspec/skill.md"><span class="file-name">SKILL.md</span><span class="file-path">skills/shipspec/SKILL.md</span></div><div class="row file-row" data-file="src/gsd.mjs"><span class="file-name">gsd.mjs</span><span class="file-path">src/gsd.mjs</span></div><div class="row file-row" data-file="test/gsd.test.mjs"><span class="file-name">gsd.test.mjs</span><span class="file-path">test/gsd.test.mjs</span></div><div class="row file-row" data-file="readme.md"><span class="file-name">README.md</span><span class="file-path">README.md</span></div><div class="row file-row" data-file="changelog.md"><span class="file-name">CHANGELOG.md</span><span class="file-path">CHANGELOG.md</span></div><div class="row file-row" data-file="examples/jira-codex-login/readme.md"><span class="file-name">README.md</span><span class="file-path">examples/jira-codex-login/README.md</span></div><div class="row file-row" data-file="examples/jira-codex-login/src/auth/login.js"><span class="file-name">login.js</span><span class="file-path">examples/jira-codex-login/src/auth/login.js</span></div><div class="row file-row" data-file="examples/node-basic/package.json"><span class="file-name">package.json</span><span class="file-path">examples/node-basic/package.json</span></div>
           </div>
         </div>
       </section>
 
       <section class="tab-panel" data-panel="evidence">
         <div class="grid">
-          <div class="section"><div class="label">Change</div><h3>add-agentic-context-engine</h3></div><div class="section"><div class="label">Branch</div><h3>codex/agentic-context-engine</h3></div><div class="section"><div class="label">Evidence</div><h3>present</h3></div><div class="section"><div class="label">Review</div><h3>present</h3></div><div class="section"><div class="label">Report</div><h3>present</h3></div><div class="section"><div class="label">Release</div><h3>present</h3></div>
+          <div class="section"><div class="label">Change</div><h3>add-agentic-rag-skill-router</h3></div><div class="section"><div class="label">Branch</div><h3>main</h3></div><div class="section"><div class="label">Evidence</div><h3>present</h3></div><div class="section"><div class="label">Review</div><h3>present</h3></div><div class="section"><div class="label">Report</div><h3>present</h3></div><div class="section"><div class="label">Release</div><h3>present</h3></div>
         </div>
       </section>
 
@@ -325,7 +331,7 @@
         <div class="section">
           <h3>Memory</h3>
           <div class="rows">
-            <div class="row">Common files: src/gsd.mjs, test/gsd.test.mjs</div><div class="row">Checks: e2e, lint, typecheck, unit</div><div class="row">Ship pattern: verify -&gt; review -&gt; report -&gt; done</div>
+            <div class="row">Common files: src/gsd.mjs, test/gsd.test.mjs, .cursor/rules/gsd.mdc, README.md, skills/shipspec/SKILL.md</div><div class="row">Checks: e2e, lint, typecheck, unit</div><div class="row">Ship pattern: verify -&gt; review -&gt; report -&gt; done</div>
           </div>
         </div>
       </section>
