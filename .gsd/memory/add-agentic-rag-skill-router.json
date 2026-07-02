@@ -1,0 +1,48 @@
+{
+  "slug": "add-agentic-rag-skill-router",
+  "title": "Add Agentic RAG skill router",
+  "learnedAt": "2026-07-01T07:18:22.626Z",
+  "changedFiles": [
+    ".cursor/rules/gsd.mdc",
+    "README.md",
+    "skills/shipspec/SKILL.md",
+    "src/gsd.mjs",
+    "test/gsd.test.mjs"
+  ],
+  "checks": [
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "unit",
+      "command": "npm test",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "result": "pass",
+      "required": "yes"
+    },
+    {
+      "name": "e2e",
+      "command": "npm run test:e2e",
+      "result": "pass",
+      "required": "no"
+    }
+  ],
+  "risks": [
+    "No verification risks detected from configured checks."
+  ],
+  "artifacts": {
+    "evidence": ".agent/evidence/add-agentic-rag-skill-router.md",
+    "review": ".gsd/reviews/add-agentic-rag-skill-router.md",
+    "report": ".gsd/reports/add-agentic-rag-skill-router.md",
+    "done": ".gsd/done/add-agentic-rag-skill-router.md"
+  },
+  "shipPattern": "verify -> review -> report -> done"
+}

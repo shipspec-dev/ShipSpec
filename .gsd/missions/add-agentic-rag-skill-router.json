@@ -1,0 +1,56 @@
+{
+  "title": "Add Agentic RAG skill router",
+  "slug": "add-agentic-rag-skill-router",
+  "request": "Add Agentic RAG skill router",
+  "phase": "planning-ready",
+  "risk": {
+    "level": "medium",
+    "reasons": [
+      "Verification evidence missing",
+      "ready validation failing",
+      "next action pending: gsd operate"
+    ]
+  },
+  "likelyFiles": [
+    "skills/shipspec/SKILL.md",
+    "src/gsd.mjs",
+    "test/gsd.test.mjs",
+    "skills/shipspec/agents/openai.yaml",
+    "src/adapters/index.ts",
+    "src/adapters/github.ts",
+    "src/adapters/openspec.ts",
+    "src/adapters/project-scripts.ts"
+  ],
+  "nextAction": {
+    "command": "open .gsd/prompts/add-agentic-rag-skill-router.md",
+    "reason": "Mission prompt and context pack are ready for an AI coding pass.",
+    "otherCommands": [
+      "open .gsd/packs/add-agentic-rag-skill-router.md",
+      "gsd ui"
+    ]
+  },
+  "validation": {
+    "spec": "pass",
+    "ready": "not-run",
+    "errors": []
+  },
+  "artifacts": {
+    "mission": ".gsd/missions/add-agentic-rag-skill-router.md",
+    "missionJson": ".gsd/missions/add-agentic-rag-skill-router.json",
+    "reasoning": ".gsd/reasoning/add-agentic-rag-skill-router.md",
+    "prompt": ".gsd/prompts/add-agentic-rag-skill-router.md",
+    "pack": ".gsd/packs/add-agentic-rag-skill-router.md",
+    "context": ".gsd/context/add-agentic-rag-skill-router.md",
+    "report": null,
+    "reflection": null,
+    "ui": ".gsd/ui/index.html"
+  },
+  "safety": {
+    "localOnly": true,
+    "externalActions": false,
+    "destructiveActions": false,
+    "deployment": false,
+    "maxLoops": 1
+  },
+  "generatedAt": "2026-07-01T07:06:59.961Z"
+}

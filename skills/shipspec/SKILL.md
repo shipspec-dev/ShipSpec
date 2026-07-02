@@ -47,6 +47,14 @@ gsd codex
 
 `gsd codex` prints a short instruction that tells Codex to use `$shipspec` and read the active mission, prompt, pack, proposal, and tasks from repo files. Prefer this over asking the user to paste long context.
 
+When a repo has many possible AI skills, route before coding:
+
+```bash
+gsd route
+```
+
+`gsd route` writes `.gsd/routes/<change>.md` and recommends skills from the mission, local RAG evidence, likely files, and learned memory. `gsd codex` includes this route automatically. Read Agentic RAG before choosing optional skills, then use only the skills supported by repo evidence.
+
 For full local Agentic RAG before implementation or review, use:
 
 ```bash

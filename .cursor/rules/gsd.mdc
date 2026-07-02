@@ -2,13 +2,13 @@
 alwaysApply: true
 ---
 
-# GSD Agent Instructions
+# ShipSpec Agent Instructions
 
-Use GSD as the shared delivery protocol for humans and AI agents.
+Use ShipSpec as the shared delivery protocol for humans and AI agents.
 
 ## Required Workflow
 
-- Always check active GSD change before editing.
+- Always check active ShipSpec change before editing.
 - Run `gsd spec` before implementation.
 - Run `gsd validate` before coding.
 - Run `gsd verify --full` before claiming done.

@@ -24,6 +24,8 @@ import {
   generateReasoning,
   generateReview,
   generateAgenticContext,
+  generateLocalRag,
+  generateSkillRoute,
   getMemorySummary,
   getNextRecommendation,
   getSpecStatus,
@@ -525,7 +527,9 @@ test("generateExamples creates a node-basic example project with ShipSpec artifa
   assert.equal(result.ok, true);
   assert.equal(await exists(join(root, "examples", "node-basic", "package.json")), true);
   assert.equal(await exists(join(root, "examples", "node-basic", "README.md")), true);
+  assert.equal(await exists(join(root, "examples", "jira-codex-login", "README.md")), true);
   assert.equal(await exists(join(root, "examples", "node-basic", ".gsd", "workflow.json")), true);
+  assert.equal(await exists(join(root, "examples", "jira-codex-login", ".gsd", "routes", "add-login-page.md")), true);
   assert.equal(
     await exists(join(root, "examples", "node-basic", "openspec", "changes", "example-change", "proposal.md")),
     true,
@@ -533,6 +537,12 @@ test("generateExamples creates a node-basic example project with ShipSpec artifa
   const readme = await readFile(join(root, "examples", "node-basic", "README.md"), "utf8");
   assert.match(readme, /gsd validate/);
   assert.match(readme, /gsd verify --full/);
+  const jiraReadme = await readFile(join(root, "examples", "jira-codex-login", "README.md"), "utf8");
+  assert.match(jiraReadme, /Jira to Codex/);
+  assert.match(jiraReadme, /gsd run "https:\/\/example\.atlassian\.net\/browse\/AUTH-42"/);
+  assert.match(jiraReadme, /gsd rag "AUTH-42 login page affected files"/);
+  assert.match(jiraReadme, /gsd codex/);
+  assert.match(jiraReadme, /gsd ship/);
 });
 
 test("runSelfTest summarizes command health using an injectable runner", async () => {
@@ -1311,6 +1321,48 @@ test("runCli codex prints no-copy handoff and appears in help", async () => {
   assert.match(advanced.stdout, /codex/);
 });
 
+test("runCli route recommends skills from request and repo evidence", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Fix login error from Jira");
+  await mkdir(join(root, "src", "auth"), { recursive: true });
+  await writeFile(join(root, "src", "auth", "login.js"), "export function login() { throw new Error('timeout'); }\n");
+  await writeFile(join(root, "src", "auth", "login.test.js"), "import { login } from './login.js';\n");
+  await generateLocalRag(root, "Jira login error");
+
+  const result = await runCli(["route", "--json"], { cwd: root });
+
+  assert.equal(result.exitCode, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.ok, true);
+  assert.equal(payload.activeChange.slug, "fix-login-error-from-jira");
+  assert.equal(payload.recommendedSkills[0].name, "shipspec");
+  assert.equal(payload.recommendedSkills.some((skill) => skill.name === "test-driven-development"), true);
+  assert.equal(payload.recommendedSkills.some((skill) => skill.name === "systematic-debugging"), true);
+  assert.equal(payload.recommendedSkills.some((skill) => skill.name === "sdach-ai"), true);
+  assert.equal(payload.recommendedSkills.some((skill) => skill.name === "agentic-rag"), true);
+  assert.match(payload.route, /## Recommended Skills/);
+  assert.match(payload.route, /\.gsd\/rag\/fix-login-error-from-jira\.md/);
+});
+
+test("generateCodexHandoff includes Agentic RAG-first skill routing", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Add login UI");
+  await mkdir(join(root, "src"), { recursive: true });
+  await writeFile(join(root, "src", "LoginView.jsx"), "export function LoginView() { return null; }\n");
+  await generateLocalRag(root, "login UI");
+
+  const result = await generateCodexHandoff(root);
+
+  assert.equal(result.ok, true);
+  assert.match(result.handoff, /Skill routing/);
+  assert.match(result.handoff, /Read Agentic RAG before choosing optional skills/);
+  assert.match(result.handoff, /Agentic RAG gate/);
+  assert.match(result.handoff, /frontend-app-builder/);
+  assert.match(result.handoff, /\.gsd\/rag\/add-login-ui\.md/);
+});
+
 test("generateContextPack writes a portable AI handoff pack", async () => {
   const root = await tempRoot();
   await execFileAsync("git", ["init"], { cwd: root });
@@ -2073,6 +2125,24 @@ test("generateAppDashboard makes the mission home a dense dashboard", async () =
   assert.match(html, /Scope is ready/);
   assert.match(html, /class="inspector compact"/);
   assert.doesNotMatch(html, /<div class="section">\s*<div class="label">Commands<\/div>/);
+});
+
+test("generateAppDashboard surfaces skill routing in the mission home", async () => {
+  const root = await tempRoot();
+  await initWorkspace(root);
+  await startChange(root, "Fix login error from Jira");
+  await mkdir(join(root, "src", "auth"), { recursive: true });
+  await writeFile(join(root, "src", "auth", "login.js"), "export function login() { throw new Error('timeout'); }\n");
+  await generateLocalRag(root, "Jira login error");
+  await generateSkillRoute(root);
+
+  await generateAppDashboard(root);
+
+  const html = await readFile(join(root, ".gsd", "app", "index.html"), "utf8");
+  assert.match(html, /Skill route/);
+  assert.match(html, /systematic-debugging/);
+  assert.match(html, /sdach-ai/);
+  assert.match(html, /\.gsd\/routes\/fix-login-error-from-jira\.md/);
 });
 
 test("runCli app prints generated app path and supports open", async () => {
